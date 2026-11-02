@@ -5,7 +5,7 @@
 - 網址：<https://discipline.jrf.org.tw/>
 - 聯絡：contact@jrf.org.tw
 
-本站是純靜態網站，沒有後端與資料庫伺服器，也沒有建置流程。案件檢索、篩選、統計圖表都由瀏覽器端的 JavaScript 讀取 `data/` 內的 JSON 後即時運算，直接以 GitHub Pages 部署。
+本站是純靜態網站，沒有後端與資料庫伺服器，也沒有建置流程。案件檢索、篩選、統計圖表都由瀏覽器端的 JavaScript 讀取 `data/` 內的 JSON 後即時運算，以 GitHub Pages 部署。
 
 ## 目錄結構
 
@@ -16,10 +16,12 @@
 ├── favicon.svg
 ├── robots.txt
 ├── sitemap.xml
-├── CNAME                  GitHub Pages 自訂網域（discipline.jrf.org.tw）
-├── .nojekyll              告訴 GitHub Pages 不要跑 Jekyll，檔案原樣發布
+├── .github/workflows/pages.yml  推上 main 後自動發布網站
 ├── assets/
 │   ├── css/main.css       全站樣式
+│   ├── img/
+│   │   ├── og-image.png         社群網站分享時顯示的圖片（1200×630）
+│   │   └── apple-touch-icon.png 加入手機主畫面時的圖示
 │   └── js/
 │       ├── load-data.js   先下載 data/ 三份 JSON，再載入主程式
 │       └── app.js         主程式：資料整理、各頁籤畫面、檢索、統計、網址錨點路由
@@ -42,15 +44,12 @@ python3 -m http.server 8000
 
 ## 部署（GitHub Pages）
 
-在 GitHub 的 repo 設定一次即可，之後推上 `main` 就會自動更新網站。
+推上 `main` 後，GitHub Actions（`.github/workflows/pages.yml`）會自動發布，約 1 分鐘生效。
 
-1. **Settings → Pages → Build and deployment**
-   - Source：`Deploy from a branch`
-   - Branch：`main`，資料夾：`/ (root)`
-2. **Custom domain** 填 `discipline.jrf.org.tw`，DNS 檢查通過後勾選 **Enforce HTTPS**。
-3. **DNS**：在 `jrf.org.tw` 的 DNS 新增一筆
-   `discipline  CNAME  jrf-tw.github.io.`
-4. 本 repo 目前是**私有**。私有 repo 要開 GitHub Pages 需要組織為付費方案（Team／Enterprise）；免費方案須將 repo 改為公開。
+- **只發布白名單內的檔案**：`index.html`、`404.html`、`favicon.svg`、`robots.txt`、`sitemap.xml`、`assets/`、`data/`。README、`.github/` 等其他檔案不會出現在網站上。新增要上線的檔案時，要放進上述目錄，或把檔名加進 workflow 的複製清單。
+- 發布前會先檢查 `data/*.json` 格式，格式錯誤就不會發布。
+- Repo 設定：Settings → Pages → Source 為 `GitHub Actions`，Custom domain 為 `discipline.jrf.org.tw`。
+- DNS：`discipline.jrf.org.tw` 以 CNAME 指向 `jrf-tw.github.io`，目前經 Cloudflare 代理。
 
 ## 更新資料
 
@@ -116,6 +115,7 @@ python3 -m http.server 8000
 ## SEO 說明
 
 - `index.html` 含 title、description、canonical、Open Graph、Twitter Card，以及 schema.org 的 `WebSite`／`Dataset`／`Organization` 結構化資料（JSON-LD）。
+- 社群分享圖片是 `assets/img/og-image.png`。換圖時保持 1200×630，檔名不變；Facebook 會快取舊圖，換圖後可到 [Facebook 分享偵錯工具](https://developers.facebook.com/tools/debug/) 重新抓取。
 - 首頁、資料庫說明、改革主張、申訴救濟、專題分析文章等文字內容直接寫在 `index.html`，不依賴 JSON 載入。其中非首頁的頁籤在 HTML 中預設為隱藏（`hidden`），搜尋引擎仍會索引，但權重可能較低。
 - 案件清單、統計圖表由 JavaScript 產生；Google 會執行 JavaScript 後再建立索引。
 - 站內各頁籤使用網址錨點（例如 `#list/q=…`、`#stats`），對搜尋引擎而言整站是同一個網址，因此 `sitemap.xml` 只列首頁。
