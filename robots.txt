@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://discipline.jrf.org.tw/sitemap.xml

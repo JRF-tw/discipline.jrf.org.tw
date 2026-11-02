@@ -1,0 +1,2942 @@
+/* [CSS-TOKENS] Design tokens / 基礎變數 */
+:root{
+  /* ── 主色：深藍 ────────────────────────────────────────────
+     --accent 為單一強調色（連結、按鈕、選取狀態、表頭）；
+     --accent-deep 為 hover／pressed；--accent-dark 為頁首深底。
+     --navy／--navy-deep 為 --accent／--accent-deep 之別名，供舊規則沿用，
+     改色時只需改 --accent 一處，別名會一併跟著變動，勿刪。 */
+  --accent:#2C4A73; --accent-deep:#1B3255; --accent-dark:#0F2038;
+  --accent-tint:#EEF3F9; --accent-tint-2:#DCE7F3; --accent-line:#B9CBE0;
+  --navy:var(--accent); --navy-deep:var(--accent-deep);
+  --gold:#C9A96A; --gold-soft:#E4D3AE;
+
+  --ink:#2B2B2E; --ink-soft:#6B6F76;
+  /* 字級階層：
+     說明類內文一律 --fs-read、導言強調 --fs-read-lg、
+     來源出處等次要說明 --fs-cite、表格內文 --fs-table、
+     表頭與表記 --fs-th、統計表與備註小字 --fs-table-s。 */
+  --fs-read:17px; --fs-read-lg:18px; --fs-cite:15.5px;
+  --fs-table:14px; --fs-th:14px; --fs-table-s:13.5px;
+
+  --line:#E2DEDA; --line-soft:#EFEBE7; --bg:#fff; --bg-soft:#F6F3F1;
+  --annot-bg:#FBF4E6; --annot-line:#DFC894; --annot-ink:#7A6231;
+  --focus:#2C4A73;
+
+  /* 申訴救濟頁的內容寬度上限：對照表與卡片共用，寬螢幕下依文字長度收斂，
+     不撐滿整頁；≤860px 時一律解除（見 [CSS-COMPLAINT] 的窄畫面區）。
+     --cp-cardw 另供「通常不是懲戒問題」與其下方的提醒方塊使用：兩張卡上下相鄰、
+     必須等寬，故不能各自用 fit-content（內容長短不同，量出來的寬度不會一樣），
+     改以同一個值框住。
+     數值取自提醒方塊的文字量，以「剛好兩行放完」為準：全文 63 個全形字，
+     每行需 32 字 ×14.5px ＝ 464px，加左右內距 36、左邊條 4 與右框線 1 ＝ 505px；
+     取 530px 是多留約一個字的餘裕，吸收標點禁則（。、」等不置於行首）造成的位移。
+     文字若有增刪，這個值要跟著重算，否則會變成三行。 */
+  --cp-maxw:900px; --cp-cardw:530px;
+
+  /* 條文分類配色：色相＝法規別（律師法＝藍／倫理規範＝紅褐／法律扶助法＝綠），
+     深淺＝新舊（舊法深、新法淺），故「哪一部法」與「新或舊」
+     兩個維度皆可單獨辨識。
+     J 舊律師法（深藍）／K 新律師法（淺藍）
+     L 舊倫理規範／M 新倫理規範
+     N 舊法律扶助法（深綠）／O 新法律扶助法（淺綠）
+     這幾組變數同時供標籤、法條篩選下拉、法規頁條文底色與新舊對照表使用，
+     改色只需改這裡，其餘一律沿用變數。 */
+  --c-j:#1C3F63; --c-j-bg:#DBE5F1; --c-j-line:#A6BFDB;
+  --c-k:#3E7CB1; --c-k-bg:#E9F2FA; --c-k-line:#BFD8EE;
+  --c-l:#7C4E57; --c-l-bg:#EBDCDE; --c-l-line:#D2B9BE;
+  --c-m:#B73C5A; --c-m-bg:#FBE1E7; --c-m-line:#EEB3C0;
+  --c-n:#1E5137; --c-n-bg:#DCE9E0; --c-n-line:#A8C6B4;
+  --c-o:#3E8C5F; --c-o-bg:#E7F3EB; --c-o-line:#BCDCC7;
+  --c-x:#5A5F66; --c-x-bg:#ECEAE8; --c-x-line:#D3CFCB;
+  /* 違失態樣標籤（紫）：與六部法典的青藍／紅／綠系皆不相混，凡「態樣名稱」出現處
+     一律沿用（態樣欄、備註欄之態樣連結、法條卡片內的態樣按鈕）。 */
+  --c-p:#5B3F7E; --c-p-bg:#E7E0F2; --c-p-line:#C6B6DE;
+
+  /* 動態參數 */
+  --e-out:cubic-bezier(.22,.68,0,1);
+  --e-soft:cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+
+/* ===== 動畫關鍵影格 ===================================================
+   全部動畫皆包在 @media (prefers-reduced-motion:no-preference) 之外
+   宣告，但於檔末統一以 reduced-motion 查詢關閉，確保無障礙偏好優先。 */
+@keyframes db-flow{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+/* 頁首流光：淡入 → 掃過 → 在畫面外完全淡出 → 靜止 → 重複。 */
+@keyframes db-sheen{
+  0%  {transform:translateX(-130%) skewX(-18deg);opacity:0}
+  8%  {transform:translateX(-70%)  skewX(-18deg);opacity:1}
+  38% {opacity:1}
+  48% {transform:translateX(330%)  skewX(-18deg);opacity:0}
+  100%{transform:translateX(330%)  skewX(-18deg);opacity:0}
+}
+@keyframes db-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes db-rise-sm{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes db-pop{0%{opacity:0;transform:scale(.94)}60%{opacity:1;transform:scale(1.012)}100%{opacity:1;transform:scale(1)}}
+@keyframes db-slide-in{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+@keyframes db-draw{from{stroke-dashoffset:2400}to{stroke-dashoffset:0}}
+@keyframes db-slice{from{opacity:0;transform:scale(.72) rotate(-7deg)}to{opacity:1;transform:none}}
+@keyframes db-drift{0%{transform:translate3d(0,0,0) rotate(0)}50%{transform:translate3d(-14px,10px,0) rotate(2deg)}100%{transform:translate3d(0,0,0) rotate(0)}}
+
+/* 字型與字級只套用在資料庫容器內，不影響官網頁首／頁尾 */
+.db-wrap{
+  max-width:1600px;margin:0 auto;padding:20px 16px 48px;position:relative;
+  font-family:Noto Sans TC,PingFang TC,Microsoft JhengHei,system-ui,sans-serif;
+  color:var(--ink); background:var(--bg); font-size:16px; line-height:1.7;
+}
+.db-wrap a{color:var(--accent)}
+.db-wrap a:hover{color:var(--accent-deep)}
+
+/* [CSS-HEADER] 頁首／頁籤／sticky */
+/* 資料庫頁首（標題列＋頁籤列）
+   .db-sticky 包住標題列與頁籤列，往下捲動時貼齊視窗頂端；
+   置頂前後外觀完全相同，故不需狀態切換腳本。
+   配色：深藍漸層底（緩慢流動）× 香檳金鑲邊 × 象牙白文字，
+   並疊一道由左向右緩慢掠過的高光（.db-sticky::after）。 */
+/* transition 只給左右的外距與內距：兩者等量反向，內容位置不動，
+   看到的是底色向兩側展開／收回，而非整條頁首位移。
+   減少動態偏好下由全域規則以 !important 關閉（見 prefers-reduced-motion 區塊）。 */
+.db-sticky{
+  position:sticky;top:0;z-index:80;margin-bottom:16px;overflow:hidden;
+  transition:margin-left .26s var(--e-soft),margin-right .26s var(--e-soft),
+             padding-left .26s var(--e-soft),padding-right .26s var(--e-soft);
+  background:#0F2038;
+  border-bottom:1px solid var(--gold);
+  box-shadow:0 4px 18px rgba(15,32,56,.30);
+  padding-top:0;
+}
+/* 流動的漸層改掛在 ::before，而且左右各內縮 1px（inset:0 1px）。
+   原本漸層直接畫在 .db-sticky 上，而頁首的寬度來自外層容器，在官網環境常是小數
+   （如 1801.6px）；帶動畫的圖層每一格重新繪製時，最右邊那個半格像素會時有時無，
+   看起來就是右緣不斷伸出一點又縮回。
+   改法：.db-sticky 自身只留與漸層兩端同色的靜態底色 #0F2038（畫一次就不再變），
+   動畫層退進 1px，最外一欄像素永遠是那層靜態底色，即使動畫層的邊緣捨入有出入
+   也看不出來。z-index:-1 使它疊在底色之上、內容之下（.db-sticky 因 position:sticky
+   ＋z-index:80 已自成堆疊脈絡，負值不會掉到頁面底層）。 */
+.db-sticky::before{
+  content:"";position:absolute;inset:0 1px;z-index:-1;pointer-events:none;
+  background:linear-gradient(115deg,#0F2038 0%,#1B3255 26%,#2C4A73 50%,#1B3255 74%,#0F2038 100%);
+  background-size:200% 100%;
+  animation:db-flow 26s linear infinite;
+}
+.db-sticky::after{
+  content:"";position:absolute;inset:0 auto 0 0;width:34%;pointer-events:none;
+  background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.16),rgba(255,255,255,0));
+  animation:db-sheen 9s var(--e-soft) infinite;
+}
+/* 選單展開時頁首變高，這道流光就成了一條掃過整個選單的垂直光帶，非常干擾。
+   展開期間整個移除（content:none 連偽元素本身都不生成），收合後自動恢復。 */
+.db-sticky.db-nav-open::after{content:none}
+/* 貼頂時底色左右滿版：以負外距把左右邊界推到視窗兩側，再以等量內距把內容推回
+   原位，故文字與按鈕的水平位置完全不變，不會在貼頂瞬間左右跳動。
+   --bleed-l／--bleed-r 由腳本量測哨兵（#db-scroll-top）與視窗兩側的距離後寫入，
+   量測對象刻意選未滿版的哨兵，才不會量到自己滿版後的結果而愈算愈寬；
+   兩者預設 0，故腳本未執行時只是不滿版，不會破版。
+   不使用 100vw：桌機的垂直捲軸不計入 vw，會多出捲軸寬度而產生水平捲動。 */
+.db-sticky.db-is-stuck{
+  margin-left:calc(-1 * var(--bleed-l,0px));margin-right:calc(-1 * var(--bleed-r,0px));
+  padding-left:var(--bleed-l,0px);padding-right:var(--bleed-r,0px)
+}
+/* 頁首固定為「單列」：標題置左、頁籤置右，同一列排列。
+   放不下時的兩段退讓由 initHeadFit() 量測後切換 class 決定，見該函式之註解：
+   　.db-head-compact＝隱藏標題文字、保留全部頁籤；
+   　.db-head-menu   ＝顯示標題、頁籤收進右上角的「≡」選單。
+   flex-wrap 一律 nowrap，故任何情況下頁首都不會被擠成兩列；
+   只有選單展開時才允許換行（頁籤本來就要落到第二列）。 */
+.db-head{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:nowrap;gap:8px 20px;border-bottom:none;
+  padding:0 18px 0;position:relative;z-index:1
+}
+.db-sticky.db-head-menu .db-head{flex-wrap:wrap}
+.db-head-main{min-width:0;flex:0 1 auto}
+.db-head h1{
+  font-size:21px;font-weight:700;letter-spacing:.14em;margin:0;
+  color:#F4F7FB;text-shadow:0 1px 3px rgba(0,0,0,.35);white-space:nowrap;
+  animation:db-slide-in .7s var(--e-out) both
+}
+/* 標題本身即「回首頁」：做成 button 而非連結，才能沿用頁籤按鈕既有的切換與捲動
+   流程（見 initHeadHome），不必另寫一套路由，也不會在網址列留下多餘的錨點。
+   外觀完全繼承 h1，僅加 hover 與焦點框。 */
+.db-head h1 .db-head-home{
+  appearance:none;background:none;border:0;margin:0;padding:0;
+  font:inherit;color:inherit;letter-spacing:inherit;text-align:left;
+  text-shadow:inherit;white-space:inherit;cursor:pointer;
+  transition:color .2s var(--e-soft)
+}
+.db-head h1 .db-head-home:hover{color:#FFFFFF}
+.db-head h1 .db-head-home:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
+.db-head p{margin:4px 0 0;color:rgba(240,245,251,.70);font-size:14.5px;letter-spacing:.02em}
+/* 中段寬度：標題與頁籤同列已放不下，但頁籤自己還排得下一列 → 只藏標題文字。
+   以 .db-sr-only 的手法隱藏而非 display:none，h1 仍留在無障礙樹中。 */
+.db-sticky.db-head-compact .db-head-main{
+  position:absolute!important;width:1px!important;height:1px!important;
+  margin:-1px!important;padding:0!important;border:0!important;
+  overflow:hidden!important;clip:rect(0,0,0,0)!important
+}
+/* 量測用的暫時狀態：強制回到「標題與頁籤都完整展開的單列」，
+   由 initHeadFit() 在同一個工作中加上、讀完寬度隨即移除，中間不會有繪製，
+   故畫面不會閃動。此處必須以 !important 蓋過 compact／menu 兩組規則。 */
+.db-sticky.db-head-measure .db-head{flex-wrap:nowrap!important}
+.db-sticky.db-head-measure .db-head-main{
+  position:static!important;width:auto!important;height:auto!important;
+  margin:0!important;overflow:visible!important;clip:auto!important;flex:0 0 auto!important
+}
+.db-sticky.db-head-measure .db-head h1{white-space:nowrap!important}
+.db-sticky.db-head-measure .db-tabs{display:flex!important;flex:0 0 auto!important}
+.db-sticky.db-head-measure .db-nav-toggle{display:none!important}
+/* 選單開關（「≡」）：僅 .db-head-menu 型態顯示 */
+.db-nav-toggle{
+  display:none;flex:0 0 auto;appearance:none;cursor:pointer;
+  /* display 由 .db-sticky.db-head-menu 開啟，見 [CSS-RESPONSIVE] 的頁首型態區 */
+  background:transparent;color:#E8EEF6;
+  border:1px solid rgba(201,169,106,.75);border-radius:5px;
+  width:42px;height:38px;align-items:center;justify-content:center;
+  font-size:23px;line-height:1;padding:0;
+  transition:background .2s var(--e-soft),color .2s,transform .2s
+}
+.db-nav-toggle:hover{background:rgba(201,169,106,.22);transform:translateY(-1px)}
+.db-nav-toggle[aria-expanded="true"]{background:var(--gold);color:#0F2038;border-color:var(--gold)}
+.db-nav-toggle:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px}
+
+/* 頁籤：深藍底上的淺色頁籤，選取以香檳金底線標示（底線由中央展開）。
+   與標題同列，靠右對齊；不換行以確保頁首恆為一列。 */
+.db-tabs{display:flex;gap:0;margin-bottom:0;flex:1 1 auto;justify-content:flex-end;flex-wrap:nowrap;position:relative;z-index:1}
+/* 選取頁籤的金色底線：以背景漸層繪製，不可改用 ::before + content——
+   CMS 編輯器會破壞 content 之值，底線會整條不顯示（全檔通則，見頁籤符號一段）。
+   底線寬度＝背景尺寸：未選取 0、hover 半寬、選取滿寬（左右各內縮 8px）；
+   background-position 固定 50%，故由中央展開。 */
+.db-tab-btn{
+  appearance:none;border:none;border-bottom:3px solid transparent;
+  padding:13px 15px 10px;font:inherit;font-size:16px;letter-spacing:.04em;
+  color:rgba(226,235,246,.74);cursor:pointer;white-space:nowrap;position:relative;
+  background-color:transparent;
+  background-image:linear-gradient(var(--gold),var(--gold));
+  background-repeat:no-repeat;background-position:50% 100%;background-size:0 3px;
+  transition:color .22s var(--e-soft),transform .22s var(--e-soft),background-size .3s var(--e-out)
+}
+.db-tab-btn:hover{color:#FFFFFF;background-size:calc(50% - 8px) 3px}
+.db-tab-btn[aria-selected="true"]{color:#fff;font-weight:700;background-size:calc(100% - 16px) 3px}
+.db-tab-btn:focus-visible{outline:2px solid var(--gold-soft);outline-offset:-2px}
+/* 申訴救濟管道：與其他資料查詢頁籤性質不同（服務指引而非資料庫檢視），故以香檳金字色標示。 */
+.db-tab-btn.db-tab-service{color:#E7C892}
+/* [CMS] 頁籤符號改以 HTML <span class=tab-ico> 呈現（原 content:"◆" 寫法會被 CMS 編輯器轉義破壞） */
+.db-tab-btn.db-tab-service[aria-selected="true"]{color:#FBEBCD}
+.db-tab-btn.db-tab-service,.db-tab-btn.db-tab-reform{background-image:linear-gradient(var(--gold-soft),var(--gold-soft))}
+.db-tab-btn.db-tab-service:hover{color:#F6E0BC}
+.db-tab-btn.db-tab-reform{color:#E7C892}
+.db-tab-btn .db-tab-ico{font-size:11px;vertical-align:2px;margin-right:3px}
+.db-tab-btn.db-tab-reform[aria-selected="true"]{color:#FBEBCD}
+.db-tab-btn.db-tab-reform:hover{color:#F6E0BC}
+
+/* ── 頁籤面板切換轉場 ────────────────────────────────────────
+   一律用 CSS transition，不要改用 Web Animations API 或 fill:forwards：
+   可見 panel 的終態固定是 opacity:1 + translate3d(0,0,0)，切換時只暫時套用
+   db-tab-enter-from → db-tab-enter-run，清除控制 class 後終態值完全不變，
+   因此不留下 Animation 物件，也不會在 reload／BFCache／file:// 下殘留動畫狀態。
+   任何動畫例外都只略過效果，不得阻斷頁籤本身功能。
+   db-rise / db-rise-sm 保留給非頁籤切換的情境。 */
+/* 只有目前可見的 panel 建立穩定終態；hidden panel 不建立額外合成層。 */
+.db-wrap section[role="tabpanel"]:not([hidden]){opacity:1;transform:translate3d(0,0,0)}
+.db-wrap section[role="tabpanel"].db-tab-enter-from{
+  opacity:.10;transform:translate3d(0,14px,0);transition:none!important
+}
+.db-wrap section[role="tabpanel"].db-tab-enter-run{
+  opacity:1;transform:translate3d(0,0,0);
+  transition:opacity 360ms cubic-bezier(.22,.68,0,1),transform 360ms cubic-bezier(.22,.68,0,1)
+}
+/* 由條文跳轉進入時暫停表格列的 db-rise-sm。表格列動畫期間會持續位移，
+   捲動定位若於此時量測就會偏高；跳轉時關掉列動畫，版面一開始就是最終位置。 */
+.db-wrap section[role="tabpanel"].db-no-entry tbody tr{animation:none!important}
+
+/* 頁籤切換時，既有的列／卡片不再各自播放垂直進場；只讓 panel 本身做一次上滑淡入。
+   後續換頁、篩選新建立的節點不帶此 class，仍可保留各自的原始動畫。 */
+.db-wrap .db-entry-settled{animation:none!important}
+/* scroll reveal 的 transition 只在切頁定格的那一畫格暫停；下一畫格即移除，
+   避免永久蓋掉 chart-card 等元件原本的 hover transition。 */
+.db-wrap .db-rv.db-rv-snap{opacity:1;transform:none;transition:none!important}
+
+/* ── 捲動進場（scroll reveal）：由腳本為區塊加上 .db-rv，
+   進入視窗時加 .db-rv-in。未套用腳本時完全不影響外觀。 */
+.db-wrap .db-rv{opacity:0;transform:translateY(22px);transition:opacity .62s var(--e-soft),transform .62s var(--e-out)}
+.db-wrap .db-rv.db-rv-in{opacity:1;transform:none}
+
+/* [CSS-COMMON-CONTROLS] 共用控制列／搜尋／按鈕 */
+/* 控制列 */
+/* 案件清單的兩個分頁（懲戒處分／暫時處分）。
+   外觀刻意與頁首的七個頁籤區隔——那是深藍底的主導覽，這裡是內容區的次層切換，
+   故走「底線式」樣式：選取者以金色底線標示，與表頭的金色圖示同一套語彙。
+   兩顆鈕是互斥的檢視切換而非可停駐的頁籤，故用 role="group" ＋ aria-pressed，
+   不用 role="tab"——後者會讓讀屏軟體預期左右方向鍵可切換，而此處沒有實作。 */
+/* 兩顆鈕置中，且恆為一列：flex-wrap:nowrap 讓它們永遠不換行，鈕內文字另加
+   white-space:nowrap，免得改成「懲戒／處分」那樣斷在字間。窄畫面放不下時
+   由下方的媒體查詢收縮內距與字級，而不是換行。 */
+.db-subtabs{display:flex;flex-wrap:nowrap;justify-content:center;gap:2px;margin:0 0 16px;border-bottom:2px solid var(--line)}
+.db-subtab{
+  appearance:none;font:inherit;font-size:16.5px;font-weight:700;letter-spacing:.05em;cursor:pointer;
+  background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;
+  padding:9px 20px;color:var(--ink-soft);border-radius:5px 5px 0 0;
+  white-space:nowrap;flex:0 1 auto;min-width:0;
+  transition:color .2s,border-color .2s,background .2s
+}
+.db-subtab:hover{color:var(--accent-deep);background:var(--accent-tint)}
+.db-subtab[aria-pressed="true"]{color:var(--accent-deep);border-bottom-color:var(--gold)}
+.db-subtab:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+/* 件數：由 DATA.cases 推導後寫入（見 initKindCounts），不寫死在 HTML 裡 */
+.db-subtab-n{font-size:13.5px;font-weight:600;letter-spacing:0;margin-left:7px;font-variant-numeric:tabular-nums;opacity:.85}
+/* 窄畫面：兩顆鈕合計約需 320px，手機直式放不下，故收內距與字級而非換行 */
+@media (max-width:430px){
+  .db-subtab{padding:9px 10px;font-size:15px;letter-spacing:.02em}
+  .db-subtab-n{margin-left:5px;font-size:12.5px}
+}
+/* 暫時處分分頁：不設法條篩選器，改於同一位置說明其法律依據 */
+.db-prov-note{
+  margin:0 auto 12px;padding:12px 18px;max-width:60em;
+  border:1px solid var(--annot-line);border-radius:8px;background:var(--annot-bg);
+  color:var(--annot-ink);font-size:15px;line-height:1.9
+}
+.db-prov-note p{margin:0}
+/* .db-controls 是 flex 容器，其 display 會勝過 [hidden] 的 UA 規則，故明寫一條 */
+.db-controls[hidden],.db-prov-note[hidden],.db-subtabs[hidden]{display:none}
+.db-controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end;justify-content:center;margin-bottom:12px}
+.db-ctl{display:flex;flex-direction:column;gap:3px}
+.db-ctl label{font-size:13px;color:var(--ink-soft);letter-spacing:.05em}
+/* 控制元件：自有按鈕使用 db- 命名空間，避免與宿主 Bootstrap／CMS 共用類名。 */
+.db-wrap select,.db-btn{
+  font:inherit;font-size:15px;color:var(--ink);background:#fff;
+  border:1px solid var(--line);border-radius:5px;padding:7px 11px;
+  transition:border-color .2s,color .2s,background .2s,box-shadow .2s,transform .2s var(--e-soft)
+}
+.db-wrap select:focus-visible,.db-btn:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.db-btn{cursor:pointer}
+.db-btn:hover{border-color:var(--accent);color:var(--accent-deep);box-shadow:0 3px 12px rgba(27,50,85,.14);transform:translateY(-1px)}
+.db-btn:active{transform:translateY(0)}
+.db-wrap select:hover{border-color:var(--accent-line)}
+.db-btn.db-clear-all{background:var(--bg-soft);border-color:var(--line);color:var(--ink-soft);white-space:nowrap;padding:7px 15px}
+.db-btn.db-clear-all:hover{border-color:var(--accent);color:var(--accent-deep);background:#fff}
+.db-result-count{font-size:15px;color:var(--ink-soft);align-self:center}
+.db-searchbox{display:flex;gap:6px}
+.db-searchbox input{width:200px;min-width:140px;font:inherit;font-size:15px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:5px;padding:7px 11px}
+.db-searchbox input:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.db-searchbox .db-btn{white-space:nowrap;background:var(--bg-soft)}
+.db-searchbox .db-btn:hover{background:#fff}
+/* 筆數：數值變動時由腳本加 .db-num-bump 播放一次強調動畫。
+   數字框固定寬 4.6ch＝四位數加一個千分位逗號的寬度（tabular-nums 下每個數字
+   等寬，1ch 即一個數字寬），故位數增減時框寬不變，其後的「筆」不會左右移動；
+   數字在框內置中，兩側留白對稱。位數超過四位（＞9,999 筆）才會撐開。
+   min-width 與 max-width 同時指定，是為了讓寬度在任何值下都恆為 4.6ch。 */
+.db-result-count b{color:var(--accent-deep);font-size:19px;font-variant-numeric:tabular-nums;display:inline-block;text-align:center;min-width:4.6ch}
+/* 數字與「筆」以此包住，確保窄畫面下不會只有「筆」被擠到下一行；
+   其後的「（檢索…）」不在其內，仍可正常換行。 */
+.db-result-count .db-rc-n{white-space:nowrap}
+.db-result-count b.db-num-bump{animation:db-pop .42s var(--e-out)}
+
+/* 關鍵字檢索列（頁籤下單獨一列、置中；筆數靠右且不影響置中）。
+   flex-wrap:nowrap＝檢索框與「清空檢索條件」恆在同一列，不論視窗多窄都不換行；
+   讓出空間的是檢索框（可壓縮），清空鈕則 flex:0 0 auto 保持原尺寸不被壓扁。
+   檢索框改 flex:1 1 auto＋max-width:560px：寬螢幕下上限仍是 560px，外觀與先前相同，
+   窄螢幕才開始縮。輸入框另需 min-width:0，否則其最小寬度會擋住整個壓縮。 */
+.db-search-row{position:relative;display:flex;flex-wrap:nowrap;gap:10px;align-items:center;justify-content:center;margin:2px 0 14px}
+.db-search-row .db-clear-all{flex:0 0 auto;font-size:14px;padding:8px 15px}
+.db-searchbox-lg{
+  position:relative;display:flex;align-items:stretch;gap:0;flex:1 1 auto;max-width:560px;min-width:0;background:#fff;
+  border:1px solid var(--line);border-radius:7px;overflow:hidden;
+  transition:box-shadow .28s var(--e-soft),border-color .28s
+}
+.db-searchbox-lg:hover{border-color:var(--accent-line)}
+.db-searchbox-lg:focus-within{
+  outline:none;border-color:var(--accent);
+  box-shadow:0 0 0 4px rgba(27,50,85,.12),0 8px 22px rgba(27,50,85,.10)
+}
+.db-searchbox-lg .db-search-ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--ink-soft);pointer-events:none;transition:color .22s}
+.db-searchbox-lg:focus-within .db-search-ico{color:var(--accent)}
+.db-searchbox-lg input{flex:1 1 0;width:100%;min-width:0;font-size:15.5px;border:none;border-radius:0;padding:8px 11px 8px 36px}
+.db-searchbox-lg input:focus-visible{outline:none}
+.db-searchbox-lg .db-btn{font-size:13.5px;padding:6px 13px;border:none;border-left:1px solid var(--line);border-radius:0;background:var(--accent);color:#fff}
+.db-searchbox-lg .db-btn:hover{background:var(--accent-deep);color:#fff;transform:none;box-shadow:none}
+/* [CMS] 頁首的流光（.db-sticky::after）會平移到元素右緣之外，全靠容器的 overflow:hidden
+   裁掉；官網佈景若把 overflow 改成 visible，流光就會週期性地從右緣探出幾像素再縮回，
+   看起來像邊界在抖動。此處把裁切釘死。 */
+.db-wrap .db-sticky{overflow:hidden!important}
+
+/* ---- [CMS] 檢索框在官網環境的重設 ----------------------------------------
+   宿主佈景可能對原生 button 設定尺寸、內距、圓角與最小寬度，且其選擇器
+   權重高於本檔（或帶 !important），貼上後檢索鈕被撐大、問號鈕被擠出圓角框外。
+   此處把兩顆按鈕的尺寸相關屬性以 !important 釘死，範圍限定在 .db-wrap 的檢索框內，
+   不影響頁面其他按鈕。
+   另外不再單靠容器的 overflow:hidden 去裁切右側圓角——佈景若把 overflow 改掉，
+   問號鈕就會露出方角；改為由問號鈕自己帶右側圓角，兩層保險。 */
+.db-wrap .db-searchbox-lg{flex-wrap:nowrap!important;overflow:hidden!important}
+.db-wrap .db-searchbox-lg input,
+.db-wrap .db-searchbox-lg .db-btn,
+.db-wrap .db-searchbox-lg .db-q-help{
+  font-family:inherit!important;line-height:1.4!important;height:auto!important;
+  min-height:0!important;max-height:none!important;box-shadow:none!important;
+  text-transform:none!important;letter-spacing:normal!important;
+  align-self:stretch!important;margin:0!important;border-radius:0!important
+}
+.db-wrap .db-searchbox-lg .db-btn{
+  flex:0 0 auto!important;width:auto!important;min-width:0!important;
+  font-size:13.5px!important;padding:6px 13px!important;
+  border:none!important;border-left:1px solid var(--line)!important;
+  background:var(--accent)!important;color:#fff!important
+}
+.db-wrap .db-searchbox-lg .db-q-help{
+  flex:0 0 auto!important;width:34px!important;min-width:0!important;padding:0!important;
+  font-size:15px!important;border:none!important;
+  border-left:1px solid rgba(255,255,255,.45)!important;
+  border-radius:0 6px 6px 0!important;
+  background:var(--accent)!important;color:#fff!important
+}
+.db-wrap .db-searchbox-lg .db-q-help:hover{background:var(--accent-deep)!important}
+.db-wrap .db-searchbox-lg input{
+  flex:1 1 0!important;width:100%!important;min-width:0!important;
+  font-size:15.5px!important;padding:8px 11px 8px 36px!important;
+  border:none!important;background:#fff!important
+}
+/* 檢索規則說明鈕：位於檢索框內、緊接檢索鈕之後，與檢索鈕共用同一塊深藍區塊，
+   使整個檢索框看起來是一件；兩者之間以一道半透明白色分隔線區隔，加上各自獨立的
+   hover 反白，讓使用者一眼看出是兩顆可分別點選的按鈕。
+   不套用 .db-btn，避免繼承其內距與圓角而破壞與檢索鈕的接合。 */
+.db-wrap .db-q-help{
+  flex:0 0 auto;width:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;
+  font:inherit;font-size:15px;font-weight:700;line-height:1;cursor:pointer;
+  color:#fff;background:var(--accent);border:none;border-left:1px solid rgba(255,255,255,.45);border-radius:0;
+  transition:background .2s
+}
+.db-wrap .db-q-help:hover{background:var(--accent-deep);color:#fff}
+/* 焦點框內縮：檢索框 overflow:hidden，外擴的外框會被裁掉而看不見 */
+.db-wrap .db-q-help:focus-visible{outline:2px solid var(--gold);outline-offset:-3px}
+
+/* ---- 檢索規則說明彈窗 ----
+   與決議書全文彈窗同一套定位配方：原生 <dialog>＋showModal()，內容置於瀏覽器
+   top layer，不受祖先容器 z-index／overflow／transform 影響（position:fixed 不可改）。
+   本區塊亦採「同一選擇器只留一條宣告」，要調樣式請直接改該條，勿在末端另加覆寫。 */
+#qh-dlg{position:fixed;top:0;right:0;bottom:0;left:0;margin:auto;width:min(600px,92vw);height:fit-content;max-height:84vh;padding:0;border:1px solid var(--line);border-radius:10px;box-shadow:0 18px 48px rgba(15,32,56,.28);background:#fff;color:var(--ink);overflow:hidden}
+#qh-dlg::backdrop{background:rgba(15,32,56,.45)}
+#qh-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 15px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;letter-spacing:.04em}
+#qh-x{width:28px;height:28px;padding:0;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font:inherit;font-size:18px;line-height:1;cursor:pointer;color:#fff;background:transparent;border:1px solid rgba(255,255,255,.55);border-radius:50%}
+#qh-x:hover{background:rgba(255,255,255,.22)}
+#qh-body{padding:14px 16px 18px;overflow:auto;max-height:calc(84vh - 50px);font-size:15.5px;line-height:1.85;-webkit-overflow-scrolling:touch}
+#qh-body ul{margin:0;padding-left:1.35em;list-style:disc}
+#qh-body li{margin:3px 0}
+/* 規則列：symbol｜→｜意義 三欄，subgrid 使四列共用同一組欄寬，箭頭因而對齊 */
+.db-qh-rules{display:grid;grid-template-columns:auto auto 1fr;gap:9px 14px;align-items:center;margin:2px 0 14px}
+.db-qh-r{display:grid;grid-column:1/-1;grid-template-columns:subgrid;align-items:center}
+.db-qh-s{white-space:nowrap}
+.db-qh-ar{color:var(--ink-soft);text-align:center}
+.db-qh-m{font-weight:700;color:var(--accent-deep)}
+.db-qh-k{display:inline-block;min-width:1.5em;text-align:center;font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:var(--accent-deep);background:var(--bg-soft);border:1px solid var(--line);border-radius:4px;padding:0 6px}
+.db-qh-note{font-size:14.5px;color:var(--ink-soft)}
+@media (max-width:640px){
+  #qh-dlg{width:100vw;max-width:100vw;border-radius:0}
+}
+/* 表格上方列：筆數（左）＋頁次（中）＋捲動提示（右） */
+.db-table-toprow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:2px 0 4px}
+.db-table-toprow .db-result-count{justify-self:start}
+.db-table-toprow .db-table-hint{justify-self:end;margin:0;padding:0}
+.db-table-toprow .db-pager{margin:0}
+/* 筆數列被擠成三行以上時，由腳本（fitCountRow）加上 .db-rc-solo，讓它獨佔第一列，
+   頁次與覆審欄開關退到第二列。行數無法以 CSS 判斷，故此處只寫版面、判斷交給腳本。
+   限定 ≥641px：手機版的上方列另有一套三列排法，不受此規則干擾。 */
+@media (min-width:641px){
+  .db-table-toprow.db-rc-solo .db-result-count{grid-column:1/-1;grid-row:1;justify-self:center;text-align:center}
+  .db-table-toprow.db-rc-solo .db-pager-slot{grid-column:2;grid-row:2}
+  .db-table-toprow.db-rc-solo .db-table-hint{grid-column:3;grid-row:2}
+}
+
+/* 表頭排序（點擊表格第一列排序） */
+thead th.db-th-sort{cursor:pointer;user-select:none;white-space:nowrap}
+thead th.db-th-sort:hover{background:var(--accent)}
+thead th.db-th-sort .db-arr{display:inline-block;margin-left:4px;font-size:12px;opacity:.55;transition:opacity .2s,transform .2s var(--e-out)}
+thead th.db-th-sort[aria-sort="ascending"],thead th.db-th-sort[aria-sort="descending"]{background:#0F2038}
+thead th.db-th-sort[aria-sort="ascending"] .db-arr,thead th.db-th-sort[aria-sort="descending"] .db-arr{opacity:1;transform:scale(1.15)}
+thead th.db-th-sort:focus-visible{outline:2px solid #fff;outline-offset:-3px}
+/* 表頭欄位說明鈕：點擊後以條文速覽用的漂浮卡片顯示說明 */
+/* 表頭上三個圖示（欄位說明「?」、一案多人、一人多案）的垂直對齊一律走這一套：
+   vertical-align:middle 會把方塊中心對到「基線＋x 高度一半」（約 0.25em），
+   但中文字身的視覺中心約在基線＋0.38em，故看起來會偏低；統一再上移 2px 補回。
+   兩者皆須成對出現，只改其中一個就會與另一個圖示錯開。 */
+thead th .db-th-help{appearance:none;display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;margin:0 1px;padding:0;vertical-align:middle;transform:translateY(-2px);
+  font:inherit;font-size:11px;font-weight:700;line-height:1;
+  color:#fff;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.6);
+  border-radius:50%;cursor:pointer;transition:background .2s,color .2s}
+thead th .db-th-help:hover{background:#fff;color:#0F2038}
+thead th .db-th-help:focus-visible{outline:2px solid #fff;outline-offset:2px}
+/* 表頭檢視鈕（一案多人／一人多案）：未啟用為灰、啟用為金。
+   只出現在「案件清單」的表頭；「違失態樣」的同一支渲染函式不傳入設定，故不生成。 */
+thead th .db-th-grp{appearance:none;display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;padding:0;margin-left:5px;vertical-align:middle;transform:translateY(-2px);cursor:pointer;
+  /* 靜止態即給底色與外框，讓三顆鈕一眼看得出是「可按的開關」而非裝飾圖案。
+     外框原本就佔 1px（transparent），全域 border-box，故改成可見框不影響 22px 佔寬，
+     被付懲戒人欄 94px 的寬度計算（見下方註解）不受影響。 */
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.28);border-radius:5px;
+  color:rgba(255,255,255,.8);transition:color .2s,background .2s,border-color .2s}
+thead th .db-th-grp svg{width:16px;height:16px;display:block;fill:currentColor}
+thead th .db-th-grp:hover{color:#fff;background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.6)}
+thead th .db-th-grp.db-on{color:var(--gold);background:rgba(201,169,106,.18);border-color:rgba(201,169,106,.65)}
+thead th .db-th-grp:focus-visible{outline:2px solid #fff;outline-offset:1px}
+/* 被付懲戒人欄：標題與人像圖示恆為同一列，任何寬度都不折行，故其垂直位置與
+   其他表頭文字一致；字級與圖示尺寸亦與其他欄、與另一顆圖示相同。
+   本欄寬僅 94px（col.db-c-name，表格為固定版型，欄寬不隨視窗縮放而變），
+   原設定需 99px，圖示遂被擠出欄外看似消失。為放得下，只動兩處不改變字身大小的
+   項目——本「標題格」的左右內距歸零、字距歸零（規則只作用於 thead th.db-th-name，
+   同欄資料格仍走 tbody td 的內距，與其他資料欄一致）：
+   　5 字×14 ＝ 70 ＋ 左外距 1 ＋ 圖示 22（含外框，全域 border-box）＝ 93 ≤ 94。
+   全形中文字寬恰為 1em，故上式可精確估算，但餘裕僅 1px；
+   ※ 字級、字距、內距、圖示尺寸任一項要改，先照上式重算，否則圖示又會被吃掉。
+   .db-th-lbl 保持不折行，避免中文在任意字間斷成「被付懲戒／人」。 */
+thead th.db-th-1line,thead th.db-th-name{white-space:nowrap}
+thead th.db-th-name{letter-spacing:0;padding-left:0;padding-right:0}
+thead th.db-th-name .db-th-lbl{white-space:nowrap}
+thead th.db-th-name .db-th-grp{margin-left:1px}
+
+/* 關係條次註記卡（暖白同色系：卡底與標題列同色族，降低白／黃反差） */
+.db-annot{
+  background:#FDFAF3;border:1px solid var(--annot-line);
+  border-radius:10px;padding:0;margin:0 0 16px;font-size:var(--fs-read);overflow:hidden;
+  box-shadow:0 3px 14px rgba(122,98,49,.08)
+}
+.db-annot h3{
+  margin:0;padding:10px 15px;background:#F6EDDA;border-bottom:1px solid var(--annot-line);
+  font-size:15.5px;color:var(--annot-ink);letter-spacing:.08em;font-weight:700;
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap
+}
+.db-annot h3 .db-tag{font-size:14.5px;font-weight:600}
+.db-annot ul{margin:0;padding:0;list-style:none}
+.db-annot li{padding:10px 15px;border-top:1px solid #EFE4CC;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline}
+.db-annot li:first-child{border-top:none}
+.db-annot li.db-law{display:block}
+/* 態樣名稱：可點擊，按下即跳至「違失態樣」頁並開啟該態樣。
+   左側金色條用 border-left，不可改用 ::before + content（CMS 會破壞 content 之值）。 */
+.db-annot .db-pat{
+  font-weight:700;color:var(--ink);font-size:15px;white-space:nowrap;
+  border-left:3px solid #C9A96A;padding:1px 0 1px 12px;margin:0;
+  appearance:none;background:none;border-top:none;border-right:none;border-bottom:none;
+  font-family:inherit;text-align:left;display:inline-block
+}
+button.db-pat{cursor:pointer;transition:color .18s,transform .18s var(--e-out)}
+button.db-pat:hover{color:var(--accent-deep);text-decoration:underline;transform:translateX(2px)}
+button.db-pat:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.db-annot .db-rel-lead{color:var(--ink-soft);font-size:15px;margin:0 6px 0 0}
+.db-annot h3 .db-cap{font-size:13px;letter-spacing:.1em;font-weight:700;color:var(--annot-ink)}
+.db-annot .db-rel-tags{line-height:1.95}
+.db-annot .db-law{color:var(--ink-soft)}
+.db-annot .db-law b{color:var(--annot-ink);font-weight:600}
+
+/* [CSS-COMMON-TABLE] 共用案件表格／分頁 */
+/* 表格 */
+/* 整張表直接展開在頁面中：容器不再限高（原為 max-height:74vh）、框內不再上下捲動，
+   要看下一列就捲頁面。連帶的兩件事：
+   ．容器一旦不是捲動容器，表頭的 position:sticky 就改以「頁面」為基準黏住，
+     故 top 必須讓開懸浮頁首的高度（--sticky-h，由 syncStickyH() 量測後寫入根元素），
+     見下方 .db-table-scroll thead th。
+   ．overflow:visible 會讓表格四角蓋過容器的圓角，故再補一條 overflow:clip——
+     clip 只裁切、不建立捲動容器，頁面層級的 sticky 仍然有效；不支援 clip 的舊瀏覽器
+     會丟棄該宣告而沿用 visible，只是圓角處看起來是直角，功能不受影響。
+   ．版面放不下整表時（見 [CSS-RESPONSIVE] 的 max-width:1431px 區塊）才恢復框內
+     左右捲動——讓頁面本身左右捲，在 CMS 文章內有被外層容器裁掉而拿不回來的風險。 */
+.db-table-scroll{overflow:visible;overflow:clip;border:1px solid var(--line);border-radius:8px;box-shadow:0 2px 12px rgba(43,43,46,.05)}
+/* 表頭黏在頁面頂端（懸浮頁首之下）。只作用於案件表格：其他表格（新舊對照表、統計表、
+   申訴表）都還在各自的 overflow-x 容器內，沿用通用規則的 top:0 即可。
+   z-index 仍為 5，低於頁首的 80，兩者重疊時由頁首蓋住表頭。 */
+.db-table-scroll thead th{top:calc(var(--sticky-h, 132px) + 1px)}
+/* 容器實際放不下整表時（由 fitTableScroll() 量測後加上），恢復框內左右捲動。
+   與 [CSS-RESPONSIVE] 以視窗寬度預判的兩個門檻互補：宿主頁面（如 jrf.org.tw）的文章欄
+   窄於視窗，視窗寬度判斷「放得下」、容器卻放不下時，溢出的部分會被 overflow:clip 直接
+   裁掉，最右欄最右邊的字就被吃掉。 */
+.db-table-scroll.db-scroll-x{overflow-x:auto;overflow-y:visible;overscroll-behavior-x:contain}
+.db-table-scroll.db-scroll-x thead th{position:static}
+table{border-collapse:collapse;width:100%;min-width:1566px;table-layout:fixed}
+thead th{
+  background:linear-gradient(180deg,#1B3255,#12253F);color:#fff;font-weight:600;
+  font-size:var(--fs-th);letter-spacing:.04em;
+  padding:10px 9px;text-align:center;position:sticky;top:0;z-index:5;line-height:1.4;vertical-align:middle;
+  transition:background .22s var(--e-soft)
+}
+tbody td{padding:9px 9px;border-top:1px solid var(--line-soft);vertical-align:top;font-size:var(--fs-table);overflow-wrap:break-word;transition:background .18s}
+tbody tr:nth-child(even) td{background:var(--bg-soft)}
+/* 列進場：換頁／篩選後重繪的前 26 列依序淡入（節點為新建立，動畫自動重播） */
+tbody tr{animation:db-rise-sm .42s var(--e-out) both}
+tbody tr:nth-child(1){animation-delay:.01s} tbody tr:nth-child(2){animation-delay:.03s}
+tbody tr:nth-child(3){animation-delay:.05s} tbody tr:nth-child(4){animation-delay:.07s}
+tbody tr:nth-child(5){animation-delay:.09s} tbody tr:nth-child(6){animation-delay:.11s}
+tbody tr:nth-child(7){animation-delay:.13s} tbody tr:nth-child(8){animation-delay:.15s}
+tbody tr:nth-child(9){animation-delay:.17s} tbody tr:nth-child(10){animation-delay:.19s}
+tbody tr:nth-child(11){animation-delay:.21s} tbody tr:nth-child(12){animation-delay:.23s}
+tbody tr:nth-child(13){animation-delay:.25s} tbody tr:nth-child(14){animation-delay:.27s}
+tbody tr:nth-child(15){animation-delay:.29s} tbody tr:nth-child(16){animation-delay:.31s}
+tbody tr:nth-child(17){animation-delay:.33s} tbody tr:nth-child(18){animation-delay:.35s}
+tbody tr:nth-child(19){animation-delay:.37s} tbody tr:nth-child(20){animation-delay:.39s}
+tbody tr:nth-child(n+21){animation-delay:.41s}
+/* 檢索摘要列（見 [JS-RENDER] 的「檢索摘要列」）：有摘要列時，一案佔兩個 <tr>，
+   nth-child 的奇偶不再等於「第幾案」，故斑馬紋改由 JS 在兩列上同時加 .db-zb。
+   本區兩條必須排在下方 hover 規則之前：同權重時後者勝，hover 淡紅底才壓得過斑馬紋。
+   只在 table.db-has-snip 內生效，沒有摘要列的表格（含違失態樣頁）完全不受影響。 */
+.db-has-snip tbody tr:nth-child(even) td{background:transparent}
+.db-has-snip tbody tr.db-zb td{background:var(--bg-soft)}
+/* 列 hover：整列淡紅底＋左側品牌紅指示條 */
+.db-table-scroll tbody tr{position:relative}
+.db-table-scroll tbody tr:hover td{background:var(--accent-tint)}
+.db-table-scroll tbody tr:hover td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+/* 摘要列與主列連動 hover：主列 hover 時摘要列同色；摘要列 hover 時以 :has() 回頭點亮主列。
+   :has() 一條選擇器一條規則（見檔首覆轍清單第 4 點）；不支援者只是少了回頭連動，功能不受影響。 */
+.db-table-scroll tbody tr.db-snip-main:hover + tr.db-snip-row td{background:var(--accent-tint)}
+.db-table-scroll tbody tr.db-snip-main:hover + tr.db-snip-row td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+.db-table-scroll tbody tr.db-snip-main:has(+ tr.db-snip-row:hover) td{background:var(--accent-tint)}
+.db-table-scroll tbody tr.db-snip-main:has(+ tr.db-snip-row:hover) td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+/* 檢索摘要列：緊接在主列下方，自第二欄（案號）起橫跨目前所有可見欄位——第一欄（編號）留空，
+   故 colspan 為「可見欄數 − 1」，並隨「顯示覆審與備註欄」調整（見 snipSpan／setRev）。
+   區塊以深藍外框（同表頭色）圈起、寬度填滿。 */
+.db-snip-row td{border-top:0;padding:0 9px 11px}
+.db-snip{box-sizing:border-box;width:100%;border:1px solid #1B3255;border-radius:6px;padding:7px 12px 6px}
+.db-snip-h{margin:0 0 3px;font-size:13px;line-height:1.6;color:var(--ink-soft)}
+.db-snip-h b{font-weight:700;color:var(--accent-deep);font-variant-numeric:tabular-nums}
+button.db-snip-l{display:flex;gap:8px;align-items:baseline;width:100%;margin:0 0 2px;padding:2px 5px;
+  font:inherit;font-size:14px;letter-spacing:normal;text-align:left;color:var(--ink);
+  background:none;border:0;border-radius:4px;cursor:pointer}
+button.db-snip-l:hover{background:rgba(143,43,52,.07)}
+button.db-snip-l:focus-visible,button.db-snip-more:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.db-snip-sec{flex:none;font-size:12px;font-weight:700;line-height:1.5;padding:0 6px;border-radius:3px;
+  background:var(--accent-tint-2);color:var(--accent-deep);border:1px solid var(--accent-line);white-space:nowrap}
+.db-snip-t{line-height:1.7;overflow-wrap:anywhere}
+button.db-snip-more{margin:1px 0 0;padding:0 5px;font:inherit;font-size:13px;color:var(--accent-deep);
+  background:none;border:0;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+/* 檢索關鍵字命中處（表格欄位與摘要列；全文彈窗另有 #ft-body 的同款樣式） */
+.db-table-scroll mark.ft-hit{background:#ffe95c;color:inherit;padding:0 1px;border-radius:2px;
+  box-shadow:0 0 0 1px rgba(180,140,0,.35)}
+col.db-c-no{width:46px} col.db-c-case{width:154px} col.db-c-name{width:94px}
+col.db-c-date{width:86px} col.db-c-unit{width:116px} col.db-c-dec{width:136px}
+/* 顯示覆審與備註欄時：該四欄壓縮為固定窄寬，
+   「違反之規範」欄不設寬度、吸收其餘空間（內容最密集，加寬效益最高）。
+   備註欄務必明訂寬度——固定版型下未設寬的欄會獨吞全部剩餘空間 */
+col.db-c-revno{width:114px} col.db-c-revdate{width:80px} col.db-c-revtext{width:126px} col.db-c-note{width:152px}
+/* 違失態樣欄：態樣名稱最長 17 字，13.5px 字身加左右內距需 ~233px；取 200px 是
+   讓長名折成兩行、短名維持一行的折衷。這一欄要加寬，就得同步重算 table 的
+   min-width 與 [CSS-RESPONSIVE] 的兩個橫捲門檻，三處是同一組數字。 */
+col.db-c-pat{width:200px}
+/* 隱藏覆審與備註欄時：恢復規範欄固定寬度，各欄依比例放大（維持原本外觀） */
+.db-rev-hidden col.db-c-norm{width:240px}
+td.db-t-no{color:var(--ink-soft);font-variant-numeric:tabular-nums}
+td.db-t-case,td.db-t-date{font-variant-numeric:tabular-nums}
+td.db-t-date{white-space:nowrap}
+td.db-t-note,td.db-t-revtext{color:var(--ink-soft);font-size:var(--fs-table-s);line-height:1.6}
+.db-rev-flag{display:inline-block;color:var(--accent-deep);font-weight:700;background:rgba(255,255,255,.6);border-radius:3px;padding:0 3px;margin-top:2px}
+.db-table-hint{text-align:right;margin:0 0 4px;font-size:14px}
+.db-empty-cell{color:#BEB8B2}
+/* 決議全文標籤：置於案號／覆審案號最前方 */
+.db-full-tag{display:inline-block;font-size:12px;font-weight:700;line-height:1.35;letter-spacing:.03em;
+  border-radius:3px;padding:1px 7px;margin:0 5px 3px 0;vertical-align:top;white-space:nowrap;
+  border:1px solid transparent;text-decoration:none;transition:background .18s,transform .18s var(--e-out)}
+.db-full-tag.db-ft-none{background:#6E6A66;color:#fff}
+.db-full-tag.db-ft-rev{background:var(--accent-tint-2);color:var(--accent-deep);border-color:var(--accent-line)}
+/* 帶說明浮字的標籤（詳覆審／無全文）：cursor:help 提示還有話可看，tabindex 讓鍵盤也到得了。
+   浮字本體由 initFullTagTip() 建在 document.body，樣式全為 inline !important
+   （理由同 showArticleFlash），故此處只留觸發端樣式。 */
+.db-full-tag[data-ft-tip]{cursor:help}
+.db-full-tag[data-ft-tip]:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+/* 條文內的「限於情節重大」標籤（見 SEVERE_ONLY）：接在該項（或整條）文字末尾，
+   故走隨文字流動的 inline 標籤，不用 .db-full-tag 那種區塊式標籤。
+   說明浮字與「詳覆審／無全文」共用同一支 initFullTagTip()，觸發端樣式一併比照。 */
+.db-sev-tag{display:inline;margin-left:6px;padding:1px 7px;border-radius:3px;
+  font-size:12.5px;font-weight:600;line-height:1.5;white-space:nowrap;cursor:help;
+  background:#F6EDDA;color:var(--annot-ink);border:1px solid var(--annot-line);
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}
+.db-sev-tag:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+/* 整條皆受限者（sev===0 且條文分項）：標籤另起一列接在條文末尾 */
+.db-sev-row{margin-top:6px}
+.db-no-result{padding:30px 14px;text-align:center;color:var(--ink-soft);animation:db-rise .4s var(--e-out) both}
+
+/* 懲戒決定顏色（由重至輕：深紅 → 暖橘 → 砂金 → 灰綠 → 灰藍） */
+tbody td.db-hc1{background:#EFB9C1!important} /* 除名 */
+tbody td.db-hc2{background:#F3CDBE!important} /* 停職1年以上 */
+tbody td.db-hc3{background:#F7DFD2!important} /* 停職未滿1年 */
+tbody td.db-hc4{background:#F1E4C6!important} /* 申誡＋研習 */
+tbody td.db-hc5{background:#F6EFDA!important} /* 申誡 */
+tbody td.db-hc6{background:#DCE7DC!important} /* 警告＋研習 */
+tbody td.db-hc7{background:#E8F0E8!important} /* 警告 */
+tbody td.db-hc8{background:#DEE8EE!important} /* 命自費研習 */
+
+/* 法條篩選下拉：對應違反之規範四色 */
+#lbl-J{color:var(--c-j)} #flt-J{background:var(--c-j-bg);color:var(--c-j);border-color:var(--c-j-line)}
+#lbl-K{color:var(--c-k)} #flt-K{background:var(--c-k-bg);color:var(--c-k);border-color:var(--c-k-line)}
+#lbl-L{color:var(--c-l)} #flt-L{background:var(--c-l-bg);color:var(--c-l);border-color:var(--c-l-line)}
+#lbl-M{color:var(--c-m)} #flt-M{background:var(--c-m-bg);color:var(--c-m);border-color:var(--c-m-line)}
+#lbl-N{color:var(--c-n)} #flt-N{background:var(--c-n-bg);color:var(--c-n);border-color:var(--c-n-line)}
+#lbl-O{color:var(--c-o)} #flt-O{background:var(--c-o-bg);color:var(--c-o);border-color:var(--c-o-line)}
+#flt-J option,#flt-K option,#flt-L option,#flt-M option,#flt-N option,#flt-O option{background:#fff;color:var(--ink)}
+.db-ctl label{font-weight:600}
+
+/* 違反之規範分類標籤：
+   色相分法規別（青藍＝律師法、紅系＝倫理規範）；
+   舊法為低彩、新法為飽和色，兩軸皆可辨識 */
+.db-tag{display:inline-block;border-radius:3px;padding:0 7px;margin:1px 3px 1px 0;font-size:13.5px;line-height:1.75;border:1px solid transparent}
+.db-tag-j{background:var(--c-j-bg);color:var(--c-j);border-color:var(--c-j-line)}
+.db-tag-k{background:var(--c-k-bg);color:var(--c-k);border-color:var(--c-k-line)}
+.db-tag-l{background:var(--c-l-bg);color:var(--c-l);border-color:var(--c-l-line)}
+.db-tag-m{background:var(--c-m-bg);color:var(--c-m);border-color:var(--c-m-line)}
+.db-tag-x{background:var(--c-x-bg);color:var(--c-x);border-color:var(--c-x-line)}
+.db-tag-n{background:var(--c-n-bg);color:var(--c-n);border-color:var(--c-n-line)}
+.db-tag-o{background:var(--c-o-bg);color:var(--c-o);border-color:var(--c-o-line)}
+/* 違失態樣標籤：外觀比照法條標籤，只換色系（紫）。凡態樣名稱可點擊處一律沿用此類，
+   外觀才不會各處不一（態樣欄、備註欄、法條卡片）。
+   ※ 不設 font-weight，一律隨所在處的字重（＝與同欄正文相同）。
+     原有的 font-weight:600 已移除：它對 <button> 版本（態樣欄）本來就
+     不生作用——button.db-tag 的 font:inherit 權重為 (0,1,1)，勝過本條 (0,1,0)——
+     實際上只加粗了備註欄那組 <span>，形成兩處字重不一。備註欄是小字灰字的次要
+     說明，整串態樣名稱加粗會比同欄正文更搶眼，故一併回歸一般字重。
+     日後若真要加粗，請連 button.db-tag 那條一起處理，否則只會改到 span 版本。 */
+.db-tag-p{background:var(--c-p-bg);color:var(--c-p);border-color:var(--c-p-line)}
+/* 「目前檢視之態樣」（違失態樣頁）的標示：同色系反轉為深紫底白字。
+   只用於態樣名稱（態樣欄與備註欄）；法條標籤一律不套強調色——四部法典各有配色，
+   再疊一層強調色會讓同一格顏色過多而更難讀。 */
+.db-tag-p-on{background:var(--c-p);color:#fff;border-color:var(--c-p)}
+.db-modal-body .db-m-jump-p,.db-tag-p-on{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+/* 規範欄與態樣欄的標籤一律走 .db-tag-flow（與備註欄同一套）：display:inline ＋
+   box-decoration-break:clone，框線隨文字斷行分段。
+   原本的 inline-block 只要一顆標籤放不進當前行就整顆換到下一行，長條文與長態樣名
+   遂各自獨佔一整行，欄位高度被撐得很空；貼齊文字流後，每一行的殘餘空間都會被
+   後面的標籤填滿。
+   備註欄那組間距（margin:0、padding:0 2px）是為 152px 的窄欄而設，這兩欄寬得多，
+   故另給較鬆的內距與右外距，相鄰標籤才分得開。 */
+td.db-t-norm .db-tag-flow,td.db-t-pat .db-tag-flow{margin:0 4px 0 0;padding:0 5px;border-radius:3px}
+/* 行距略放寬：inline 標籤的背景色塊只有字身高度，行距太密時上下兩行的色塊會貼在
+   一起而看不出分行。
+   overflow-wrap:anywhere 只是最後的退路：依規範，任意斷行僅在「這一行找不到任何
+   正常斷點」時才准用，而標籤之間與條文分節處的 <wbr> 都是正常斷點，故實際填行
+   靠的是那些 <wbr>（見 citeWrap 與 normHtml 的 join）；anywhere 只負責收拾
+   「單一不可分的長字串比整欄還寬」這種例外，不致撐破欄寬。 */
+td.db-t-norm,td.db-t-pat{line-height:1.95;overflow-wrap:anywhere}
+/* 規範欄⇄態樣欄的連動：滑鼠停在（或鍵盤聚焦於）任一標籤時，同列其餘不相關的
+   標籤一起淡出，藉此指出這一條條文對到哪一個態樣。
+   ．同一組的條文與態樣共用 .db-lkN（N 為該態樣在本列中的序位，見 normLinks）。
+   ．範圍限縮在 td.db-t-norm 與 td.db-t-pat：備註欄同樣有條文與態樣標籤，
+     那是另一回事，不該跟著淡出。
+   ．一組一條規則，不得合併成選擇器列表——:has() 只要有一項不被支援，
+     整條規則會被丟棄（見檔首覆轍清單第 4 點）。
+   ．不支援 :has() 的瀏覽器一律不淡出，兩欄照常並列，對照關係仍看得到，
+     只是少了強調，故不另備退路。 */
+td.db-t-norm .db-tag,td.db-t-pat .db-tag{transition:opacity .16s var(--e-soft)}
+tr:has(.db-lk1:is(:hover,:focus-visible)) :is(td.db-t-norm,td.db-t-pat) .db-tag:not(.db-lk1){opacity:.22}
+tr:has(.db-lk2:is(:hover,:focus-visible)) :is(td.db-t-norm,td.db-t-pat) .db-tag:not(.db-lk2){opacity:.22}
+tr:has(.db-lk3:is(:hover,:focus-visible)) :is(td.db-t-norm,td.db-t-pat) .db-tag:not(.db-lk3){opacity:.22}
+tr:has(.db-lk4:is(:hover,:focus-visible)) :is(td.db-t-norm,td.db-t-pat) .db-tag:not(.db-lk4){opacity:.22}
+tr:has(.db-lk5:is(:hover,:focus-visible)) :is(td.db-t-norm,td.db-t-pat) .db-tag:not(.db-lk5){opacity:.22}
+tr:has(.db-lk6:is(:hover,:focus-visible)) :is(td.db-t-norm,td.db-t-pat) .db-tag:not(.db-lk6){opacity:.22}
+tr:has(.db-lk7:is(:hover,:focus-visible)) :is(td.db-t-norm,td.db-t-pat) .db-tag:not(.db-lk7){opacity:.22}
+tr:has(.db-lk8:is(:hover,:focus-visible)) :is(td.db-t-norm,td.db-t-pat) .db-tag:not(.db-lk8){opacity:.22}
+/* 備註欄的法條標籤：欄寬窄，整塊 inline-block 若擠不下會變成上下兩行、框線包成一大格。
+   改用 display:inline，讓框線隨文字斷行分段（box-decoration-break:clone 使每一段
+   各自保有左右內距與圓角），視覺上就與一般文字一樣自然換行。 */
+.db-tag-flow{display:inline;-webkit-box-decoration-break:clone;box-decoration-break:clone;
+  /* 備註欄很窄。標籤若沿用外距與較寬的內距，或限制只能在條、項、款之間斷行，
+     行末就會留下塞不下的空白。此處一律貼齊文字流：外距歸零、內距縮到 2px，
+     並沿用中文預設的逐字斷行，讓文字與標籤把每一行填滿。 */
+  margin:0;padding:0 2px;border-radius:2px}
+/* 備註欄中的態樣連結（patternInclude 之人工歸屬，見 patLinkify）：
+   外觀與其他態樣名稱統一為紫色標籤（.db-tag-p），並沿用 .db-tag-flow 貼齊文字流——
+   備註欄很窄，整串態樣名稱若不斷行會把欄寬撐破。
+   游標、hover 與 focus 一律走 span.db-tag-flow[role="button"] 那一組，不另立樣式。
+   （亦不沿用 .db-annot .db-pat：該處是 white-space:nowrap 的區塊式標題。） */
+.db-t-note .db-tag-p{cursor:pointer}
+
+/* 頁次 */
+/* 頁次列：固定槽位設計。結構恆為「上一頁｜N 個等寬槽位｜下一頁」，
+   槽位不論顯示數字或省略號皆同寬，故任何頁次下整列寬度與
+   各按鈕位置完全不變，切換頁次時不會左右跳動 */
+.db-pager{display:flex;flex-wrap:nowrap;gap:6px;align-items:center;justify-content:center;margin:18px 0 4px}
+.db-pager .db-pg-nums{display:flex;gap:6px;align-items:center;flex-wrap:nowrap}
+.db-pager button{
+  min-width:36px;padding:6px 10px;font:inherit;font-size:14.5px;background:#fff;
+  border:1px solid var(--line);border-radius:5px;color:var(--ink);cursor:pointer;
+  font-variant-numeric:tabular-nums;
+  transition:background .2s,border-color .2s,color .2s,transform .2s var(--e-out)
+}
+.db-pager button:hover:not([disabled]):not(.db-cur){border-color:var(--accent);color:var(--accent-deep);transform:translateY(-2px)}
+/* 數字槽與省略號槽：等寬（含框線），數字採等寬數字字體，位數改變也不影響寬度 */
+.db-pager .db-pg-nums button,.db-pager .db-gap{
+  box-sizing:border-box;min-width:46px;padding-left:4px;padding-right:4px;text-align:center
+}
+.db-pager button[disabled]{opacity:.4;cursor:default}
+.db-pager button.db-cur{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;box-shadow:0 4px 12px rgba(27,50,85,.28)}
+.db-pager button:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.db-pager .db-gap{color:var(--ink-soft);display:inline-flex;align-items:center;justify-content:center;font-size:14px;padding:5px 4px}
+@media (max-width:640px){
+  .db-pager{gap:4px}
+  .db-pager .db-pg-nums{gap:4px}
+  .db-pager .db-pg-nums button,.db-pager .db-gap{min-width:36px}
+  .db-pager button{padding:5px 6px}
+}
+
+/* [CSS-PATTERN] 違失態樣 */
+/* 頁籤二：態樣清單 */
+.db-pattern-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:9px;margin-bottom:8px}
+.db-pattern-item{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  text-align:left;font:inherit;font-size:15.5px;color:var(--ink);
+  background:#fff;border:1px solid var(--line);border-radius:7px;padding:10px 13px;cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:border-color .22s,background .22s,color .22s,box-shadow .28s var(--e-soft),transform .22s var(--e-out);
+  animation:db-rise-sm .4s var(--e-out) both
+}
+.db-pattern-item:nth-child(3n+2){animation-delay:.05s}
+.db-pattern-item:nth-child(3n+3){animation-delay:.1s}
+/* 尚無案件之樣態：淡灰底、虛線框、文字轉為次要色，與有案件者一眼可分。
+   本組規則刻意置於 :hover 與 .db-cur 之前，兩者特異度相同時由後者勝出，
+   故被選取時仍顯示正常的選取樣式。 */
+.db-pattern-item.db-zero{background:var(--bg-soft);border-style:dashed;color:var(--ink-soft)}
+.db-pattern-item.db-zero .db-cnt{background:#fff;color:var(--ink-soft)}
+/* ===== [暫時：撰寫進度標示] ==========================================
+   說明文字尚為「待填寫」之樣態，於清單以紅色系標示，方便清點還沒寫的類別。
+   全部寫完後請一併刪除下列三處（皆標有 [暫時]）：
+     ①本組 CSS（.db-pattern-item.db-todo、.db-pattern-item.db-todo .db-cnt、#pat-todo-note）
+     ②patItemHtml() 內的 todo 判斷與 patDescTodo() 函式
+     ③#pat-todo-note 這個元素，及 renderPatternList() 內填寫它的那幾行、
+       以及 .db-pat-group-h 內「待填 N」的那一段
+   本組規則刻意置於 :hover 與 .db-cur 之前：特異度相同時由後者勝出，
+   故滑過與被選取時仍顯示正常樣式，紅色只在未選取狀態呈現。 */
+.db-pattern-item.db-todo{border-color:#D9A7A7;background:#FEF7F7;color:#9C3B3B}
+.db-pattern-item.db-todo .db-cnt{background:#F6E1E1;color:#A24A4A}
+#pat-todo-note{
+  margin:-2px 0 12px;font-size:13.5px;line-height:1.7;color:#A24A4A;
+  background:#FEF7F7;border:1px dashed #D9A7A7;border-radius:7px;padding:7px 13px
+}
+.db-pat-group-h .db-gtodo{flex:none;font-size:13px;color:#A24A4A;font-variant-numeric:tabular-nums}
+/* ===== [暫時] 以上為撰寫進度標示，全部寫完後刪除 ===================== */
+.db-pattern-item:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 20px rgba(27,50,85,.12)}
+.db-pattern-item.db-cur{border-color:var(--accent);background:var(--accent);color:#fff;box-shadow:0 8px 22px rgba(27,50,85,.26)}
+.db-pattern-item.db-cur .db-cnt{background:#fff;color:var(--accent-deep)}
+.db-pattern-item .db-cnt{
+  flex:none;font-size:13.5px;font-variant-numeric:tabular-nums;
+  background:var(--bg-soft);border-radius:99px;padding:2px 10px;color:var(--ink-soft);transition:background .22s,color .22s
+}
+.db-pattern-item:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.db-pl-toggle{display:flex;justify-content:center;margin-bottom:6px}
+.db-pl-toggle button{
+  font:inherit;font-size:14.5px;color:var(--accent);background:var(--bg-soft);
+  border:1px solid var(--line);border-radius:99px;padding:6px 20px;cursor:pointer;
+  transition:border-color .2s,background .2s,transform .2s var(--e-out)
+}
+.db-pl-toggle button:hover{border-color:var(--accent);background:#fff;transform:translateY(-1px)}
+/* 違失態樣的七大類分組（清單展開時顯示）。
+   分組只是導覽用的呈現層：.db-pattern-list 於分組時改為 block，
+   由每一類自己的 .db-pat-group-items 當 grid 容器，卡片樣式完全沿用 .db-pattern-item。 */
+.db-pattern-list.db-grouped{display:block}
+.db-pat-group{margin:0 0 20px}
+.db-pat-group:last-child{margin-bottom:4px}
+.db-pat-group-h{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  margin:0 0 6px;padding:0 0 5px;border-bottom:2px solid var(--accent)
+}
+.db-pat-group-h .db-gname{font-size:17px;font-weight:700;color:var(--accent-deep);letter-spacing:.01em}
+.db-pat-group-h .db-gmeta{flex:none;font-size:13px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.db-pat-group-desc{margin:0 0 10px;font-size:14.5px;line-height:1.8;color:var(--ink-soft)}
+.db-pat-group-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:9px}
+/* 態樣詳情頁的所屬大類（眉標）；同時屬於兩類者並列 */
+.db-pat-eyebrow{margin:0 0 3px;font-size:13.5px;color:var(--ink-soft);letter-spacing:.02em}
+/* 編號與標題同大小、同顏色（整段一起放在 <b> 內，中間不留空格）；
+   同時屬於兩個大類者，以下列分隔號區隔，分隔號本身維持次要色。 */
+.db-pat-eyebrow b{color:var(--accent-deep);font-weight:700}
+.db-pat-eyebrow .db-eb-sep{color:var(--ink-soft);font-weight:400;margin:0 8px}
+.db-pattern-detail{margin-top:0}
+/* ═══ 捲動定位錨點：全檔通則（改動任何一處定位前先讀完本段）═══════════
+   問題：頁首 .db-sticky 是固定列，直接把目標捲到視窗頂端，目標就被頁首蓋住。
+   本檔一律用同一種解法——在目標上方放一個「零淨高度錨點」：
+     height:calc(var(--sticky-h) + 12px)  ＋  margin-top: 同值取負
+   兩者相抵，版面上不佔空間，但錨點自身的上緣正好落在目標上方一個頁首的高度。
+   程式端只做兩件事：syncStickyH() 同步 --sticky-h，然後捲到「錨點自身的
+   文件座標」，不自行扣任何高度，也不交給宿主決定捲動容器。
+
+   三個踩過的坑，任一項都會讓定位重新失準：
+   ① 不要改成 position:absolute。試過，在 jrf.org.tw 上會偏位——絕對定位的
+      錨點不參與版面，其座標與目標的實際位置在宿主容器下會脫鉤。
+   ② 不要改用 scrollIntoView()。對照表外層是 overflow 容器，宿主樣式也可能
+      再造出可捲動祖先，scrollIntoView() 會捲錯容器（見 gotoLawArticle）。
+   ③ 不要只捲一次就放手。申訴頁的地圖與流程圖是進站後才建立的，字型與外部
+      圖片也還在載入，版面會繼續長高；單次捲動必然落空。需要持續校正時，
+      把 DBHASH 的貼齊目標換成該錨點（DBHASH.target），沿用逐格貼齊。
+
+   全檔共有四種定位對象，配方相同、只差高度：
+     #pattern-anchor  違失態樣標題（頁首高＋14px，另以負外距回拉，見下）
+     .db-art-anchor   法規頁每一條條文（由 articleHtml() 隨條文產生）
+     .db-cp-anchor    申訴救濟頁八個節標題（置於 <h3> 內第一個子元素）
+     scroll-margin-top  少數改用 scrollIntoView 的目標（#annot-box 等，見下）
+   ═════════════════════════════════════════════════════════════════ */
+/* 違失態樣定位錨點：與上述配方相同，但高度為頁首＋14px，使標題不緊貼頁首。
+   另以負的上外距把整塊往回拉，未跳轉時淨佔約 24px，標題才不會離「展開全部」
+   太遠；負外距不改變錨點自身高度，故「捲至錨點上緣」的公式不變。 */
+#pattern-anchor{
+  height:calc(var(--sticky-h,52px) + 14px);
+  margin:calc(-1 * (var(--sticky-h,52px) - 10px)) 0 0;
+  padding:0;border:0;pointer-events:none;overflow:hidden
+}
+/* 少數仍以 scrollIntoView 定位的目標：改用 scroll-margin-top 預留頁首高度。
+   （scroll-margin-top 只對 scrollIntoView 生效，對程式自行 scrollTo 無作用，
+   故其餘定位一律走上述的零淨高度錨點。） */
+#annot-box,#pat-pager-top,#list-pager-top,.db-law-title-wrap{
+  scroll-margin-top:calc(var(--sticky-h, 132px) + 12px)
+}
+/* 條文定位錨點：每一條文由 articleHtml() 各自產生一個，不共用、不搬移。
+   配方與注意事項見上方「捲動定位錨點：全檔通則」。 */
+/* display:flow-root 使 .db-article 自成 block formatting context，錨點的負上外距
+   因此不會與 .db-article 本身的上外距合併（前一個 display:block 是舊瀏覽器的回退，
+   兩行都要留：本規則的用途是壓過宿主樣式，不能因不支援 flow-root 而整條失效）。
+
+   為什麼非擋不可：新舊對照表內的 .db-article 是 padding:0／border:none
+   （見 [CSS-LAWS] 之 .db-wrap .db-cmp-table .db-article），父子上外距會合併，
+   整個 .db-article 盒因而被往上拉一整個「頁首高＋12px」，突出到上一列儲存格裡。
+   突出的那段是透明的、看不出來，卻照樣接收點擊，於是上一列只要比錨點矮，
+   該列兩欄的「懲戒案例 →」就一起按不動——徵狀正是「矮的對照列整列點不進去」。
+   下方 .db-article>h4／.db-badge 的 z-index 不足以解決：表格的繪製分層在
+   Blink 與 Gecko 並不一致，跨列的 z-index 在 Chrome 不必然勝出，
+   因此同一份頁面在 Firefox 正常、在 Chrome 失效。
+
+   本宣告不改變任何東西的位置：錨點的文件座標（gotoLawArticle 唯一依據）、
+   條號與內文的位置、儲存格高度都與合併時完全相同，
+   只有 .db-article 自身的盒子上緣不再向上突出。 */
+.db-article{
+  position:relative;z-index:auto;display:block;display:flow-root;float:none;clear:none;
+  box-sizing:border-box;width:auto;min-width:0;max-width:none;
+  min-height:0;max-height:none;overflow:visible;transform:none;
+  margin:0 0 15px;padding:11px 15px
+}
+.db-article>h4{position:relative;z-index:2}
+.db-article>h4 .db-badge{position:relative;z-index:3}
+.db-art-anchor{
+  display:block;height:calc(var(--sticky-h, 132px) + 12px);
+  margin-top:calc(-1 * (var(--sticky-h, 132px) + 12px));
+  padding:0;border:0;pointer-events:none;visibility:hidden
+}
+/* 申訴救濟頁各節標題的定位錨點；配方見上方「捲動定位錨點：全檔通則」。
+   置於 <h3> 內的第一個子元素：.db-about-h 有 padding-top，錨點的負上外距
+   不會與標題自身的上外距發生外距合併（margin collapsing）。 */
+.db-cp-anchor{
+  display:block;height:calc(var(--sticky-h, 132px) + 12px);
+  margin-top:calc(-1 * (var(--sticky-h, 132px) + 12px));
+  padding:0;border:0;pointer-events:none;visibility:hidden
+}
+.db-pattern-detail h2{
+  font-size:20px;color:var(--accent-deep);margin:0 0 12px;letter-spacing:.04em;
+  border-left:5px solid var(--accent);padding-left:11px;
+  animation:db-slide-in .45s var(--e-out) both
+}
+.db-pat-related{display:flex;flex-wrap:wrap;align-items:center;gap:6px 4px;margin:0 0 14px;padding-left:16px}
+.db-pat-related .db-rel-lead{color:var(--ink-soft);font-size:14.5px;font-weight:700;margin-right:2px}
+.db-pat-related .db-rel-group{display:inline-flex;flex-wrap:wrap;gap:4px;margin-right:10px}
+/* 違失態樣說明文字（暖白同色系，與註記卡一致） */
+.db-pat-desc{
+  background:#FDFAF3;border:1px solid var(--annot-line);border-radius:10px;
+  margin:0 0 18px;padding:0;overflow:hidden;box-shadow:0 3px 14px rgba(122,98,49,.07)
+}
+.db-pat-desc .db-desc-body{padding:14px 18px 16px;font-size:var(--fs-read);line-height:1.95;color:var(--ink)}
+.db-pat-desc .db-desc-body p{margin:0 0 11px;text-align:justify;text-wrap:pretty}
+.db-pat-desc .db-desc-body p:last-child{margin-bottom:0}
+/* 結構化說明區塊：供較長的態樣說明呈現條列與統計表；既有 intro/cases 格式不受影響。 */
+.db-pat-desc .db-desc-list{margin:2px 0 15px;padding-left:1.45em}
+.db-pat-desc .db-desc-list li{margin:0 0 12px;padding-left:2px}
+.db-pat-desc .db-desc-list li:last-child{margin-bottom:0}
+.db-pat-desc .db-desc-item-title{display:block;color:var(--accent-deep);font-weight:700;margin-bottom:3px}
+.db-pat-desc .db-desc-item-text{display:block;text-align:justify;text-wrap:pretty}
+.db-pat-desc .db-desc-table-scroll{overflow-x:auto;margin:7px 0 15px;border:1px solid var(--annot-line);border-radius:7px;background:#fff}
+.db-wrap .db-pat-desc .db-desc-table{width:100%;min-width:520px;border-collapse:collapse;table-layout:auto;font-size:15px}
+.db-wrap .db-pat-desc .db-desc-table thead th{
+  position:static;z-index:auto;background:#F6EDDA;color:var(--annot-ink);font-size:14.5px;
+  padding:8px 10px;border:1px solid var(--annot-line);text-align:center;letter-spacing:.03em
+}
+.db-wrap .db-pat-desc .db-desc-table thead th:first-child{text-align:center}
+.db-wrap .db-pat-desc .db-desc-table tbody tr{animation:none}
+.db-wrap .db-pat-desc .db-desc-table tbody td{
+  background:#fff;padding:8px 10px;border:1px solid #EFE4CC;font-size:15px;line-height:1.65;vertical-align:middle
+}
+/* 隔列底色只留給說明區的純統計表（type:'table'）；子類對照表（.db-sc-table）
+   已改用列標字母＋整列 .db-sc-on 底色表示選取，再加斑馬紋會與選取狀態混淆，
+   故以 :not() 排除。※ 單獨成一條規則，不與其他選擇器合併成列表。 */
+.db-wrap .db-pat-desc .db-desc-table:not(.db-sc-table) tbody tr:nth-child(even) td{background:#FDFAF3}
+.db-wrap .db-pat-desc .db-desc-table tbody td:not(:first-child){text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.db-wrap .db-pat-desc .db-desc-table tbody tr.db-desc-total td{font-weight:700;background:#F6EDDA;color:var(--annot-ink)}
+/* 「故意犯罪經判刑確定」的純統計表（type:'table'）依內容決定寬度，不撐滿說明卡；
+   欄名與數值維持單行，窄螢幕仍可由外層容器橫向捲動。
+   ※ 一律排除 .db-sc-table：子類對照表也帶 .db-desc-table，若被這三條掃到，
+     width:max-content ＋ 儲存格 nowrap 會讓「說明」欄整句不折行，把表撐成
+     遠寬於版面的一條，寬螢幕也得左右滑動——此坑已踩過一次。
+     只用 :not() 且每條選擇器各自成規則，不使用 :has()、不合併選擇器列表。 */
+.db-pat-desc-P002 .db-desc-table-scroll{max-width:100%}
+.db-wrap .db-pat-desc-P002 .db-desc-table:not(.db-sc-table){width:max-content;min-width:0;font-size:15px}
+.db-wrap .db-pat-desc-P002 .db-desc-table:not(.db-sc-table) th{white-space:nowrap}
+.db-wrap .db-pat-desc-P002 .db-desc-table:not(.db-sc-table) td{white-space:nowrap}
+/* ---------- 子類對照表（可勾選 → 即時篩選同頁下方的案件清單） ----------
+   欄寬策略：table-layout:fixed，欄寬一律取自表頭。
+   　．四欄法規依據給相同的固定寬度＝真正等寬，不受條號長短影響；
+   　．勾選、得經同意、成立、不成立四欄只放短內容，給剛好的固定寬度；
+   　．「態樣」欄不設寬度，吃掉剩餘空間並自動換行——長句本來就該折行，
+   　　 讓它撐成一行會把整張表拉得又寬又鬆，反而看不出對照關係。
+   整表另設 min-width，窄螢幕由外層 .db-desc-table-scroll 橫向捲動。
+
+   ※ 選擇器一律寫成 `table.db-sc-table tbody td.xxx`，不可省略 table／tbody：
+     上方的通則
+       .db-wrap .db-pat-desc .db-desc-table tbody td:not(:first-child)
+     其優先權為 (0,4,2)，內含 white-space:nowrap 與 text-align:center。
+     若本區寫成 `.db-sc-table td.db-sc-t`（(0,4,1)）會輸給它，結果就是
+     「態樣」欄仍不折行、在 fixed 版面下把文字擠出表格外——此坑已踩過一次。
+   註：不使用 :has()——選擇器列表中只要一項不被支援，整條規則會被丟棄。 */
+.db-pat-desc .db-subcat{margin:9px 0 16px}
+.db-wrap .db-pat-desc table.db-sc-table{min-width:1060px;table-layout:fixed}
+/* fixed 版面下欄寬是硬邊界：一律 border-box，讓 width 把左右內距算進去，
+   否則「得經同意受任」「不成立」這種剛好塞滿的欄名會被內距推出格線外。 */
+.db-wrap .db-pat-desc table.db-sc-table th,
+.db-wrap .db-pat-desc table.db-sc-table td{box-sizing:border-box}
+.db-wrap .db-pat-desc table.db-sc-table thead th{white-space:normal;padding:7px 8px}
+.db-wrap .db-pat-desc table.db-sc-table tbody td{padding:7px 8px}
+.db-wrap .db-pat-desc table.db-sc-table thead th.db-sc-pick,
+.db-wrap .db-pat-desc table.db-sc-table tbody td.db-sc-pick{width:46px;text-align:center;padding:7px 4px}
+/* 檢索欄列標：同一張表由上而下依序 A、B、C…，供說明文字指名某一列。
+   字母本身就是開關（取代原本的核取方塊）：未選為淡色、選取後轉為主色，
+   同時整列套用 .db-sc-on 的底色。字母由 subcatTableHtml 依 rows 序號產生，
+   分類標題列與備註列不占字母。
+   ※ 狀態同時寫在 class 與 aria-pressed，樣式只吃 class——屬性選擇器留給
+     輔助技術使用，避免舊瀏覽器在選擇器上出現差異。 */
+.db-pat-desc .db-sc-lb{
+  display:block;width:100%;margin:0;padding:3px 0;border:0;border-radius:5px;
+  background:none;font-family:inherit;font-size:23px;font-weight:800;
+  line-height:1.15;letter-spacing:0;color:#CFC1A2;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+  transition:color .12s ease, background-color .12s ease
+}
+.db-pat-desc .db-sc-lb:hover{color:var(--annot-ink);background:#F3E8CF}
+.db-pat-desc .db-sc-lb:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.db-pat-desc .db-sc-lb.db-sc-lb-on{color:var(--accent-deep)}
+/* 「態樣」欄不給寬度：由 fixed 版面配置分得剩餘空間，文字自動折行。
+   表頭一律置中（見上方通則），內文仍為左右對齊 */
+.db-wrap .db-pat-desc table.db-sc-table thead th.db-sc-h-t{text-align:center}
+.db-wrap .db-pat-desc table.db-sc-table tbody td.db-sc-t{
+  text-align:justify;white-space:normal;word-break:break-word;overflow-wrap:anywhere;
+  text-wrap:pretty;line-height:1.7
+}
+/* 四欄法規依據等寬；欄內以條文標籤為單位換行 */
+.db-wrap .db-pat-desc table.db-sc-table thead th.db-sc-law,
+.db-wrap .db-pat-desc table.db-sc-table tbody td.db-sc-law{
+  width:159px;white-space:normal;line-height:2;text-align:center
+}
+.db-wrap .db-pat-desc table.db-sc-table thead th.db-sc-h-cs,
+.db-wrap .db-pat-desc table.db-sc-table tbody td.db-sc-cs{width:80px;white-space:normal;font-size:16px;padding:7px 4px}
+.db-wrap .db-pat-desc table.db-sc-table thead th.db-sc-h-n,
+.db-wrap .db-pat-desc table.db-sc-table tbody td.db-sc-n{
+  width:62px;white-space:nowrap;font-weight:700;color:var(--accent-deep);padding:7px 4px
+}
+.db-wrap .db-pat-desc table.db-sc-table tbody td.db-sc-n0{font-weight:400;color:var(--ink-soft)}
+/* 「除名」欄（區塊旗標 b.expel）：寬度、粗體、內距一律比照相鄰的「成立」欄，
+   只換色。色相取自案件清單「除名」儲存格底色（tbody td.db-hc1 之 #EFB9C1）的
+   深色版，與該處的顏色語彙一致，也與「成立」欄的深藍一眼可分。 */
+.db-wrap .db-pat-desc table.db-sc-table thead th.db-sc-h-x,
+.db-wrap .db-pat-desc table.db-sc-table tbody td.db-sc-x{
+  width:62px;white-space:nowrap;font-weight:700;color:#A63A4B;padding:7px 4px
+}
+.db-wrap .db-pat-desc table.db-sc-table tbody tr.db-sc-on td{background:#FBF3E0}
+/* 分類標題列：整列合併，作為三段衝突來源的段落標題 */
+.db-wrap .db-pat-desc table.db-sc-table tbody tr.db-sc-grp td{
+  background:#F1E6CE;color:var(--annot-ink);font-weight:700;letter-spacing:.04em;
+  text-align:left;white-space:normal;padding:7px 10px
+}
+/* 分類標題本身即為另一違失態樣時（rows[].groupPat）：整段標題做成可點擊。
+   外觀維持標題原樣，只加底線與游標提示，不套標籤樣式——整列已是深色標題，
+   再包一顆紫色標籤會蓋掉分類的層次。 */
+.db-pat-desc .db-sc-grp-link{
+  display:inline;margin:0;padding:0;border:0;background:none;font:inherit;color:inherit;
+  letter-spacing:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px
+}
+.db-pat-desc .db-sc-grp-link:hover{color:var(--accent-deep)}
+.db-pat-desc .db-sc-grp-link:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+/* 備註列：整列合併，置於合計之後 */
+.db-wrap .db-pat-desc table.db-sc-table tbody tr.db-sc-note td{
+  background:#FDFAF3;color:var(--ink-soft);font-size:13.5px;line-height:1.85;
+  text-align:justify;white-space:normal;text-wrap:pretty;padding:9px 12px
+}
+/* 人工標記式子類對照表（by:'tag'）：無法規依據欄與「得經同意受任」欄，
+   改為「違失型態／說明」兩欄。欄數與內容量都比條文式那張少，
+   故另給較小的 min-width，避免在寬螢幕上被硬撐出無謂的橫向捲軸。
+   ※ 選擇器仍一律寫成 `table.db-sc-tag tbody td.xxx`（(0,4,3)），
+     理由與上方相同：要贏過通則的 nowrap／center（(0,4,2)）。 */
+.db-wrap .db-pat-desc table.db-sc-tag{min-width:760px}
+/* 多一欄「除名」就多 62px：min-width 跟著加，否則寬螢幕下欄寬由剩餘空間分配，
+   「說明」欄會被壓窄。權重 (0,4,1) 高於上一條 (0,3,1)，故後者不必改。 */
+.db-wrap .db-pat-desc table.db-sc-tag.db-sc-expel{min-width:822px}
+/* 「違失型態」給固定寬度，剩餘空間全部留給「說明」——說明句長，型態名短 */
+.db-wrap .db-pat-desc table.db-sc-tag thead th.db-sc-h-t,
+.db-wrap .db-pat-desc table.db-sc-tag tbody td.db-sc-t{width:236px}
+.db-wrap .db-pat-desc table.db-sc-tag thead th.db-sc-h-d{text-align:center}
+.db-wrap .db-pat-desc table.db-sc-tag tbody td.db-sc-d{
+  text-align:justify;white-space:normal;word-break:break-word;overflow-wrap:anywhere;
+  text-wrap:pretty;line-height:1.7
+}
+.db-pat-desc .db-sc-none{color:var(--ink-soft)}
+/* 案件區筆數列上的篩選註記 */
+.db-pat-detail .db-rc-sub{margin-left:8px;font-size:13.5px;color:var(--ink-soft)}
+/* 「僅顯示不包含其他態樣的案件」核取方塊：只出現在概括條款態樣（見 ONLYPAT_PATS），
+   位置在說明框與案件表格之間。配色走主色藍系（律師法標籤同一族的淺藍底），
+   啟用時整塊反轉為深藍底白字，一眼看得出「這一頁的資料正被過濾」。
+   ※ 用到 :has() 的規則一條選擇器一條規則，不與其他選擇器合併——列表中只要有一項
+     不被支援，整條規則會被丟棄。啟用時核取方塊改用白色 accent-color，否則深藍底上
+     的深藍方塊會看不見。 */
+.db-onlypat{margin:0 0 12px}
+.db-onlypat label{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;
+  border:1px solid var(--c-j-line);border-radius:8px;background:var(--c-k-bg);
+  font-size:14.5px;color:var(--accent-deep);font-weight:600;cursor:pointer;user-select:none;
+  transition:background .18s,border-color .18s,color .18s}
+.db-onlypat label:hover{background:var(--c-j-bg);border-color:var(--accent)}
+.db-onlypat input{width:16px;height:16px;cursor:pointer;accent-color:var(--accent)}
+.db-onlypat input:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.db-onlypat label:has(input:checked){background:var(--accent);border-color:var(--accent-deep);color:#fff}
+.db-onlypat label:has(input:checked) input{accent-color:#fff}
+/* 案例區塊：每則案例以左側金色邊條與「案例N」標籤標示 */
+.db-pat-desc .db-desc-cases{margin-top:15px;display:grid;gap:12px}
+.db-pat-desc .db-desc-case{border-left:3px solid var(--annot-line);padding:1px 0 1px 14px}
+.db-pat-desc .db-case-lb{
+  display:inline-block;background:#EFE3C4;color:#6B5827;
+  font-size:13px;font-weight:700;letter-spacing:.06em;
+  border-radius:3px;padding:2px 10px;margin-bottom:5px
+}
+/* 案例引用之案號：列於「案例N」標籤之後，不寫在內文句末括號內。
+   案號取自 PAT_META_BY_ID 各態樣說明中的案例的 no 欄位（與 cases[].caseNo 逐字相同）；
+   併案之數個案號整串存於同一個 no，故畫面上一份決議書只出現一個案號標籤。
+   查得決議書全文者輸出為按鈕（沿用 .db-ft-open，由全文彈窗的委派處理器接手）；
+   查無全文者輸出為 .db-plain 純文字標籤，樣式上與可點擊者明顯有別。 */
+/* [CMS] 案號標籤是 <button>，官網主題多半對按鈕另有 border／padding／background
+   規則。此處一律加 .db-wrap 前綴把權重提到 (0,3,0)，作法與上方對照表格線相同，
+   以免嵌入官網後框線或內距被主題蓋掉（本機預覽看不出來）。 */
+.db-wrap .db-pat-desc .db-case-nos{display:inline}
+.db-wrap .db-pat-desc .db-case-no{
+  display:inline-block;font:inherit;font-size:13.5px;line-height:1.6;
+  background:#fff;color:#6B5827;border:1px solid var(--annot-line);border-radius:3px;
+  padding:1px 8px;margin:0 0 5px 5px;vertical-align:1px;cursor:pointer;
+  font-variant-numeric:tabular-nums;text-decoration:none;box-shadow:none;
+  transition:background .18s,border-color .18s,color .18s
+}
+.db-wrap .db-pat-desc .db-case-no:hover{background:#EFE3C4;border-color:#C9A96A;color:#4A3E1C}
+.db-wrap .db-pat-desc .db-case-no:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.db-wrap .db-pat-desc .db-case-no.db-plain{cursor:default;background:var(--bg-soft);color:var(--ink-soft);border-style:dashed}
+/* 案例案號後的懲戒決定標籤：文字直接取自 cases[].decision（不另存一份，
+   同 articleIndex 之理），底色沿用案件清單「懲戒決定」欄的同一組色票。
+   ※ 表格那組寫成 tbody td.db-hcN，只作用於儲存格，故此處另寫一份同色規則；
+     日後改色務必兩處一起改（搜尋 db-hc1 可一次找到）。
+   ※ 非懲戒（hc=0，含不付懲戒／不予懲戒／免議／不受理）與未分類者不上色，
+     與案件清單完全一致，不另給顏色以免看似另一種懲戒。 */
+.db-wrap .db-pat-desc .db-case-dec{
+  display:inline-block;font:inherit;font-size:13px;line-height:1.6;
+  background:var(--bg-soft);color:var(--ink);border:1px solid var(--line);border-radius:3px;
+  padding:1px 8px;margin:0 0 5px 4px;vertical-align:1px
+}
+.db-wrap .db-pat-desc .db-case-dec.db-hc1{background:#EFB9C1;border-color:#E09FAB} /* 除名 */
+.db-wrap .db-pat-desc .db-case-dec.db-hc2{background:#F3CDBE;border-color:#E6B39F} /* 停職1年以上 */
+.db-wrap .db-pat-desc .db-case-dec.db-hc3{background:#F7DFD2;border-color:#E9C6B4} /* 停職未滿1年 */
+.db-wrap .db-pat-desc .db-case-dec.db-hc4{background:#F1E4C6;border-color:#E0CDA2} /* 申誡＋研習 */
+.db-wrap .db-pat-desc .db-case-dec.db-hc5{background:#F6EFDA;border-color:#E5D9B7} /* 申誡 */
+.db-wrap .db-pat-desc .db-case-dec.db-hc6{background:#DCE7DC;border-color:#BCD0BC} /* 警告＋研習 */
+.db-wrap .db-pat-desc .db-case-dec.db-hc7{background:#E8F0E8;border-color:#C8DAC8} /* 警告 */
+.db-wrap .db-pat-desc .db-case-dec.db-hc8{background:#DEE8EE;border-color:#BCCEDA} /* 命自費研習 */
+/* 同一案號數名被付懲戒人而決定不同時，於各標籤前冠姓名以資區別 */
+.db-wrap .db-pat-desc .db-case-dec-who{font-weight:700}
+.db-wrap .db-pat-desc .db-case-dec-who::after{content:'：'}
+.db-pat-desc .db-desc-case p{margin:0;text-align:justify}
+.db-pat-desc .db-desc-todo{color:var(--ink-soft);font-style:normal;letter-spacing:.05em}
+.db-hint{color:var(--ink);font-size:var(--fs-read);line-height:1.9;padding:2px 2px 8px}
+.db-foot{margin-top:24px;color:#A6A19C;font-size:14px;letter-spacing:.03em;text-align:right}
+
+/* 可點選之法條標籤 */
+button.db-tag{appearance:none;font:inherit;cursor:pointer;transition:filter .18s,transform .18s var(--e-out)}
+button.db-tag:hover{filter:brightness(.95);transform:translateY(-1px)}
+button.db-tag:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+span.db-tag-flow[role="button"]{cursor:pointer;transition:filter .18s}
+span.db-tag-flow[role="button"]:hover{filter:brightness(.95)}
+span.db-tag-flow[role="button"]:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+
+/* [CSS-LAWS] 懲戒法規／新舊對照 */
+/* 懲戒依據頁籤 */
+.db-lawsel{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:2px 0 12px}
+@media (min-width:680px){
+  .db-lawsel{grid-template-columns:repeat(2,1fr)}
+}
+@media (min-width:1000px){
+  .db-lawsel{grid-template-columns:repeat(3,1fr)}
+}
+.db-lawsel button{
+  font:inherit;font-size:14.5px;line-height:1.5;padding:9px 12px;border-radius:7px;cursor:pointer;
+  border:1px solid var(--line);background:#fff;color:var(--ink);text-align:left;
+  transition:background .22s,color .22s,border-color .22s,box-shadow .28s var(--e-soft),transform .22s var(--e-out);
+  animation:db-rise-sm .4s var(--e-out) both
+}
+.db-lawsel button:nth-child(2){animation-delay:.05s}
+.db-lawsel button:nth-child(3){animation-delay:.1s}
+.db-lawsel button:nth-child(4){animation-delay:.15s}
+.db-lawsel button:nth-child(5){animation-delay:.2s}
+.db-lawsel button:nth-child(6){animation-delay:.25s}
+.db-lawsel button:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(43,43,46,.10)}
+.db-lawsel button span{display:block;font-size:13px;margin-top:1px;opacity:.85}
+.db-lawsel button.db-cur{font-weight:700;border-width:2px}
+.db-lawsel button.db-le{border-color:var(--c-l-line)}.db-lawsel button.db-le.db-cur,.db-lawsel button.db-le:hover{background:linear-gradient(100deg,var(--c-m-bg) 0%,var(--c-m-bg) 46%,var(--c-l-bg) 54%,var(--c-l-bg) 100%);color:var(--c-l)}
+.db-lawsel button.db-lf{border-color:var(--c-j-line)}.db-lawsel button.db-lf.db-cur,.db-lawsel button.db-lf:hover{background:linear-gradient(100deg,var(--c-k-bg) 0%,var(--c-k-bg) 46%,var(--c-j-bg) 54%,var(--c-j-bg) 100%);color:var(--c-k)}
+.db-lawsel button.db-lx{border-color:var(--c-x-line)}.db-lawsel button.db-lx.db-cur,.db-lawsel button.db-lx:hover{background:var(--c-x-bg);color:var(--c-x)}
+/* 新舊對照表（律師法、倫理規範共用） */
+/* 只需要橫向捲動。若不明寫 overflow-y，CSS 會把它算成 auto，此容器就成了
+   縱向捲動容器——條文定位錨點（.db-art-anchor）位於條文上方，落在本容器邊界之外，
+   瀏覽器可能改為捲動本容器而非頁面，定位因而失準。高度為 auto，不會裁切內容。 */
+.db-cmp-scroll{overflow-x:auto;overflow-y:hidden}
+/* 表記說明表（資料庫說明頁）：沿用主表格的表頭配色，
+   自帶橫向捲動容器；覆蓋全域 table 的 1400px 最小寬度 */
+.db-mark-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;margin:12px 0 4px}
+.db-mark-table{width:100%;min-width:1400px;border-collapse:collapse;table-layout:fixed}
+.db-mark-table th:first-child{width:52px}
+.db-mark-table td{font-size:var(--fs-th);line-height:1.65;vertical-align:top}
+/* [CMS] 以下與框線有關的規則一律加 .db-wrap 前綴提高權重：官網主題（CMS 內容樣式／Bootstrap）
+   多半有自己的 table／td 規則，權重若高於本檔的 .db-cmp-table td（0,1,1），
+   在 border-collapse 的解析下會讓部分格線消失（本機預覽看不出來）。
+   加上 .db-wrap 後為 (0,2,1)，可壓過 .xxx table td 這類主題寫法。
+   ※ 只提高框線相關規則的權重；填色相關的 :has() 規則（0,3,1）維持不動。 */
+.db-wrap .db-cmp-table{
+  width:100%;min-width:680px;table-layout:fixed;
+  /* Firefox 對 collapsed border + 儲存格背景 + overflow-x:auto 有已知繪製問題。
+     對照表改採 separate/0-spacing，格線由各 cell 單邊繪製，避免 collapsed-border 衝突。 */
+  border-collapse:separate!important;border-spacing:0!important
+}
+/* 對照表格線：只畫右、下框，第一欄補左框、表頭補上框。
+   內部交界因此恆為單一 1px，不會因 separate 模式形成雙線。
+   background-clip:padding-box 亦避免 Firefox 將儲存格底色畫到框線區域。 */
+.db-wrap .db-cmp-table th{
+  padding:10px 13px;font-size:15px;letter-spacing:.05em;line-height:1.5;
+  border:0!important;border-right:1px solid #D3CDC8!important;border-bottom:1px solid #D3CDC8!important;
+  background-clip:padding-box
+}
+.db-wrap .db-cmp-table td{
+  width:50%;vertical-align:top;padding:9px 13px;font-size:var(--fs-table);
+  border:0!important;border-right:1px solid #D3CDC8!important;border-bottom:1px solid #D3CDC8!important;
+  background-clip:padding-box
+}
+.db-wrap .db-cmp-table tr > :first-child{border-left:1px solid #D3CDC8!important}
+.db-wrap .db-cmp-table thead th{border-top:1px solid #D3CDC8!important}
+.db-cmp-table th.db-ch-m{background:var(--c-m-bg);color:var(--c-m)}
+.db-cmp-table th.db-ch-l{background:var(--c-l-bg);color:var(--c-l)}
+.db-cmp-table th.db-ch-k{background:var(--c-k-bg);color:var(--c-k)}
+.db-cmp-table th.db-ch-j{background:var(--c-j-bg);color:var(--c-j)}
+.db-cmp-table th.db-ch-o{background:var(--c-o-bg);color:var(--c-o)}
+.db-cmp-table th.db-ch-n{background:var(--c-n-bg);color:var(--c-n)}
+
+/* 空儲存格的佔位元素：見 CMP_BLANK 之註解。無尺寸、不影響版面。 */
+.db-wrap .db-cmp-table td>.db-cmp-blank{display:inline;font-size:0;line-height:0}
+/* 新舊欄位對照：第一欄恆為「新法」、第二欄恆為「舊法」。
+   除色相之外再加一層欄位層級的區別——
+   新法欄：表頭實心色條（下緣 3px 實線）、儲存格淨白底；
+   舊法欄：表頭虛線下緣、儲存格暖灰底，並整欄降一階彩度，
+   使讀者一眼分辨左右兩欄之新舊，不需回頭讀標題。 */
+.db-wrap .db-cmp-table thead th:first-child{border-bottom:3px solid currentColor!important}
+.db-wrap .db-cmp-table thead th:nth-child(2){border-bottom:3px solid currentColor!important;opacity:.92}
+/* 取消單、雙列不同底色（斑馬紋）之設計，避免與懲戒依據之填色互相干擾。
+   ※ 這兩條的權重必須壓在下方 :has() 規則（權重 0,3,1）之下，否則會反過來
+     蓋掉懲戒依據的儲存格填色。舊寫法為
+       .db-cmp-table tbody tr:nth-child(even) td          （0,2,3）
+       .db-cmp-table tbody tr:nth-child(even) td:nth-child(2)（0,3,3）
+     後者權重高於 :has()，導致「雙數列的舊法欄」填色全部失效（實測兩表共 31 格）。
+     改以不含 :nth-child(even) 的寫法：全域斑馬紋 tbody tr:nth-child(even) td
+     權重同為 (0,1,3)，此處後宣告即可整批取消，且權重低於 :has()。 */
+.db-cmp-table tbody tr td{background:transparent}
+.db-cmp-table tbody tr td:nth-child(2){background:#FAF8F6}
+/* 曾作為懲戒依據之條文：改以「整個欄位（儲存格）」填色標示 */
+.db-cmp-table td:has(.db-article.db-u-j){background:var(--c-j-bg)}
+.db-cmp-table td:has(.db-article.db-u-k){background:var(--c-k-bg)}
+.db-cmp-table td:has(.db-article.db-u-l){background:var(--c-l-bg)}
+.db-cmp-table td:has(.db-article.db-u-m){background:var(--c-m-bg)}
+.db-cmp-table td:has(.db-article.db-u-n){background:var(--c-n-bg)}
+.db-cmp-table td:has(.db-article.db-u-o){background:var(--c-o-bg)}
+/* 表格內條文原本緊貼文字之填色刪除（改由儲存格底色呈現） */
+.db-cmp-table td .db-article.db-u-j,.db-cmp-table td .db-article.db-u-k,
+.db-cmp-table td .db-article.db-u-l,.db-cmp-table td .db-article.db-u-m,
+.db-cmp-table td .db-article.db-u-n,.db-cmp-table td .db-article.db-u-o{background:transparent}
+.db-wrap .db-cmp-table .db-article{border:none;margin:0;padding:0}
+.db-wrap .db-cmp-table td .db-article + .db-article{margin-top:13px;padding-top:11px;border-top:1px dashed var(--line)}
+/* 法規對照表字級固定：法條本文 15px、條號 16.5px、懲戒案例按鈕 12.5px。
+   直接指定於對照表範圍，避免 td 基準字級或 CMS 樣式造成單段條文與多段條文字級不一致。 */
+.db-wrap .db-cmp-table .db-article{font-size:15px}
+.db-wrap .db-cmp-table .db-article h4{font-size:16.5px}
+.db-wrap .db-cmp-table .db-article ol.db-paras>li,
+.db-wrap .db-cmp-table .db-article .db-kuan{font-size:15px}
+.db-wrap .db-cmp-table .db-article h4 .db-badge{font-size:12.5px}
+.db-law-title-wrap{margin:8px 0 10px;padding-bottom:9px;border-bottom:2px solid var(--line)}
+.db-law-title{font-size:21px;font-weight:700;color:var(--accent-deep);letter-spacing:.04em;margin:0 0 4px}
+/* 法規標題列上的「懲戒案例 →」按鈕：整部規範層級（不核對條次），
+   與條文層級的 .db-article h4 .db-badge 分開設樣式，兩者互不影響。 */
+.db-law-title .db-badge{
+  display:inline-block;font-size:12.5px;font-weight:600;letter-spacing:0;vertical-align:3px;
+  margin-left:10px;padding:2px 9px;border-radius:99px;
+  font-family:inherit;appearance:none;cursor:pointer;
+  background:var(--c-x-bg);color:var(--c-x);border:1px solid var(--c-x-line);
+  transition:filter .18s,transform .18s var(--e-out)
+}
+.db-law-title .db-badge:hover{filter:brightness(.96);transform:translateY(-1px)}
+.db-law-title .db-badge:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.db-law-note-fixed{font-size:var(--fs-read);line-height:1.8;color:var(--ink);background:var(--bg-soft);border-radius:7px;padding:11px 15px;margin:2px 0 8px}
+.db-law-source{font-size:var(--fs-cite);line-height:1.7;color:var(--ink-soft);margin:0;text-align:right}
+.db-law-source a{color:var(--accent);text-decoration:underline}
+.db-law-source a:hover{color:var(--accent-deep)}
+.db-law-used-toggle{
+  display:inline-flex;align-items:center;gap:9px;font-size:15px;font-weight:700;
+  color:var(--accent-deep);background:var(--accent-tint);border:1.5px solid var(--accent-line);
+  border-radius:8px;padding:10px 17px;margin:0 0 16px;cursor:pointer;
+  transition:background .2s,box-shadow .28s var(--e-soft),transform .2s var(--e-out)
+}
+.db-law-used-toggle:hover{background:var(--accent-tint-2);transform:translateY(-1px);box-shadow:0 6px 18px rgba(27,50,85,.14)}
+.db-law-used-toggle input{width:17px;height:17px;cursor:pointer;accent-color:var(--accent)}
+/* 倫理規範頁之色系變體：該頁版面（.db-eh-cta、條文底色、對照表表頭）為紅褐色系，
+   主色深藍的勾選鈕落在其中過於突兀，故改用同頁的 --c-l 家族。
+   僅換顏色，不動尺寸、間距與行為；套用與否由 toneUsedToggle() 依 lawState.key 決定。 */
+.db-law-used-toggle.db-tone-l{color:var(--c-l);background:var(--c-l-bg);border-color:var(--c-l-line)}
+.db-law-used-toggle.db-tone-l:hover{background:#E4D2D5;box-shadow:0 6px 18px rgba(124,78,87,.18)}
+.db-law-used-toggle.db-tone-l input{accent-color:var(--c-l)}
+/* [CSS-LAW-INTERACTION] 條文跳轉／卡片／漂浮速覽 */
+/* 金色強調框不畫在 .db-article 本身：宿主樣式可能改寫 outline／animation，
+   對照表的 overflow 又會裁掉向外擴張的 outline。改由 showArticleFlash() 在
+   document.body 建立獨立的 fixed overlay，以 inline !important ＋
+   requestAnimationFrame 控制位置與透明度，故本區不留 keyframes／class。 */
+.db-article h4{margin:0 0 5px;font-size:16.5px;color:var(--ink)}
+.db-article h4 .db-badge{font-size:12.5px;border-radius:99px;padding:2px 9px;margin-left:8px;vertical-align:1px;font-weight:600}
+.db-article h4 button.db-badge{appearance:none;border:none;font-family:inherit;cursor:pointer;transition:filter .18s,transform .18s var(--e-out)}
+.db-article h4 button.db-badge:hover{filter:brightness(.94);transform:translateY(-1px)}
+.db-article h4 button.db-badge:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+/* 條文卡片：色相分法規別、深淺分新舊（舊法為低彩、新法為飽和色） */
+.db-article.db-u-j{background:var(--c-j-bg);border-color:var(--c-j-line)}.db-article.db-u-j h4{color:var(--c-j)}.db-article.db-u-j .db-badge{background:#fff;color:var(--c-j)}
+.db-article.db-u-k{background:var(--c-k-bg);border-color:var(--c-k-line)}.db-article.db-u-k h4{color:var(--c-k)}.db-article.db-u-k .db-badge{background:#fff;color:var(--c-k)}
+.db-article.db-u-l{background:var(--c-l-bg);border-color:var(--c-l-line)}.db-article.db-u-l h4{color:var(--c-l)}.db-article.db-u-l .db-badge{background:#fff;color:var(--c-l)}
+.db-article.db-u-m{background:var(--c-m-bg);border-color:var(--c-m-line)}.db-article.db-u-m h4{color:var(--c-m)}.db-article.db-u-m .db-badge{background:#fff;color:var(--c-m)}
+.db-article.db-u-n{background:var(--c-n-bg);border-color:var(--c-n-line)}.db-article.db-u-n h4{color:var(--c-n)}.db-article.db-u-n .db-badge{background:#fff;color:var(--c-n)}
+.db-article.db-u-o{background:var(--c-o-bg);border-color:var(--c-o-line)}.db-article.db-u-o h4{color:var(--c-o)}.db-article.db-u-o .db-badge{background:#fff;color:var(--c-o)}
+/* 條文旁的關聯規範標籤（a.db-badge-ref）：連往該條文相關之外部規範。
+   刻意採法規別以外的中性主色，與同列的「懲戒案例 →」按鈕一眼可分。 */
+.db-article h4 a.db-badge-ref{background:var(--accent-tint);border:1px solid var(--accent-line);color:var(--accent);text-decoration:none;display:inline-block;transition:filter .18s,transform .18s var(--e-out)}
+.db-article h4 a.db-badge-ref:hover{background:var(--accent-tint-2);color:var(--accent-deep);text-decoration:none;transform:translateY(-1px)}
+.db-article h4 a.db-badge-ref:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.db-article ol.db-paras,.db-modal-body ol.db-paras{margin:0;padding:0;list-style:none;counter-reset:para}
+.db-article ol.db-paras>li,.db-modal-body ol.db-paras>li{position:relative;padding-left:27px;margin:4px 0;counter-increment:para;font-size:15px;line-height:1.75}
+.db-article ol.db-paras>li::before,.db-modal-body ol.db-paras>li::before{
+  content:counter(para);position:absolute;left:0;top:4px;width:19px;height:19px;border-radius:3px;
+  background:rgba(255,255,255,.75);color:var(--ink-soft);font-size:12px;text-align:center;line-height:19px;font-variant-numeric:tabular-nums
+}
+.db-article ol.db-paras>li.db-hl,.db-modal-body ol.db-paras>li.db-hl{background:#FFF3D6;border-radius:3px}
+.db-article .db-kuan,.db-modal-body .db-kuan{padding-left:calc(14px + 2em);text-indent:-2em;color:var(--ink);font-size:15px;line-height:1.75}
+.db-modal-body .db-hl-t,.db-modal-body .db-kuan.db-hl{background:#FFF3D6;border-radius:3px}
+
+/* 條文漂浮卡片（錨定於被點擊的條文按鈕旁；用 absolute 定位於 .db-wrap 內，
+   不使用 position:fixed 全螢幕浮層，嵌入官網 CMS 文章編輯器亦可正常運作） */
+.db-law-pop{
+  position:absolute;z-index:60;background:#fff;
+  border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:8px;
+  width:min(600px, calc(100% - 8px));
+  box-shadow:0 18px 44px rgba(43,43,46,.26);
+  animation:db-pop .3s var(--e-out) both
+}
+.db-law-pop[hidden]{display:none}
+.db-law-pop .db-modal-head{background:var(--bg-soft);border-radius:6px 6px 0 0;padding:12px 17px}
+.db-law-pop .db-modal-body{max-height:360px;overflow-y:auto;padding:13px 17px 17px}
+.db-modal-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.db-modal-head #modal-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.db-modal-head .db-tag{font-size:14.5px;font-weight:700}
+.db-modal-head .db-m-title{font-size:15.5px;color:var(--ink-soft)}
+.db-modal-close{
+  margin-left:auto;appearance:none;border:1px solid var(--line);background:#fff;border-radius:5px;
+  font:inherit;font-size:14px;padding:5px 13px;cursor:pointer;color:var(--ink);
+  transition:border-color .2s,color .2s,background .2s
+}
+.db-modal-close:hover{border-color:var(--accent);color:#fff;background:var(--accent)}
+.db-modal-body{padding:14px 18px 18px;overflow-y:auto}
+.db-modal-body .db-m-note{font-size:14.5px;color:var(--ink-soft);margin:8px 0 0}
+/* 其它規範速覽卡片：全文連結與案件檢索並排一列，兩者外觀一致（.db-m-jump）。
+   連結為 <a>，故需補上 .db-m-jump 未涵蓋的行內元素樣式（去底線、可設內距）。 */
+.db-modal-body .db-m-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0}
+.db-modal-body a.db-m-jump{display:inline-block;text-decoration:none;white-space:nowrap}
+.db-modal-body .db-m-jump{appearance:none;border:1px solid var(--accent);background:#fff;color:var(--accent-deep);border-radius:5px;font:inherit;font-size:14px;padding:6px 13px;cursor:pointer;transition:background .2s,color .2s}
+.db-modal-body .db-m-jump:hover{background:var(--accent);color:#fff}
+/* 法條卡片的動作列：與上方條文之間留出間距；按鈕字級小一號（連帶縮小按鈕本身），
+   一列才放得下「檢視引用本條之案件」與多顆態樣按鈕。
+   只作用於法條卡片（.db-m-acts-law），其它規範速覽卡片維持原字級。 */
+.db-modal-body .db-m-acts-law{margin-top:16px}
+.db-modal-body .db-m-acts-law .db-m-jump{font-size:12.5px;padding:4px 10px;border-radius:4px}
+/* 態樣按鈕：配色比照違失態樣標籤（紫），與「檢視引用本條之案件」一眼可分 */
+.db-modal-body .db-m-jump-p{border-color:var(--c-p-line);color:var(--c-p);background:var(--c-p-bg)}
+.db-modal-body .db-m-jump-p:hover{background:var(--c-p);color:#fff;border-color:var(--c-p)}
+
+/* [CSS-STATS] 統計 */
+/* 統計頁 */
+/* 二級標題（統計頁 .db-stats-h、資料庫說明與申訴救濟管道頁 .db-about-h 共用）：
+   左側品牌紅邊條＋淡紅漸層底 */
+.db-stats-h,.db-about-h{
+  font-size:21px;font-weight:700;color:var(--accent-deep);letter-spacing:.05em;
+  margin:26px 0 12px;padding:8px 14px;
+  background:linear-gradient(90deg,var(--accent-tint) 0%,rgba(251,239,242,0) 88%);
+  border-left:4px solid var(--accent);border-radius:0 5px 5px 0
+}
+.db-stats-h:first-child,.db-about-h:first-child{margin-top:4px}
+.db-stats-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;margin:0 0 6px;padding-bottom:10px;background:#fff}
+.db-stats-table{border-collapse:collapse;font-size:var(--fs-table-s);width:100%}
+.db-stats-table th,.db-stats-table td{border:1px solid var(--line);padding:5px 5px;text-align:center;white-space:nowrap}
+.db-stats-table thead th{background:var(--bg-soft);color:var(--accent-deep);font-weight:700;white-space:normal;line-height:1.35;padding:5px 4px}
+.db-stats-table tbody th{background:#fff;font-weight:600;color:var(--ink)}
+.db-stats-table tbody tr:hover td,.db-stats-table tbody tr:hover th{background:var(--accent-tint)}
+.db-stats-table tr.db-sum th,.db-stats-table tr.db-sum td{background:var(--bg-soft);font-weight:700}
+.db-stats-table td.db-z{color:#C8C2BC}
+.db-stats-table td.db-dash{color:#C8C2BC}
+.db-stats-table td.db-na{background:var(--bg-soft)}
+/* 年度長條：於「總計」欄底部繪製一條與該年度數值成正比的細長條，
+   使讀者在數字之外亦可直接比較各年度的量級；進場時由 0 成長至目標寬度 */
+.db-stats-table td.db-yr-bar{position:relative}
+.db-stats-table td.db-yr-bar .db-yb{
+  position:absolute;left:3px;right:3px;bottom:2px;height:4px;border-radius:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-line));
+  transform:scaleX(0);transform-origin:0 50%;
+  transition:transform 1.05s var(--e-out)
+}
+/* 以 scaleX 縮放（而非 width 百分比），長條恆在儲存格內、不會溢出至鄰欄 */
+.db-stats-table.db-yb-on td.db-yr-bar .db-yb{transform:scaleX(var(--f,0))}
+/* 統計表分組：粗線區隔「懲戒／不予懲戒／免議／不受理／暫時停職」各群組 */
+.db-stats-table .db-gsep{border-left:2px solid #BDB6B0}
+/* 類別色標：表頭下緣色條＋淺色底，顏色與（三）圓餅圖之類別一致 */
+.db-stats-table thead th.db-ckey{border-bottom-width:3px}
+/* 統計頁：表格與其備註、資料來源同置於 .db-chart-card 卡片內，視覺上與圖表一致 */
+.db-chart-card{
+  border:1px solid var(--line);border-radius:10px;padding:16px 18px 12px;margin:0 0 18px;background:#fff;
+  transition:box-shadow .3s var(--e-soft)
+}
+.db-chart-card:hover{box-shadow:0 10px 28px rgba(43,43,46,.07)}
+/* 三級標題（統計圖表標題 .db-chart-card h3、申訴救濟管道頁 .db-about-sh 共用） */
+.db-chart-card h3,.db-about-sh{
+  font-size:18.5px;font-weight:700;color:var(--accent-deep);letter-spacing:.04em;
+  margin:20px 0 12px;padding:0 0 7px 11px;
+  border-left:3px solid var(--accent);border-bottom:1px solid var(--line)
+}
+.db-chart-card h3{margin:2px 0 12px}
+/* 圖表備註與資料來源改用資料庫說明之 .db-about-note 格式 */
+.db-chart-svg{width:100%;height:auto;display:block;overflow:visible}
+.db-chart-svg .db-pt text{display:none;font-size:12.5px;font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:3.5px;stroke-linejoin:round;pointer-events:none}
+.db-chart-svg .db-pt:hover text{display:block}
+.db-chart-svg .db-pt:hover circle:last-of-type{r:5}
+/* 折線成長：路徑以描邊逐段畫出（dasharray 取足夠大之固定值） */
+.db-chart-svg polyline:not(.db-pie-leader){stroke-dasharray:2400;animation:db-draw 1.9s var(--e-soft) both}
+/* 折線資料點：隨線段依序浮現 */
+.db-chart-svg .db-pt{animation:db-rise-sm .5s var(--e-out) both;animation-delay:.75s}
+/* 圓餅圖：切片夠寬時標籤留在圖內（白字置中）；經計算容不下時才改置圖外並以指線連接 */
+.db-chart-svg .db-pt .db-pie-lb-in{display:block;font-size:20px;font-weight:500;fill:#fff;text-anchor:middle;pointer-events:none;stroke:none;paint-order:normal}
+.db-chart-svg .db-pt .db-pie-lb-out{display:block;font-size:20px;font-weight:400;pointer-events:none;paint-order:stroke;stroke:#fff;stroke-width:2px;stroke-linejoin:round}
+.db-chart-svg .db-pt .db-pie-leader{fill:none;stroke-width:1.2px;pointer-events:none}
+/* 圓餅切片依序自圓心綻開 */
+.db-chart-svg .db-slice{transform-origin:50% 50%;transform-box:view-box;animation:db-slice .62s var(--e-out) both}
+.db-chart-svg .db-slice:nth-of-type(2){animation-delay:.07s}
+.db-chart-svg .db-slice:nth-of-type(3){animation-delay:.14s}
+.db-chart-svg .db-slice:nth-of-type(4){animation-delay:.21s}
+.db-chart-svg .db-slice:nth-of-type(5){animation-delay:.28s}
+.db-chart-svg .db-slice:nth-of-type(6){animation-delay:.35s}
+.db-chart-svg .db-slice:nth-of-type(n+7){animation-delay:.42s}
+.db-chart-svg .db-slice path{transition:opacity .2s,transform .28s var(--e-out)}
+.db-chart-svg .db-slice:hover path{opacity:.86}
+.db-chart-legend{display:flex;flex-wrap:wrap;gap:5px 18px;margin:10px 0 4px;font-size:14.5px;color:var(--ink)}
+.db-chart-legend span{display:inline-flex;align-items:center;gap:6px}
+.db-chart-legend i{width:20px;height:4px;border-radius:2px;display:inline-block}
+/* 圓餅圖年度區間切換鈕 */
+.db-pie-range{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:2px 0 12px}
+.db-pie-range-lbl{font-size:13px;color:var(--ink-soft);letter-spacing:.05em;margin-right:2px}
+.db-wrap .db-pie-range-btn{
+  font-size:14.5px;padding:7px 17px;border-radius:999px;cursor:pointer;
+  color:var(--ink-soft);background:var(--bg-soft);border:1px solid var(--line)
+}
+.db-wrap .db-pie-range-btn:hover{border-color:var(--accent);color:var(--accent-deep);background:#fff}
+.db-wrap .db-pie-range-btn.db-is-on,
+.db-wrap .db-pie-range-btn.db-is-on:hover{
+  background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;
+  box-shadow:0 4px 14px rgba(27,50,85,.26)
+}
+/* 圓餅圖不放大超過原始尺寸（viewBox 640×340）：寬版頁面下避免視覺過大，
+   並與下方圖例一同置中；折線圖不受影響（其 viewBox 為 720 寬，維持滿版） */
+#chart-kind,#legend-kind{max-width:640px;margin-left:auto;margin-right:auto}
+/* [CSS-ANALYSIS] 統計與分析：專題分析（列表、文章、文章內圖表） */
+/* 分頁切換沿用案件清單的 .db-subtabs／.db-subtab（見 [CSS-COMMON-CONTROLS]）。 */
+.db-ana-sub[hidden]{display:none}
+/* 文章列表：一列一篇，標題在左、發布日期在右；窄螢幕改為上下排列 */
+.db-ana-list{list-style:none;margin:6px auto 0;padding:0;max-width:860px;border-top:2px solid var(--accent-deep)}
+.db-ana-list li{margin:0;padding:0;border-bottom:1px solid var(--line)}
+.db-wrap .db-ana-item{
+  display:flex;align-items:baseline;gap:18px;padding:18px 8px 18px 6px;
+  color:var(--ink);text-decoration:none;transition:background .18s
+}
+.db-wrap .db-ana-item:hover{background:var(--accent-tint)}
+.db-wrap .db-ana-item:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.db-ana-item-t{flex:1 1 auto;font-size:19px;font-weight:700;color:var(--accent-deep);line-height:1.5;letter-spacing:.03em}
+.db-ana-item-d{flex:none;font-size:14.5px;color:var(--ink-soft);font-variant-numeric:tabular-nums;white-space:nowrap}
+.db-ana-item-go{flex:none;width:18px;height:18px;color:var(--accent);align-self:center}
+.db-ana-item-go svg{width:100%;height:100%;display:block}
+@media (max-width:640px){
+  .db-wrap .db-ana-item{flex-wrap:wrap;gap:4px 12px}
+  .db-ana-item-t{flex-basis:100%;font-size:17.5px}
+}
+/* 文章：正文限制行長，表格與圖可較寬 */
+.db-ana-art{max-width:1040px;margin:0 auto;font-size:var(--fs-read);line-height:1.9;color:var(--ink)}
+.db-ana-art[hidden]{display:none}
+.db-wrap .db-ana-back{
+  display:inline-flex;align-items:center;gap:6px;margin:2px 0 14px;padding:6px 12px 6px 8px;
+  font:inherit;font-size:14.5px;color:var(--accent-deep);background:#fff;
+  border:1px solid var(--accent-line);border-radius:6px;cursor:pointer;box-shadow:none
+}
+.db-wrap .db-ana-back:hover{background:var(--accent-tint)}
+.db-wrap .db-ana-back:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.db-ana-art-hd{border-bottom:2px solid var(--accent-deep);padding:0 0 12px;margin:0 0 22px}
+.db-ana-art-t{font-size:clamp(23px,3.2vw,29px);font-weight:700;line-height:1.45;color:var(--accent-deep);letter-spacing:.03em;margin:0 0 6px}
+.db-ana-art-m{margin:0;font-size:14.5px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.db-ana-body p{margin:0 0 14px;text-wrap:pretty}
+.db-ana-body p.db-ana-indent{padding-left:2em}
+.db-ana-body ul,.db-ana-body ol{margin:0 0 12px;padding-left:1.8em}
+.db-ana-body li{margin:0 0 6px}
+.db-ana-body li p{margin:0}
+/* 項目符號之下的編號清單（如第二節三組分類之一）：再縮一層，看得出隸屬上一項 */
+.db-ana-body ul + ol{padding-left:3.8em}
+.db-ana-body .db-ana-h{
+  font-size:21px;font-weight:700;color:var(--accent-deep);letter-spacing:.05em;
+  margin:34px 0 14px;padding:8px 14px;
+  background:linear-gradient(90deg,var(--accent-tint) 0%,rgba(251,239,242,0) 88%);
+  border-left:4px solid var(--accent);border-radius:0 5px 5px 0
+}
+.db-ana-body .db-ana-sh{
+  font-size:18px;font-weight:700;color:var(--accent-deep);letter-spacing:.04em;
+  margin:26px 0 12px;padding:0 0 6px 11px;border-left:3px solid var(--accent);border-bottom:1px solid var(--line)
+}
+.db-ana-scroll{overflow-x:auto;margin:0 0 18px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.db-ana-table{border-collapse:collapse;width:100%;font-size:var(--fs-table-s);line-height:1.65}
+/* 案件清單的表格規則寫成無前綴的 table／tbody td（最小寬度、固定欄寬、斑馬紋），
+   會一併套到文章內的表格，故於此逐項還原；斑馬紋另依各表需要重設。 */
+.db-wrap .db-ana-table{min-width:0;table-layout:auto}
+.db-wrap .db-ana-table tbody td{padding:7px 9px;border-top:1px solid var(--line);font-size:var(--fs-table-s);background:#fff}
+.db-wrap .db-ana-table.db-ana-numtab tbody tr:nth-child(2n) td{background:var(--bg-soft)}
+/* 28 件表：一案一個 <tbody>，以案為單位交替底色（同一案號的各列同色） */
+.db-wrap .db-ana-t28 tbody:nth-of-type(2n) td{background:var(--bg-soft)}
+.db-ana-t28 thead th{text-align:center}
+.db-ana-table th,.db-ana-table td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+.db-ana-table thead th{background:var(--bg-soft);color:var(--accent-deep);font-weight:700;white-space:nowrap}
+.db-ana-table td p{margin:0 0 6px}
+.db-ana-table td p:last-child{margin:0}
+.db-ana-table.db-ana-numtab td:not(:first-child),.db-ana-table.db-ana-numtab th:not(:first-child){text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* 末列為「合計」的表（db-ana-sum）才加底色 */
+.db-wrap .db-ana-table.db-ana-sum tbody tr:last-child td{font-weight:700;background:var(--bg-soft)}
+.db-ana-table td[colspan]{font-weight:700;color:var(--accent-deep)}
+/* 文字欄位多的兩張表：固定欄寬比例，避免案號按鈕（不可斷行的方塊）把版面撐開；
+   窄螢幕維持最小寬度、改由外框橫向捲動 */
+.db-wrap .db-ana-table.db-ana-t28{table-layout:fixed;min-width:680px}
+.db-ana-t28 th:nth-child(1){width:23%}.db-ana-t28 th:nth-child(2){width:29%}.db-ana-t28 th:nth-child(3){width:48%}
+.db-ana-t28 td:first-child{line-height:1.9}
+/* 相近刑度比較：一個刑度區間一段，左「除名」、右「未除名」各自往下排卡片。
+   卡片內為案號、刑度標籤、懲戒結果與行為摘要，摘要一律完整顯示。
+   除名用與圖一、圖二相同的深紅，未除名用主色深藍。窄螢幕改為上下兩段。 */
+.db-ana-cmp{margin:4px 0 22px}
+.db-ana-cmp-band{margin:0 0 18px}
+.db-ana-cmp-hd{display:flex;align-items:baseline;gap:12px;padding:0 0 6px;margin:0 0 10px;border-bottom:2px solid var(--accent-deep)}
+.db-ana-cmp-lbl{font-size:18px;font-weight:700;color:var(--accent-deep);letter-spacing:.03em}
+.db-ana-cmp-n{font-size:13.5px;color:var(--ink-soft)}
+.db-ana-cmp-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.db-ana-cmp-tag{display:inline-block;font-size:13px;font-weight:700;padding:2px 12px;border-radius:5px;margin:0 0 8px}
+.db-ana-cmp-tag.is-dis{background:#F7ECEE;color:#8E1F33}
+.db-ana-cmp-tag.is-non{background:var(--accent-tint);color:var(--accent-deep)}
+.db-ana-cmp-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 14px 12px;margin:0 0 10px}
+.db-ana-cmp-col:first-child .db-ana-cmp-card{border-left:3px solid #8E1F33}
+.db-ana-cmp-col:last-child .db-ana-cmp-card{border-left:3px solid var(--accent)}
+.db-ana-body .db-ana-cmp-card p{margin:0}
+.db-ana-cmp-card .db-ana-cno{font-size:14.5px;line-height:1.7}
+.db-ana-chips{display:flex;flex-wrap:wrap;gap:6px;margin:7px 0 8px}
+.db-ana-chip{font-size:13px;line-height:1.5;padding:2px 9px;border-radius:5px;background:var(--bg-soft);border:1px solid var(--line);color:var(--ink)}
+.db-ana-chip.is-sum{font-weight:700}
+.db-ana-res{font-size:13px;line-height:1.5;padding:2px 9px;border-radius:5px;font-weight:700;background:var(--accent-tint);color:var(--accent-deep);border:1px solid var(--accent-line)}
+.db-ana-body p.db-ana-cmp-sum{font-size:14.5px;line-height:1.8;color:var(--ink)}
+@media (max-width:640px){ .db-ana-cmp-cols{grid-template-columns:minmax(0,1fr);gap:4px} }
+/* 文章內的簡易圖表：橫條（刑度組成、緩刑對照）、方塊（28 件分類）、覆審三格 */
+.db-ana-bars{margin:2px 0 4px}
+.db-ana-barrow{display:grid;grid-template-columns:150px minmax(0,1fr) 76px;gap:10px;align-items:center;margin:0 0 8px;font-size:14px}
+.db-ana-barlbl{color:var(--ink);line-height:1.35}
+.db-ana-barlbl small{display:block;font-size:12px;color:var(--ink-soft)}
+.db-ana-bar{display:flex;height:24px;border-radius:4px;overflow:hidden;background:var(--line-soft)}
+.db-ana-bar span{display:block;height:100%}
+.db-ana-barpct{font-size:13px;color:var(--ink-soft);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.db-ana-barsep{border-top:1px dashed var(--line);margin:10px 0 10px 160px}
+.db-ana-cats{display:flex;flex-wrap:wrap;gap:16px 34px;justify-content:center;padding:6px 0 2px}
+.db-ana-cat{display:flex;flex-direction:column;align-items:center}
+.db-ana-sq{display:grid;grid-template-columns:repeat(5,16px);gap:4px}
+.db-ana-sq i{display:block;width:16px;height:16px;border-radius:3px}
+.db-ana-body .db-ana-cat p{margin:8px 0 0;font-size:13.5px;line-height:1.5;color:var(--ink);text-align:center;max-width:12em}
+.db-ana-cat b{display:block;font-size:18px;color:var(--accent-deep)}
+.db-ana-rev{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.db-ana-rev-c{border-radius:8px;padding:12px 8px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.db-ana-rev-c b{font-size:26px;line-height:1.2;font-variant-numeric:tabular-nums}
+.db-ana-rev-c span{font-size:14px;font-weight:700}
+.db-ana-rev-c small{font-size:12.5px}
+.db-ana-rev-c.is-keep{background:var(--bg-soft);color:var(--ink)}
+.db-ana-rev-c.is-up{background:#F7ECEE;color:#8E1F33}
+.db-ana-rev-c.is-down{background:var(--accent-tint);color:var(--accent-deep)}
+@media (max-width:640px){
+  .db-ana-barrow{grid-template-columns:96px minmax(0,1fr) 58px;gap:6px;font-size:13px}
+  .db-ana-barsep{margin-left:102px}
+}
+/* 文中案號：點開決議書全文彈窗（沿用 .db-ft-open 的委派處理器）。
+   <button> 會被官網主題套用通用樣式，故以 .db-wrap 前綴提高權重並逐項歸零。 */
+.db-wrap .db-ana-body button.db-ana-no{
+  display:inline;font:inherit;line-height:inherit;letter-spacing:inherit;color:var(--accent);
+  background:none;border:0;border-radius:0;white-space:normal;
+  text-decoration:underline dashed var(--accent-line);text-decoration-thickness:1px;text-underline-offset:4px;
+  padding:0;margin:0;cursor:pointer;box-shadow:none;text-align:inherit;vertical-align:baseline
+}
+.db-wrap .db-ana-body button.db-ana-no:hover{color:var(--accent-deep);text-decoration:underline solid var(--accent)}
+.db-wrap .db-ana-body button.db-ana-no:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+/* 文章內圖表 */
+.db-ana-fig{margin:6px 0 22px;padding:16px 18px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.db-ana-fig-t{font-size:16px;font-weight:700;color:var(--accent-deep);margin:0 0 8px;letter-spacing:.03em}
+.db-ana-fig-note{margin:10px 0 0;font-size:14px;line-height:1.8;color:var(--ink-soft)}
+.db-ana-fig-svg svg{display:block;width:100%;height:auto;overflow:visible}
+#ana-fig1 svg{max-width:560px;margin:0 auto}
+.db-ana-key{display:flex;flex-wrap:wrap;gap:4px 18px;justify-content:center;margin:8px 0 0;font-size:13.5px;color:var(--ink-soft)}
+.db-ana-key span{display:inline-flex;align-items:center;gap:6px}
+.db-ana-key i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.db-ana-pt.db-ft-open{cursor:pointer}
+.db-ana-pt:focus{outline:none}
+.db-ana-pt:hover circle,.db-ana-pt:focus-visible circle{stroke:var(--ink);stroke-width:1.5}
+@media (prefers-reduced-motion:no-preference){
+  .db-ana-art:not([hidden]){animation:db-rise-sm .45s var(--e-out) both}
+}
+/* [CSS-ABOUT] 資料庫說明 */
+/* 資料庫說明頁 */
+.db-about{font-size:var(--fs-read);line-height:1.9;color:var(--ink)}
+.db-about p{margin:0 0 13px;text-wrap:pretty}
+/* [CSS-REFORM] 改革主張 */
+/* 改革主張頁 */
+.db-reform-hero{
+  /* 靜態漸層：原本加了 background-size:210% ＋ db-flow 推動 background-position，
+     但此漸層起點 #0F2038 與終點 #24406B 不同色，平鋪後兩塊之間會出現一道硬邊，
+     動起來就成了掃過主視覺的橫線（頁首 .db-sticky::before 起訖同色，故無此問題）。
+     已取消該動畫；動態僅保留下方 ::after 的柔光飄移，該效果無邊界、不會產生線條。 */
+  background:linear-gradient(125deg,#0F2038 0%,#1B3255 34%,#2C4A73 62%,#24406B 100%);
+  border-radius:12px;color:#fff;padding:34px 38px 30px;margin:6px 0 22px;
+  position:relative;overflow:hidden;box-shadow:0 12px 34px rgba(15,32,56,.22)
+}
+.db-reform-hero::after{
+  content:"";position:absolute;inset:-40% -10%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(255,255,255,.14),rgba(255,255,255,0) 70%);
+  animation:db-drift 18s var(--e-soft) infinite
+}
+.db-reform-hero .db-reform-mark{
+  position:absolute;right:6px;bottom:-46px;font-size:180px;font-weight:900;
+  color:rgba(255,255,255,.09);line-height:1;pointer-events:none;user-select:none;
+  /* 視差：捲動時由腳本寫入 --par 位移量 */
+  transform:translateY(var(--par,0px))
+}
+.db-reform-hero .db-kicker{font-size:14px;letter-spacing:.35em;color:var(--gold-soft);margin:0 0 10px;font-weight:700;position:relative}
+/* 大標的白色原本靠 .db-reform-hero 的 color 繼承而來，但繼承一定輸給任何直接宣告：
+   官網 CMS 佈景若對 h2 設了文字色，本標題就會變成深色而在深藍底上幾乎看不見。
+   故此處明確指定，並加 !important 以免佈景選擇器權重較高。 */
+.db-reform-hero h2{font-size:28px;letter-spacing:.12em;font-weight:900;margin:0 0 14px;position:relative;color:#fff!important}
+.db-reform-hero p{font-size:var(--fs-read-lg);line-height:1.95;margin:0;max-width:790px;color:#EDF2F9;position:relative}
+.db-reform-hero b{color:var(--gold-soft)}
+.db-reform-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.db-reform-card{
+  position:relative;border:1px solid var(--line);border-top:4px solid var(--accent);
+  border-radius:10px;background:#fff;padding:20px 20px 18px;line-height:1.9;
+  font-size:var(--fs-read);color:var(--ink);overflow:hidden;
+  transition:box-shadow .3s var(--e-soft),transform .3s var(--e-out),border-color .3s
+}
+.db-reform-card::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:0;
+  background:radial-gradient(120% 90% at 50% -10%,rgba(27,50,85,.10),rgba(27,50,85,0) 70%);
+  transition:opacity .35s var(--e-soft)
+}
+.db-reform-card:hover{box-shadow:0 14px 30px rgba(15,32,56,.16);transform:translateY(-4px)}
+.db-reform-card:hover::after{opacity:1}
+.db-reform-card .db-num{position:absolute;top:8px;right:14px;font-size:48px;font-weight:900;line-height:1;color:rgba(27,50,85,.10);letter-spacing:0;pointer-events:none;transition:transform .35s var(--e-out)}
+.db-reform-card:hover .db-num{transform:scale(1.08) translateY(-2px)}
+.db-reform-card h3{font-size:17.5px;font-weight:800;letter-spacing:.04em;color:var(--accent-deep);margin:0 46px 9px 0;line-height:1.5}
+.db-reform-card p{margin:0}
+.db-reform-card.db-rc-j{border-top-color:var(--c-j)}.db-reform-card.db-rc-j .db-num{color:rgba(91,127,145,.14)}.db-reform-card.db-rc-j h3{color:#3F6272}
+.db-reform-card.db-rc-k{border-top-color:var(--c-k)}.db-reform-card.db-rc-k .db-num{color:rgba(31,94,122,.14)}.db-reform-card.db-rc-k h3{color:#1F5E7A}
+.db-reform-card.db-rc-l{border-top-color:var(--c-l)}.db-reform-card.db-rc-l .db-num{color:rgba(154,106,115,.14)}.db-reform-card.db-rc-l h3{color:#7C4E57}
+.db-reform-card.db-rc-m{border-top-color:var(--c-m)}.db-reform-card.db-rc-m .db-num{color:rgba(27,50,85,.13)}.db-reform-card.db-rc-m h3{color:var(--accent)}
+.db-reform-foot{margin:22px 0 4px;font-size:14.5px;color:var(--ink-soft);text-align:center;letter-spacing:.05em}
+@media (max-width:640px){
+  .db-reform-hero{padding:24px 20px 22px}
+  .db-reform-hero h2{font-size:22px}
+  .db-reform-hero .db-reform-mark{font-size:130px;bottom:-32px}
+}
+
+
+/* [CSS-COMPLAINT] 申訴救濟／地圖／公會資訊 */
+/* 申訴救濟管道頁 */
+/* 民眾入口（申訴救濟頁「一、」）：常見情形 → 違失態樣。
+   刻意做成卡片清單而非表格：本區只是導覽，欄位化反而增加閱讀負擔。
+   卡片正面只有標題，點擊才展開其下的態樣連結；欄數以 auto-fill 自適應，
+   不另寫 media query。align-items:start 是必要的——同列卡片才不會被
+   展開中的那一張撐成一樣高。
+   ※ 不使用 ::before／::after 的 content（CMS 會破壞其值），
+     箭頭等符號一律寫在 HTML 內容裡。 */
+.db-pub-lead{color:var(--ink-soft);font-size:var(--fs-cite);line-height:1.85;margin:0 0 14px}
+.db-pub-list{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:12px;margin:0 0 14px;align-items:start
+}
+.db-pub-item{
+  border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;
+  background:linear-gradient(180deg,#FCFAF9,#F5F2EF);overflow:hidden
+}
+/* [CMS] 卡片是 <details>、標題是 <summary>：展開收合全交給瀏覽器，本檔不綁事件。
+   曾改用 button＋hidden 屬性切換，在 jrf.org.tw 上點得開、再點收不回來，
+   連行內 display:none!important 都壓不住（原因未查明，不是 CSS 特異性問題）。
+   勿改回 JS 切換；同頁「四、常見疑慮」（.db-cp-q）用的也是 <details>。 */
+/* 收合狀態下每張卡片一律等高：標題預留兩行的高度，一行的標題不會比兩行的矮。
+   仍搭配 .db-pub-list 的 align-items:start，故展開其中一張時不會把同列其他張
+   一併撐高（見上方 .db-pub-list 之註解）。單欄（窄畫面）時解除，避免留白。 */
+.db-pub-t{
+  list-style:none;cursor:pointer;padding:11px 13px;min-height:calc(3.2em + 22px);
+  display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  font-weight:700;color:var(--accent-deep);font-size:16.5px;line-height:1.6;
+  transition:color .18s
+}
+/* Safari 的三角標記不吃 list-style，須另外關閉（同 .db-cp-q>summary 的做法）。 */
+.db-pub-t::-webkit-details-marker{display:none}
+@media (max-width:620px){ .db-pub-t{min-height:0} }
+.db-pub-t:hover{color:var(--accent)}
+.db-pub-t:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+/* 箭頭改由 CSS 旋轉：▼ 轉半圈即為 ▲，展開狀態直接讀 details 的 open 屬性，
+   不必由 JS 換字元（字元仍寫在 HTML 內容裡，不用 ::before 的 content，見上方註解）。 */
+.db-pub-ar{
+  flex:0 0 auto;font-weight:400;font-size:12px;color:var(--ink-soft);
+  display:inline-block;transition:transform .22s var(--e-out)
+}
+.db-pub-item[open] .db-pub-ar{transform:rotate(180deg)}
+.db-pub-body{padding:0 13px 12px;animation:db-rise-sm .22s var(--e-out) both}
+.db-pub-d{color:var(--ink-soft);font-size:var(--fs-table);line-height:1.8;margin:0 0 9px}
+/* 態樣連結：刻意不沿用 .db-tag.db-tag-p（紫色標籤）。
+   紫色是「態樣名稱」在資料庫其他各頁的統一標記色，但本區整體走申訴頁的
+   深藍系，紫色標籤夾在其中過於搶眼，故此處另立一組配色；日後若有人想
+   「統一回紫色」，請先確認這個取捨是否仍成立，不要順手改。
+   每張小卡一律滿欄寬並設 min-height，故不隨態樣名稱長短變形，
+   長名稱換行後仍與短名稱同寬、同高。 */
+.db-pub-pats{display:grid;gap:6px}
+.db-pub-pat{
+  appearance:none;font:inherit;cursor:pointer;width:100%;
+  min-height:48px;display:flex;align-items:center;text-align:left;
+  padding:6px 11px;font-size:var(--fs-table);line-height:1.55;
+  background:var(--accent-tint);color:var(--accent-deep);
+  border:1px solid var(--accent-line);border-radius:6px;
+  transition:background .18s,transform .18s var(--e-out)
+}
+.db-pub-pat:hover{background:var(--accent-tint-2);transform:translateY(-1px)}
+.db-pub-pat:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.db-pub-foot{color:var(--ink-soft);font-size:var(--fs-cite);line-height:1.85;margin:0 0 6px}
+.db-pub-more{
+  appearance:none;font:inherit;font-size:var(--fs-cite);cursor:pointer;
+  background:var(--accent-tint);color:var(--accent-deep);
+  border:1px solid var(--accent-line);border-radius:5px;padding:2px 11px;margin-left:6px;
+  transition:background .18s,transform .18s var(--e-out)
+}
+.db-pub-more:hover{background:var(--accent-tint-2);transform:translateY(-1px)}
+.db-pub-more:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+/* [CSS-COMPLAINT-TABLE] 地方公會申訴方式表 */
+/* 各地方律師公會申訴資訊一覽表。
+   刻意不沿用案件清單的表格樣式：本檔有一條通用規則 table{min-width:1566px}
+   （為案件清單的寬表格而設），且 thead th 是深藍底的置頂表頭，
+   兩者套到這張窄表上都會破版，故此處以獨立類名重新宣告，並把 min-width 歸零。 */
+/* 表格與其下方的「展開全部」鈕合為一個區塊（band），寬度與對齊只設定在這一層。
+   兩者原本各自置中，表格改為靠左後若不同層設定，按鈕會留在頁面中央而與表格脫節。 */
+.db-bar-form-band{width:60%;min-width:min(420px,100%);max-width:100%;margin:0}
+.db-bar-form-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:2px 0 0}
+/* 寬度只取六成（由 .db-bar-form-band 決定）：欄內都是短字串，撐滿整頁反而鬆散。
+   min-width 為四欄不斷行所需的下限（約 420px），視窗窄到放不下時由
+   .db-bar-form-wrap 橫向捲動接手；≤640px 另改為滿版並取消下限，見下方。 */
+.db-wrap .db-bar-form{width:100%;min-width:420px;max-width:none;margin:0;
+  border-collapse:collapse;table-layout:fixed;font-size:var(--fs-read)}
+.db-wrap .db-bar-form col.db-c-bar{width:28%}
+.db-wrap .db-bar-form col.db-c-doc,.db-wrap .db-bar-form col.db-c-rule{width:24%}
+.db-wrap .db-bar-form col.db-c-fee{width:24%}
+/* 表頭沿用資料庫的深藍底白字；position 歸為 static——通用的 thead th 是置頂表頭，
+   這張表不需要，留著會在捲動時浮在內容上。 */
+.db-wrap .db-bar-form thead th{
+  background:linear-gradient(180deg,#1B3255,#12253F);color:#fff;font-weight:600;
+  font-size:15px;letter-spacing:.04em;padding:9px 10px;text-align:center;
+  border:1px solid #12253F;position:static;z-index:auto
+}
+.db-wrap .db-bar-form td{border:1px solid var(--line);padding:9px 10px;vertical-align:top;
+  text-align:center;overflow-wrap:anywhere;line-height:1.6}
+.db-wrap .db-bar-form td.db-bar{font-weight:700;color:var(--accent-deep);white-space:nowrap}
+.db-wrap .db-bar-form td.db-na{color:var(--ink-soft)}
+.db-wrap .db-bar-form tbody tr:nth-child(even){background:rgba(27,50,85,.035)}
+/* 申訴資料表預設只顯示前 5 列；此 class 由 initBarForm() 在 JS 可用時才加入。
+   無 JS 時不套用收合 class，16 列資料仍全部可讀。 */
+.db-wrap .db-bar-form.db-collapsed tbody tr:nth-child(n+6){display:none}
+.db-wrap .db-bar-form-toggle{
+  display:block;width:max-content;max-width:calc(100% - 24px);margin:-1px auto 16px;padding:6px 18px 7px;
+  appearance:none;font:inherit;font-size:14px;font-weight:700;line-height:1.4;letter-spacing:.02em;
+  color:var(--accent-deep);background:#fff;cursor:pointer;
+  border:1px solid var(--line);border-top:0;border-radius:0 0 7px 7px;
+  box-shadow:0 3px 8px rgba(15,32,56,.08);
+  position:relative;z-index:1;
+  transition:background .2s var(--e-soft),color .2s,border-color .2s,box-shadow .2s
+}
+.db-wrap .db-bar-form-toggle:hover{
+  background:var(--accent-tint);color:var(--accent-deep);border-color:var(--accent-line);
+  box-shadow:0 4px 10px rgba(15,32,56,.12)
+}
+.db-wrap .db-bar-form-toggle:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.db-wrap .db-bar-form-toggle[hidden]{display:none!important}
+/* 連結改以圖示呈現，字級略放大以維持點擊面積 */
+.db-wrap .db-bar-form td a{font-size:17px;text-decoration:none;line-height:1}
+.db-wrap .db-bar-form td a:hover{text-decoration:none;filter:brightness(1.15)}
+@media (max-width:640px){
+  .db-bar-form-band{width:100%;min-width:0}
+  .db-wrap .db-bar-form{width:100%;min-width:0;font-size:14px}
+  .db-wrap .db-bar-form thead th{font-size:14px;padding:8px 4px}
+  .db-wrap .db-bar-form td{padding:8px 4px}
+  .db-wrap .db-bar-form col.db-c-bar{width:28%}
+  .db-wrap .db-bar-form col.db-c-doc,.db-wrap .db-bar-form col.db-c-rule{width:22%}
+  .db-wrap .db-bar-form col.db-c-fee{width:28%}
+}
+.db-about-src{list-style:none;padding:0;margin:0 0 16px}
+.db-about-src li{position:relative;padding:9px 15px 9px 35px;margin:0 0 8px;border-radius:6px;font-size:var(--fs-read);
+  /* [CMS] 方形項目符號以背景漸層繪製，避免 content 引號字串被 CMS 轉義 */
+  background:linear-gradient(var(--accent),var(--accent)) 15px 50% / 7px 7px no-repeat var(--bg-soft);
+  transition:background-color .22s,transform .22s var(--e-out)}
+.db-about-src li:hover{transform:translateX(3px)}
+.db-about-src a{color:var(--accent);text-decoration:underline}
+.db-about-src a:hover{color:var(--accent-deep)}
+.db-about-meta{margin:0 0 16px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.db-about-meta>div{display:flex;border-top:1px solid var(--line);transition:background .2s}
+.db-about-meta>div:hover{background:var(--accent-tint)}
+.db-about-meta>div:first-child{border-top:none}
+.db-about-meta dt{flex:0 0 100px;background:var(--bg-soft);color:var(--accent-deep);font-weight:700;font-size:15.5px;padding:11px 15px;margin:0}
+.db-about-meta dd{flex:1;padding:11px 15px;margin:0;font-size:var(--fs-read)}
+.db-about-note{font-size:var(--fs-read);line-height:1.85;color:var(--ink-soft);background:var(--bg-soft);border:1px solid var(--line);border-radius:7px;padding:12px 16px;margin:0 0 8px}
+.db-about-note b{color:var(--accent-deep);margin-right:4px}
+.db-about-note a{color:var(--accent);text-decoration:underline}
+.db-about-note a:hover{color:var(--accent-deep)}
+/* 備註縮排對齊：標籤凸排，折行後之文字與首行內文起點對齊。
+   「備註」標籤寬 2em＋全形空格 1em＝3em；「資料來源」為 4em＋1em＝5em（.db-an-src）；
+   另加 4px 為標籤 b 之 margin-right */
+p.db-about-note{padding-left:calc(16px + 3em + 4px);text-indent:calc(-3em - 4px)}
+p.db-about-note.db-an-src{padding-left:calc(16px + 5em + 4px);text-indent:calc(-5em - 4px)}
+/* 多列備註（備註＋資料來源同框）：以 div.db-about-note 包多個 p，逐列凸排 */
+div.db-about-note p{margin:0;padding-left:calc(3em + 4px);text-indent:calc(-3em - 4px)}
+div.db-about-note p+p{margin-top:4px}
+div.db-about-note p.db-an-src{padding-left:calc(5em + 4px);text-indent:calc(-5em - 4px)}
+/* 分項列（1、2、…）：無標籤前綴，故不需再凸排，僅整列縮排至與首行項次（如「1、」）同一起點 */
+div.db-about-note p.db-src-num{padding-left:calc(3em + 4px);text-indent:0}
+div.db-about-note.db-an-src p.db-src-num{padding-left:calc(5em + 4px);text-indent:0}
+.db-chart-card .db-about-note{margin:8px 0 4px}
+
+.db-complaint{font-size:var(--fs-read);line-height:1.9;color:var(--ink)}
+.db-complaint p{margin:0 0 13px;text-wrap:pretty}
+.db-complaint-intro a{white-space:nowrap}
+.db-flow-wrap{overflow-x:auto;margin:0 0 8px;padding-bottom:6px}
+#flow-svg{min-width:820px;width:100%;height:auto;display:block}
+#flow-svg text{font-family:inherit}
+.db-bar-layout{display:flex;gap:24px;align-items:stretch;margin-top:6px}
+/* 版面採原始格式：地圖欄固定 320px，右側聯繫資訊區塊占其餘寬度 */
+.db-map-col{flex:0 0 320px;position:relative}
+.db-map-inner{position:relative;width:100%}
+.db-map-box{border:1px solid var(--line);border-radius:10px;padding:7px;background:linear-gradient(180deg,#FBF8F6,#F4EFEC);position:relative}
+#tw-map{width:100%;height:auto;display:block}
+#tw-map .db-region{fill:#E3D9D6;stroke:#fff;stroke-width:1.5;cursor:pointer;transition:fill .22s var(--e-soft);outline:none}
+#tw-map .db-region:hover,#tw-map .db-region.db-hover{fill:var(--accent-tint-2)}
+#tw-map .db-region.db-cur{fill:var(--accent)}
+#tw-map .db-region:focus-visible{stroke:var(--accent-deep);stroke-width:2.5px}
+#tw-map .db-rlabel{font-size:15.5px;fill:#4A4340;pointer-events:none;font-family:inherit;text-anchor:middle;font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:2.8px;stroke-linejoin:round}
+#tw-map .db-rlabel.db-big{font-size:23px;font-weight:800;stroke-width:3.4px}
+#tw-map .db-region.db-cur + .db-rlabel{fill:#fff;stroke:var(--accent-deep);stroke-width:0.6px}
+/* 地圖左上兩顆 chip：全國律師聯合會與法律扶助基金會 */
+.db-twba-chip{
+  position:absolute;top:10px;left:10px;z-index:2;
+  font:inherit;font-size:13px;font-weight:700;cursor:pointer;
+  color:var(--c-k);background:var(--c-k-bg);border:1.5px solid var(--c-k-line);border-radius:7px;
+  padding:7px 11px;box-shadow:0 2px 6px rgba(43,43,46,.12);
+  transition:background .2s,border-color .2s,transform .2s var(--e-out)
+}
+.db-twba-chip:hover,.db-twba-chip.db-cur{background:#C9E0EB;border-color:#7FADC2;transform:translateY(-1px)}
+.db-twba-chip:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+/* 法律扶助基金會 chip：位於全國律師聯合會 chip 下方 */
+.db-twba-chip.db-laf-chip{
+  top:56px;
+  color:#3F6A58;background:#E3F0EA;border-color:#B7D3C6
+}
+.db-twba-chip.db-laf-chip:hover,.db-twba-chip.db-laf-chip.db-cur{background:#D1E6DB;border-color:#96BFAD}
+.db-bar-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.db-bar-card{border:1px solid var(--line);border-radius:10px;overflow:hidden;flex:1;display:flex;flex-direction:column;animation:db-pop .45s var(--e-out) both}
+.db-bar-card-head{
+  background:linear-gradient(110deg,#1B3255,#2C4A73 70%);color:#fff;
+  padding:17px 21px;font-size:23px;font-weight:700;letter-spacing:.04em
+}
+.db-bar-card-body{padding:20px 22px;flex:1;display:flex;flex-direction:column;justify-content:space-evenly}
+.db-bar-row{display:flex;gap:12px;padding:14px 0;border-top:1px solid var(--line-soft);font-size:19px;line-height:1.9}
+.db-bar-row:first-child{border-top:none}
+.db-bar-row .db-k{flex:0 0 96px;color:var(--ink-soft);font-weight:700}
+.db-bar-row .db-v{flex:1;min-width:0;word-break:break-all}
+.db-bar-row .db-v a{color:var(--accent);text-decoration:underline}
+.db-bar-row .db-v a:hover{color:var(--accent-deep)}
+.db-bar-row .db-v .db-tel{display:inline-block;margin-right:14px;white-space:nowrap}
+.db-bar-empty{color:var(--ink-soft);padding:30px 18px;text-align:center;border:1px dashed var(--line);border-radius:10px;font-size:18px;flex:1;display:flex;align-items:center;justify-content:center}
+/* 「懲戒案例檢索」按鈕：位於聯繫資訊卡片最後一列（單一置中按鈕） */
+.db-bar-row-case{justify-content:center}
+.db-bar-case-btn{
+  appearance:none;font:inherit;font-size:17.5px;font-weight:700;cursor:pointer;
+  color:#fff;background:var(--accent);border:none;border-radius:7px;
+  padding:11px 22px;letter-spacing:.04em;
+  transition:background .2s,box-shadow .28s var(--e-soft),transform .2s var(--e-out)
+}
+.db-bar-case-btn:hover{background:var(--accent-deep);transform:translateY(-2px);box-shadow:0 8px 20px rgba(27,50,85,.28)}
+.db-bar-case-btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (max-width:720px){
+  .db-bar-layout{flex-direction:column;align-items:stretch}
+  .db-map-col{flex:0 0 auto;width:100%;max-width:340px;align-self:center}
+  .db-bar-card{flex:0 0 auto}
+  .db-bar-card-body{justify-content:flex-start}
+  .db-bar-row{padding:9px 0;font-size:17px;line-height:1.75}
+  .db-bar-empty{flex:0 0 auto}
+}
+.db-law-preamble{font-size:var(--fs-read);color:var(--ink-soft);border-left:3px solid var(--line);padding:2px 0 2px 13px;margin:0 0 15px}
+.db-article{margin:0 0 15px;padding:11px 15px;border:1px solid var(--line-soft);border-radius:6px}
+/* [CSS-RESPONSIVE] 全域 RWD / 窄螢幕 */
+/* 手機版可左右滑動提示（桌機隱藏） */
+.db-scroll-hint{display:none;font-size:13px;color:var(--ink-soft)}
+@media (max-width:768px){
+  .db-tab-btn{padding:10px 12px 8px}
+}
+@media (max-width:640px){
+  /* [CMS] 手機全寬：外層容器的左右內距在小螢幕上佔去可觀的可讀寬度，
+     此處讓資料庫本體撐滿整個螢幕寬度，僅保留 10px 讓文字不貼齊邊緣。
+     ．本規則整段包在 ≤640px 內，桌機／平板與其他瀏覽器的表現完全不變。
+     ．採 100vw「全出血」寫法，不依賴 :has()，不論外層有幾層 padding 都能滿版；
+       行動瀏覽器捲軸為浮動式，100vw 不會造成水平溢出。
+     ．檔首相容層的量測式置中（recenter）在此狀態下位移量為 0，不會再左右偏移。 */
+  .db-wrap{
+    width:100vw;max-width:100vw;
+    margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);
+    padding-left:10px;padding-right:10px
+  }
+  /* 懸浮頁首（.db-sticky）左右不留白：以負邊界抵銷 .db-wrap 的 10px 內距，
+     使深藍頁首橫向切齊螢幕兩側；頁首內部的左右內距（.db-head）仍保留，
+     標題與「≡」按鈕不會貼齊邊緣。 */
+  .db-sticky{margin-left:-10px;margin-right:-10px}
+  /* 此寬度下版面本身已滿版（.db-wrap 為 100vw），頁首以 -10px 負邊界即切齊螢幕，
+     故貼頂時不再套用 --bleed-*，避免內容平白右移 10px */
+  .db-sticky.db-is-stuck{margin-left:-10px;margin-right:-10px;padding-left:0;padding-right:0}
+  .db-wrap{font-size:15px}
+  .db-result-count{margin-left:0}
+  /* 法規選單改單欄，避免長標題在手機被擠壓換行 */
+  .db-lawsel{grid-template-columns:1fr!important}
+  /* 表格上方列：三橫列——筆數（置中）／頁次（置中，與表格下方的頁次做法一致）／
+     提示與覆審欄開關同一列（提示靠左、開關靠右）。
+     採格線而非 flex 直向堆疊，才能讓第三列左右分置，且不必更動 HTML 的元素順序。
+     第三列的兩項必須指名 grid-row：HTML 的順序是「開關」在前、「提示」在後，
+     而格線的自動排列只會往後走不會回填，僅指定 grid-column 會使先出現的開關
+     佔住第 3 列第 2 格，後出現的提示被擠到第 4 列。 */
+  .db-table-toprow{display:grid;grid-template-columns:auto auto;align-items:center;gap:8px 10px}
+  .db-table-toprow .db-result-count{grid-column:1/-1;grid-row:1;justify-self:center}
+  .db-table-toprow .db-pager-slot{grid-column:1/-1;grid-row:2;justify-self:center}
+  .db-table-toprow .db-scroll-hint{grid-column:1;grid-row:3;justify-self:start}
+  .db-table-toprow .db-table-hint{grid-column:2;grid-row:3;justify-self:end}
+  /* 篩選下拉的欄數不在此決定，見下方「法條篩選欄數」兩段規則 */
+  /* 顯示表格可左右滑動提示 */
+  .db-scroll-hint{display:inline-flex;align-items:center;gap:4px}
+  /* 懲戒法規：新舊條文對照表改為隨螢幕等分兩欄，不再橫向捲動。
+     min-width 歸零後 table-layout:fixed 會把兩欄各分一半，長句以斷字換行處理。 */
+  .db-cmp-scroll{overflow-x:visible;overflow-y:visible}
+  .db-wrap .db-cmp-table{min-width:0}
+  .db-wrap .db-cmp-table th{padding:8px 6px;font-size:14px;letter-spacing:.02em}
+  .db-wrap .db-cmp-table td{padding:8px 7px;overflow-wrap:anywhere;word-break:break-word}
+  /* 申訴流程圖：改由腳本繪製直式版本（見 buildFlow），故取消最小寬度與橫向捲動 */
+  .db-flow-wrap{overflow-x:visible}
+  #flow-svg{min-width:0}
+}
+
+/* ===== 極窄螢幕（≤360px）=====
+   「↔ 表格可左右滑動」與「顯示覆審與備註欄」兩者皆不折行，並排約需 260px；
+   螢幕再窄就會擠出格線外，此時捨棄提示（純輔助說明），保留可操作的開關。 */
+@media (max-width:360px){
+  .db-scroll-hint{display:none!important}
+  /* 檢索列在此寬度已無換行可退（見 .db-search-row 的 nowrap），
+     故縮小放大鏡與清空鈕的內距，把省下的寬度讓給輸入框 */
+  .db-searchbox-lg .db-search-ico{left:8px;width:15px;height:15px}
+  .db-searchbox-lg input{padding-left:28px;padding-right:8px}
+  .db-search-row .db-clear-all{padding:8px 10px}
+}
+
+/* ===== 窄螢幕的字級與內距 =====
+   純粹是視覺調整，與「頁首要不要收成選單」無關，故仍以視窗寬度為條件。
+   刻意與下方的頁首型態分開：量測 initHeadFit() 時字級必須只由視窗寬度決定，
+   若字級也隨型態 class 變動，量測結果會反過來被自己的判定影響而來回擺盪。 */
+@media (max-width:1180px){
+  .db-head{padding:0 14px;gap:8px}
+  .db-head h1{font-size:18px;letter-spacing:.08em;line-height:1.35}
+}
+
+/* ===== 版面放不下整表時：恢復案件表格的框內左右捲動 =====
+   不收進容器的話，溢出的就是整個頁面，嵌在 jrf.org.tw 文章內可能被外層容器裁掉而
+   拿不回來，故仍保留「放不下才捲」的退路。
+   ．只恢復左右捲動；上下一律是整表展開、隨頁面捲動（不設 max-height）。
+   ．容器一旦又成為捲動容器，表頭就無法黏在頁面頂端（它會改以容器為基準，而容器
+     在垂直方向不捲動＝永遠不會黏住），故把 sticky 一併關掉，避免表頭卡在表格頂端
+     擋住第一列。
+   ．門檻分兩段，因為表格的最小寬度本身就分兩種（見 table 與 .db-rev-hidden table）：
+     　顯示覆審與備註欄：1566 ＋ 容器邊框 1×2 ＋ .db-wrap 左右內距 16×2 ＝ 1600（＝ .db-wrap 的 max-width）→ 1599px 以下收起
+     　隱藏覆審與備註欄：min-width 歸零，實際只需各欄寬度合計 1072（46＋154＋94＋86
+     　　＋116＋136＋240＋200）＋ 32 ＝ 1104 → 1103px 以下才收起
+     欄寬若有更動，這兩個門檻要一起重算，否則不是提早出現捲軸、就是整頁被撐寬。
+   ．上述門檻只是依視窗寬度的預判；容器實際放不下（嵌入宿主頁面時文章欄窄於視窗）時，
+     由 fitTableScroll() 依量測結果補上 .db-scroll-x，不再讓最右欄被 overflow:clip 裁掉。 */
+@media (max-width:1599px){
+  :not(.db-rev-hidden) > .db-table-scroll{overflow-x:auto;overflow-y:visible;overscroll-behavior-x:contain}
+  :not(.db-rev-hidden) > .db-table-scroll thead th{position:static}
+}
+@media (max-width:1103px){
+  .db-table-scroll{overflow-x:auto;overflow-y:visible;overscroll-behavior-x:contain}
+  .db-table-scroll thead th{position:static}
+}
+
+/* ===== 頁首型態三：.db-head-menu（頁籤一列也放不下）=====
+   標題留在左側，全部頁籤收進右上角的「≡」選單。
+   套用條件由 initHeadFit() 量測後決定，不再綁死在某個視窗寬度——
+   標題與頁籤的實際寬度會隨字型、字級與宿主容器而變，寫死門檻必然有失準的一天。 */
+.db-sticky.db-head-menu .db-head h1{white-space:normal;overflow-wrap:break-word}
+.db-sticky.db-head-menu .db-head-main{flex:1 1 auto}
+.db-sticky.db-head-menu .db-nav-toggle{display:inline-flex;margin:7px 0}
+/* 收合狀態：頁籤隱藏，頁首只剩「標題＋≡」一列 */
+.db-sticky.db-head-menu .db-tabs{display:none}
+/* 展開狀態。選單只在 .db-head-menu 型態下存在，故以下一律連寫兩個 class：
+   單寫 .db-nav-open 會讓寬螢幕誤觸時也套用直向選單樣式。 */
+.db-sticky.db-head-menu.db-nav-open .db-head{border-bottom:1px solid rgba(255,255,255,.16)}
+/* 展開的選單改為多欄格線，縮短列數：每欄至少 140px，且不小於容器的 30%，
+   故欄數自動落在 1～3 欄之間（30% 的下限即為「最多三欄」）——
+   手機直式約 2 欄、平板約 3 欄，七個頁籤由七列縮為三～四列。
+   min() 與 max() 若遇不支援的舊瀏覽器，整條 grid-template-columns 會被丟棄，
+   退回單欄，不會破版。
+   display:grid 亦同時蓋掉上面收合狀態的 display:none（多一個 class，權重較高）。 */
+.db-sticky.db-head-menu.db-nav-open .db-tabs{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(max(140px,30%),1fr));
+  flex:1 1 100%;gap:2px 6px;justify-content:flex-start;
+  padding:4px 0 8px;max-height:62vh;overflow-y:auto
+}
+/* 直向選單：選取狀態以左側金色邊條標示，展開時不逐項滑入 */
+.db-sticky.db-head-menu.db-nav-open .db-tab-btn{
+  width:100%;text-align:left;font-size:16px;
+  padding:11px 12px;border-bottom:none;
+  border-left:3px solid transparent;border-radius:0;
+  background-image:none
+}
+.db-sticky.db-head-menu.db-nav-open .db-tab-btn[aria-selected="true"]{
+  border-left-color:var(--gold);
+  background:rgba(255,255,255,.08)
+}
+/* 「服務類」頁籤以極淡底色標示，不用分隔線——格線排列下那條線會橫在格子中間。 */
+.db-sticky.db-head-menu.db-nav-open .db-tab-btn.db-tab-service{
+  margin-left:0;border-left:3px solid transparent;padding-left:12px;
+  background-color:rgba(255,255,255,.05)
+}
+.db-sticky.db-head-menu.db-nav-open .db-tab-btn.db-tab-service[aria-selected="true"],
+.db-sticky.db-head-menu.db-nav-open .db-tab-btn.db-tab-reform[aria-selected="true"]{
+  border-left-color:var(--gold-soft)
+}
+
+/* ===== 法條篩選的欄數：以「下拉放得下最長選項」為準，四欄→兩欄→單欄 =====
+   下拉的寬度由最長的選項決定（現況最長為「第38條（已刪除）（99 件）」，
+   15px 字級下文字約 191px，加上內距與箭頭約需 231px）。
+   容器寬＝視窗 −.db-wrap 內距 32 −.db-controls 內距 40 ＝ 視窗 −72。
+   　四欄需 4×231＋3×16 ＝ 972 → 視窗約 1044px；門檻取 1120px，留約 8% 餘裕，
+   　　以吸收不同字型的字寬差異，避免剛好卡在邊界而被截字。
+   　兩欄需 2×231＋16 ＝ 478 → 視窗約 550px；門檻取 561px。
+   四欄的情形沿用主樣式表的彈性排列（未動）；放不下時才改為等寬格線，
+   一律兩欄或一律單欄，故不會出現「上三下一」的參差。
+   兩段刻意都指定 min-width，避免較窄的規則被後面較寬的規則蓋掉。
+   ※ 日後若新增更長的條號標題，上式要重算，門檻須跟著調。 */
+@media (min-width:561px) and (max-width:1119px){
+  .db-controls{display:grid;grid-template-columns:repeat(2,1fr);
+    justify-content:stretch;align-items:end;gap:10px 16px;padding:0 20px}
+  .db-ctl{min-width:0}
+  .db-ctl select{width:100%}
+}
+@media (max-width:560px){
+  .db-controls{display:grid;grid-template-columns:1fr;
+    justify-content:stretch;align-items:end;gap:10px;padding:0 20px}
+  .db-ctl{min-width:0}
+  .db-ctl select{width:100%}
+}
+
+/* [CMS] 防呆：官網佈景常對 <div> 加 clearfix ::before/::after（content:""），
+   在 flex/grid 容器內會變成一個幽靈項目，把內容整體往後推一格（出現空的第一格＝跑版）。
+   這些排版容器本身沒有用到 ::before/::after，故一律清除以確保版面正確。 */
+.db-tabs::before,.db-tabs::after,.db-controls::before,.db-controls::after,
+.db-search-row::before,.db-search-row::after,.db-searchbox-lg::before,.db-searchbox-lg::after,
+.db-table-toprow::before,.db-table-toprow::after,
+.db-pattern-list::before,.db-pattern-list::after,.db-pl-toggle::before,.db-pl-toggle::after,
+.db-pat-group-h::before,.db-pat-group-h::after,
+.db-pat-group-items::before,.db-pat-group-items::after,
+.db-pat-related::before,.db-pat-related::after,.db-reform-grid::before,.db-reform-grid::after,
+.db-lawsel::before,.db-lawsel::after,.db-chart-legend::before,.db-chart-legend::after,
+.db-bar-layout::before,.db-bar-layout::after,.db-about-meta::before,.db-about-meta::after,
+.db-law-pop::before,.db-law-pop::after,
+.db-qh-rules::before,.db-qh-rules::after,.db-qh-r::before,.db-qh-r::after{content:none!important;display:none!important}
+
+/* 覆審／備註欄：案件清單預設隱藏、違失態樣預設顯示；兩處皆可切換 */
+.db-rev-hidden table{min-width:0}
+.db-rev-hidden col.db-c-revno,.db-rev-hidden col.db-c-revdate,.db-rev-hidden col.db-c-revtext,.db-rev-hidden col.db-c-note{display:none}
+/* 表頭與資料格的序位不同：規範欄的表頭橫跨兩欄（colspan＝2，見 CASE_COLUMNS 的
+   head），而 colspan 不影響 nth-child，故覆審案號的表頭仍是第 8 個 th，資料格卻
+   已是第 9 個 td。兩者必須分開寫，合成一條就會多隱藏或少隱藏一欄。 */
+.db-rev-hidden thead th:nth-child(n+8){display:none}
+.db-rev-hidden tbody td:nth-child(n+9){display:none}
+.db-rev-toggle{display:inline-flex;align-items:center;gap:4px;font-size:14px;color:var(--ink-soft);cursor:pointer;white-space:nowrap;user-select:none}
+.db-rev-toggle input{width:16px;height:16px;cursor:pointer;accent-color:var(--accent)}
+
+
+/* ===== 互動動畫（第二批，保守版）==============================
+   以下僅保留「不改動 DOM 結構、不影響原有互動」的效果：
+     排序箭頭翻轉／折線資料點逐一彈出＋標籤浮現／
+     圓餅切換旋轉過渡／
+     地圖區塊依序淡入與點選彈跳／改革卡片錯開進場。
+   以下效果一律不得加入，括號內為原因：整表交叉淡出的表格複本、排序欄整欄
+   高亮、關鍵字螢光筆（會改寫表格文字節點）、清空條件時下拉縮放（transform
+   會使原生下拉選單無法展開）、左三欄凍結、懲戒色塊刷出（會被列 hover 覆蓋）、
+   條文卡片高度補間。以上皆會與既有腳本衝突，使篩選器、頁碼或條文卡片失常。 */
+@keyframes db-arr-flip{0%{transform:rotateX(0)}55%{transform:rotateX(180deg) scale(1.35)}100%{transform:rotateX(360deg)}}
+@keyframes db-pt-pop{0%{opacity:0;transform:scale(.35)}70%{opacity:1;transform:scale(1.2)}100%{opacity:1;transform:scale(1)}}
+@keyframes db-lb{0%,12%{opacity:0}42%{opacity:1}100%{opacity:0}}
+@keyframes db-pie-spin{from{opacity:.15;transform:rotate(-18deg) scale(.94)}to{opacity:1;transform:none}}
+@keyframes db-reg-in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+/* 排序箭頭翻轉（純 CSS，依 aria-sort 觸發） */
+thead th[aria-sort="ascending"] .db-arr,thead th[aria-sort="descending"] .db-arr{animation:db-arr-flip .55s var(--e-out)}
+
+/* 折線圖資料點逐一彈出，數值標籤隨之浮現後淡出（hover 時恆亮） */
+.db-chart-svg .db-pt:not(.db-slice){transform-box:fill-box;transform-origin:50% 50%;animation:db-pt-pop .5s var(--e-out) both}
+.db-chart-svg .db-pt:not(.db-slice) text{display:block;opacity:0;animation:db-lb 1.05s var(--e-soft) both}
+.db-chart-svg .db-pt:not(.db-slice):hover text{display:block!important;opacity:1!important;animation:none!important}
+
+/* 圓餅圖切換年度區間：整圖旋轉補間就位 */
+.db-chart-svg.db-pie-swap{animation:db-pie-spin .62s var(--e-out)}
+
+/* 台灣地圖：僅保留首次載入時的區塊依序淡入；點選縣市不播放額外動畫。 */
+#tw-map.db-map-in .db-region{animation:db-reg-in .5s var(--e-out) both}
+
+/* 改革主張卡片錯開進場（配合 .db-rv 捲動進場之 transition） */
+.db-reform-card:nth-child(1){transition-delay:0s}
+.db-reform-card:nth-child(2){transition-delay:.06s}
+.db-reform-card:nth-child(3){transition-delay:.12s}
+.db-reform-card:nth-child(4){transition-delay:.18s}
+.db-reform-card:nth-child(5){transition-delay:.24s}
+.db-reform-card:nth-child(6){transition-delay:.3s}
+.db-reform-card:nth-child(7){transition-delay:.36s}
+.db-reform-card:nth-child(8){transition-delay:.42s}
+.db-reform-card:nth-child(9){transition-delay:.48s}
+.db-reform-card:nth-child(10){transition-delay:.54s}
+.db-reform-card:nth-child(11){transition-delay:.6s}
+
+/* ===== 無障礙：使用者要求減少動態時，全面關閉動畫與轉場 ===== */
+@media (prefers-reduced-motion:reduce){
+  .db-wrap *,.db-wrap *::before,.db-wrap *::after,
+  .db-sticky,.db-sticky::before,.db-sticky::after,.db-reform-hero,.db-reform-hero::after{
+    animation:none!important;transition:none!important
+  }
+  .db-wrap .db-rv{opacity:1!important;transform:none!important}
+  /* 以 transform 成長呈現的長條需直接顯示最終長度 */
+  .db-stats-table td.db-yr-bar .db-yb{transform:scaleX(var(--f,0))!important}
+  /* 折線圖數值標籤：不播放浮現動畫，但仍保留原本的 hover 顯示行為 */
+  .db-chart-svg .db-pt:not(.db-slice) text{display:none!important;opacity:1!important}
+  .db-chart-svg .db-pt:not(.db-slice):hover text{display:block!important;opacity:1!important}
+  .db-reform-hero .db-reform-mark{transform:none!important}
+}
+
+/* [CSS-FULLTEXT] 決議書全文彈窗 */
+/* ===== 決議書全文彈窗 ===================================================
+   外觀沿用「律師懲戒決議書彙編」原檔：#fafafa 底、白色圓角卡片、深藍案號標題條、
+   紅褐段落標，全部限縮於 #ft-dlg／#ft-body 之內，不影響資料庫既有版面。
+
+   本區塊已整併為「同一選擇器只保留一條宣告」，不以「後面追加覆寫」的方式疊層。
+   要調整樣式請直接改對應的那一條，勿在區塊末端另加覆寫。
+
+   五個踩過的坑，改動前請先讀：
+   ① #ft-dlg 必須維持 position:fixed。改成 relative／static 會讓彈窗脫離固定定位、
+      退回文件流末端（<body> 最下方），畫面上只剩遮罩。inset:0 配 margin:auto 是
+      瀏覽器對 dialog:modal 的內建置中配方；position:fixed 同時作為關閉鈕的定位基準。
+   ② 本區塊必須位於含 :root 的主樣式表內。曾誤置於 <noscript><style> 之中，
+      結果只有停用 JavaScript 時才生效。
+   ③ 字族、字級、行高三項帶 !important。實測站方樣式表未命中這些段落，但字級一旦
+      被外部覆蓋極難察覺，故保留此三項；字重、字距、字形傾斜維持一般宣告。
+   ④ 資料庫主樣式表有一條通用規則 table{min-width:1566px}（為案件列表寬表格而設），
+      會連帶撐開署名表。min-width 在盒模型中優先於 width 與 max-width，故必須明確
+      歸零，否則委員名單永遠不折行。
+   ⑤ 段落縮排類別 .ft-p*-tm* 由行內樣式轉換而來，命名即其值：p=padding-left、
+      t=text-indent，m 表負值、底線表小數點（.ft-p6_5-tm1_5 = 6.5em / -1.5em）。
+      其權重與 .lvl1／.c1 相同，靠排在其後勝出，插入新規則請維持順序。 */
+
+/* ---- 容器、遮罩與關閉鈕 ---- */
+#ft-dlg{position:fixed;top:0;right:0;bottom:0;left:0;margin:auto;width:min(860px,92vw);height:fit-content;max-height:84vh;padding:0;border:1px solid #c7c2ba;border-radius:10px;box-shadow:0 18px 48px rgba(26,22,18,.3);background:#fafafa;color:#1a1a1a;overflow:hidden}
+#ft-dlg::backdrop{background:rgba(32,27,22,.5)}
+#ft-body{padding:14px;overflow:auto;max-height:84vh;background:#fafafa;font:16px/1.9 "Noto Sans TC","Microsoft JhengHei",sans-serif;color:#1a1a1a;-webkit-overflow-scrolling:touch;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif !important}
+#ft-x{position:absolute;top:18px;right:20px;z-index:3;width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;font-family:inherit;font-size:21px;line-height:1;border:2px solid #1d3b6e;border-radius:50%;background:#fff;color:#1d3b6e;cursor:pointer;font-weight:700;box-shadow:0 2px 7px rgba(26,22,18,.3)}
+#ft-x:hover{background:#1d3b6e;color:#fff}
+#ft-x:focus-visible{outline:3px solid #b58900;outline-offset:2px}
+button.db-full-tag.db-ft-open{background:var(--accent-deep,#1d3b6e);color:#fff;cursor:pointer;font-family:inherit;border-color:transparent}
+button.db-full-tag.db-ft-open:hover{background:var(--accent,#8f2b34);transform:translateY(-1px)}
+
+/* ---- 決議書卡片與案號標題條 ---- */
+#ft-body .doc{background:#fff;border:1px solid #ddd;border-radius:8px;padding:18px 22px;margin:0;font-family:inherit !important;font-size:16px !important;line-height:1.9 !important;font-weight:400;letter-spacing:normal;font-style:normal}
+#ft-body .doc h2{font-size:16px;margin:0 0 12px;color:#fff;border-left:0;padding:9px 62px 9px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;background:#1d3b6e;border-radius:6px;letter-spacing:.02em}
+/* 姓名獨佔一列（flex-basis:100%）並排在最後（order:1），使同案多人時姓名向下換行，
+   而不是把後面的來源按鈕擠到第三列；標題條因此永遠是「案號＋按鈕」一列、姓名一列。
+   靠 order 而非調整 HTML 順序，是為了不動 650 份決議書原檔的結構。 */
+#ft-body .doc h2 .pname{order:1;flex:1 0 100%;font-size:14.5px;font-weight:600;color:#fff}
+#ft-body .doc h2 .srcbtn{order:0;margin-left:auto;font-size:12px;font-weight:500;letter-spacing:.03em;color:#fff;background:rgba(255,255,255,.16);border-radius:5px;padding:3px 11px;text-decoration:none;white-space:nowrap;line-height:1.6;border:1px solid rgba(255,255,255,.5)}
+#ft-body .doc h2 .srcbtn:hover{opacity:1;text-decoration:none;background:rgba(255,255,255,.3)}
+#ft-body .doc h2 .cn{font-weight:700}
+
+/* ---- 前導資訊區（案號／被付懲戒人／決議日期／原決議或覆審） ---- */
+#ft-body .meta{display:grid;grid-template-columns:8.7em minmax(0,1fr);gap:5px 10px;align-items:baseline;font-size:16px;color:#333;background:#f4f6f9;border:1px solid #e3e8ef;border-radius:6px;padding:12px 15px;margin:0 0 14px}
+#ft-body .meta .hide{display:none}
+#ft-body .meta dt{color:#1d3b6e;font-weight:700;white-space:nowrap;letter-spacing:.02em;font-size:16px;line-height:1.9}
+#ft-body .meta dd{margin:0;min-width:0;overflow-wrap:anywhere;font-size:16px;line-height:1.9;font-weight:400}
+#ft-body .meta .empty{color:#b0b0b0}
+#ft-body .meta a{color:#1d3b6e}
+#ft-body .meta dd.wide{grid-column:2}
+#ft-body .meta dd p{font-size:16px;line-height:1.9;font-weight:400}
+#ft-body .meta .full-xref{font:inherit;color:#1d3b6e;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+#ft-body .meta .full-xref:hover{color:#8f2b34}
+#ft-body .meta .full-xref:focus-visible{outline:2px solid #b58900;outline-offset:1px}
+/* 檢索關鍵字命中處 */
+#ft-body mark.ft-hit{background:#ffe95c;color:inherit;padding:0 1px;border-radius:2px;
+  box-shadow:0 0 0 1px rgba(180,140,0,.35)}
+/* 由摘要列點入時，捲動到的那一處再加一圈外框，讓眼睛找得到 */
+#ft-body mark.ft-hit.ft-hit-cur{outline:2px solid #8f2b34;outline-offset:1px}
+
+/* ---- 段落標與段落 ---- */
+#ft-body .sec{font-family:inherit !important;font-size:16px !important;line-height:1.9 !important;font-weight:400;letter-spacing:normal;font-style:normal}
+#ft-body .sec h3{font-size:14.5px;color:#8f2b34;margin:14px 0 5px;letter-spacing:.08em}
+#ft-body .sec div{white-space:pre-wrap;border-left:3px solid #e5e5e5;padding-left:14px;font-family:inherit !important;font-size:16px !important;line-height:1.9 !important;font-weight:400;letter-spacing:normal;font-style:normal}
+#ft-body .sec div p{font-family:inherit !important;font-size:16px !important;line-height:1.9 !important;font-weight:400;letter-spacing:normal;font-style:normal}
+#ft-body .sec div.flow{white-space:normal}
+#ft-body .sec div.flow p{margin:0 0 .4em;padding-left:0;text-indent:2em}
+/* .c1–.c4 不可比照 .lvl1–.lvl4 一併刪除：.ft-p4 只設 padding-left，
+   text-indent:0 是靠 .cN 供給，刪了段落縮排會全跑掉。
+   （.lvlN 可刪，是因為同一個 <p> 上的 .ft-p*-tm* 權重相同而排序在後，
+   會把它唯一的宣告整條蓋掉，全庫無一例外。） */
+#ft-body .sec div.flow p.c1{padding-left:2em;text-indent:0}
+#ft-body .sec div.flow p.c2{padding-left:5em;text-indent:0}
+#ft-body .sec div.flow p.c3{padding-left:6em;text-indent:0}
+#ft-body .sec div.flow p.c4{padding-left:7.5em;text-indent:0}
+#ft-body .sec div.flow p.ft-p2-tm2{padding-left:2em;text-indent:-2em}
+#ft-body .sec div.flow p.ft-p4-tm2{padding-left:4em;text-indent:-2em}
+#ft-body .sec div.flow p.ft-p5-tm3{padding-left:5em;text-indent:-3em}
+#ft-body .sec div.flow p.ft-p5-tm1{padding-left:5em;text-indent:-1em}
+#ft-body .sec div.flow p.ft-p4{padding-left:4em}
+#ft-body .sec div.flow p.ft-p6_5-tm1_5{padding-left:6.5em;text-indent:-1.5em}
+#ft-body .sec div.flow p.ft-p6-tm1{padding-left:6em;text-indent:-1em}
+#ft-body .sec div.flow p.ft-p6-tm2{padding-left:6em;text-indent:-2em}
+#ft-body .sec div.flow p.ft-p2{padding-left:2em}
+#ft-body .sec div.flow p.ft-p6{padding-left:6em}
+#ft-body .sec div.flow p.ft-p5_5-tm1_5{padding-left:5.5em;text-indent:-1.5em}
+#ft-body .sec div.flow p.ft-p4_5-tm2_5{padding-left:4.5em;text-indent:-2.5em}
+#ft-body .sec div.flow p.ft-p7_5-tm1{padding-left:7.5em;text-indent:-1em}
+#ft-body .sec div.flow p.ft-p7-tm2{padding-left:7em;text-indent:-2em}
+#ft-body .sec div.flow p.ft-p5{padding-left:5em}
+#ft-body .sec div.flow p.ft-p3-tm1{padding-left:3em;text-indent:-1em}
+#ft-body .sec div.flow p.ft-p7_5-tm2_5{padding-left:7.5em;text-indent:-2.5em}
+#ft-body .sec div.flow p.ft-p3_5-tm1_5{padding-left:3.5em;text-indent:-1.5em}
+#ft-body .sec div.flow p.ft-p7_5-tm1_5{padding-left:7.5em;text-indent:-1.5em}
+#ft-body .sec div.flow p.ft-p8_5-tm2_5{padding-left:8.5em;text-indent:-2.5em}
+#ft-body .sec div.flow p.ft-p7-tm3{padding-left:7em;text-indent:-3em}
+#ft-body .sec div.flow p.ft-p6_5-tm2_5{padding-left:6.5em;text-indent:-2.5em}
+#ft-body .sec div.flow p.ft-p2_5-tm2_5{padding-left:2.5em;text-indent:-2.5em}
+#ft-body .sec div.flow p.ft-p8-tm1_5{padding-left:8em;text-indent:-1.5em}
+#ft-body .sec div.flow p.ft-p10-tm3{padding-left:10em;text-indent:-3em}
+#ft-body .sec div.flow p.ft-p6_5{padding-left:6.5em}
+#ft-body .sec div.flow p.ft-p5_5-tm1{padding-left:5.5em;text-indent:-1em}
+#ft-body .sec div.flow p.ft-p8-tm3{padding-left:8em;text-indent:-3em}
+#ft-body .sec div.flow p.ft-p7_5{padding-left:7.5em}
+#ft-body .sec div.flow p.major{padding-left:0;text-indent:0;font-weight:700;color:#8f2b34;margin-top:.8em}
+
+/* ---- 決議機關及署名 ---- */
+#ft-body .sec.signwrap h3{background:#1d3b6e;color:#fff;border-radius:6px;padding:7px 13px;margin:18px 0 8px;letter-spacing:.06em}
+#ft-body .sec.signwrap div{border-left:none;padding-left:0}
+#ft-body table{min-width:0}
+#ft-body table.sign{border-collapse:collapse;width:100%;font-size:12.5px;background:#f4f6f9;border:1px solid #e3e8ef;border-radius:6px;overflow:hidden;margin:6px 0 0;min-width:0;table-layout:auto;max-width:100%}
+#ft-body table.sign th{text-align:left;white-space:nowrap;width:1%;color:#1d3b6e;font-weight:700;font-size:12px;letter-spacing:.02em;padding:8px 14px 8px 12px;background:#eef2f7;border-bottom:1px solid #e3e8ef;vertical-align:top}
+#ft-body table.sign td{padding:8px 12px;border-bottom:1px solid #e3e8ef;color:#333;vertical-align:top;overflow-wrap:anywhere;line-height:1.75;font-size:12.5px;width:99%;white-space:normal;word-break:break-word}
+#ft-body table.sign tr:last-child th{border-bottom:none}
+#ft-body table.sign tr:last-child td{border-bottom:none}
+#ft-body table.sign .empty{color:#b0b0b0}
+
+
+@media (max-width:640px){
+  /* 只調整間距與版面；字級一律維持 16px，不隨螢幕縮小，門檻統一為 640px。 */
+  #ft-dlg{width:100vw;max-width:100vw;height:100vh;max-height:100vh;border:0;border-radius:0}
+  #ft-body{padding:10px;max-height:100vh}
+  #ft-body .doc{padding:14px 15px}
+  #ft-body .doc h2{padding:8px 54px 8px 12px}
+  #ft-x{top:14px;right:14px;width:32px;height:32px}
+  #ft-body .meta{grid-template-columns:1fr}
+  #ft-body .meta dd{padding-left:0}
+  #ft-body table.sign th{width:1%;white-space:nowrap;padding-right:10px}
+}
+
+/* [CSS-ETHIC-HISTORY] 舊倫理規範歷史版本 */
+/* ===== 舊倫理規範歷史版本頁 ==========================================
+   由「懲戒法規 →（律師倫理規範新舊對照）」頁的按鈕進入，
+   或以網址錨點 #8 直接開啟；此頁刻意不列於頁首頁籤列。 */
+.db-eh-cta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:0 0 15px;padding:12px 15px;background:var(--c-l-bg);border:1px solid var(--c-l-line);border-radius:7px}
+.db-eh-cta-btn{appearance:none;font:inherit;font-size:15px;font-weight:700;cursor:pointer;color:#fff;background:var(--c-l);border:1px solid var(--c-l);border-radius:6px;padding:8px 16px;transition:filter .2s,transform .2s var(--e-out)}
+.db-eh-cta-btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.db-eh-cta-btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.db-eh-cta-note{flex:1 1 260px;font-size:var(--fs-cite);line-height:1.7;color:var(--ink-soft)}
+.db-eh-back{appearance:none;font:inherit;font-size:14.5px;cursor:pointer;color:var(--accent);background:#fff;border:1px solid var(--accent-line);border-radius:6px;padding:6px 14px;margin:0 0 12px;transition:background .2s,color .2s,border-color .2s}
+.db-eh-back:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.db-eh-back:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.db-eh-time{margin:0 0 16px;font-size:var(--fs-table);line-height:1.75;background:var(--bg-soft);border:1px solid var(--line);border-radius:7px;padding:12px 16px}
+.db-eh-time>b{color:var(--accent-deep)}
+.db-eh-time ol{margin:8px 0 0;padding:0;list-style:none}
+.db-eh-time li{display:flex;flex-wrap:wrap;gap:2px 10px;padding:5px 0;border-top:1px dashed var(--line)}
+.db-eh-time li:first-child{border-top:0}
+.db-eh-time .db-eh-d{flex:0 0 9.2em;font-weight:700;color:var(--ink)}
+.db-eh-time .db-eh-c{flex:1 1 260px;color:var(--ink-soft)}
+.db-eh-time .db-eh-here{display:inline-block;font-size:12.5px;font-weight:700;color:var(--c-l);background:var(--c-l-bg);border:1px solid var(--c-l-line);border-radius:99px;padding:0 8px;margin-left:6px}
+.db-eh-toolbar{display:flex;justify-content:flex-end;margin:0 0 10px}
+.db-eh-all{appearance:none;font:inherit;font-size:14px;cursor:pointer;color:var(--c-l);background:#fff;border:1px solid var(--c-l-line);border-radius:6px;padding:6px 13px;transition:background .2s}
+.db-eh-all:hover{background:var(--c-l-bg)}
+.db-eh-all:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.db-eh-art h4 .db-eh-tgl{background:var(--c-l);color:#fff}
+.db-eh-art h4 .db-eh-new{background:var(--c-l-bg);color:var(--c-l);border:1px solid var(--c-l-line)}
+.db-eh-hist{margin:11px 0 0;padding:11px 0 0;border-top:1px dashed var(--c-l-line)}
+.db-eh-hist[hidden]{display:none}
+.db-eh-ver{margin:0 0 11px;padding:9px 13px;background:var(--c-l-bg);border-left:3px solid var(--c-l-line);border-radius:0 6px 6px 0}
+.db-eh-ver:last-child{margin-bottom:0}
+.db-eh-vh{font-size:14.5px;font-weight:700;color:var(--c-l);margin:0 0 5px}
+.db-eh-vh span{font-weight:400;font-size:13.5px;color:var(--ink-soft);margin-left:8px}
+.db-eh-note{font-size:14px;line-height:1.7;color:var(--annot-ink);background:var(--annot-bg);border:1px solid var(--annot-line);border-radius:6px;padding:8px 12px;margin:0 0 10px}
+#eh-cta-slot:empty{display:none}
+#eh-cta-slot .db-law-used-toggle{margin:0 0 16px}
+@media (max-width:640px){
+  .db-eh-time .db-eh-d{flex:1 1 100%}
+  .db-eh-cta{display:block}
+  .db-eh-cta-btn{width:100%;margin:0 0 8px}
+}
+
+/* ===== [CSS-HOME] 首頁（進站著陸頁）==================================
+   全部沿用 :root 既有變數，未新增任何色值。
+   命名空間一律 db-home-*，避免與宿主 CMS／Bootstrap 衝突。
+   卡片、按鈕、搜尋框的 hover／focus 語言與 .db-btn、.db-searchbox-lg 相同。 */
+.db-home{display:flex;flex-direction:column;gap:34px;
+  /* 標題區左欄的共同寬度：引言、搜尋框、資料更新標籤皆以此為右緣，三者切齊 */
+  --home-col:560px}
+
+/* ── 標題區 ───────────────────────────────────────────── */
+.db-home-hero{
+  display:flex;gap:48px;align-items:flex-start;
+  padding:34px 26px 30px;border-radius:8px;
+  background:linear-gradient(180deg,var(--accent-tint) 0%,rgba(238,243,249,0) 82%)
+}
+.db-home-hero-main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:16px}
+.db-home-eyebrow{display:flex;align-items:center;gap:10px;font-size:13.5px;letter-spacing:.12em;color:var(--ink-soft)}
+.db-home-rule{width:22px;height:2px;background:var(--gold);flex:0 0 auto}
+.db-home-h1{
+  margin:0;font-size:34px;line-height:1.38;font-weight:700;letter-spacing:.03em;
+  color:var(--accent-deep);text-wrap:pretty;max-width:22em
+}
+.db-home-lead{margin:0;font-size:var(--fs-read);line-height:1.9;color:var(--ink);max-width:var(--home-col);text-wrap:pretty}
+
+/* 快速檢索：外觀與案件清單頁的 .db-searchbox-lg 一致 */
+.db-home-search{
+  position:relative;display:flex;align-items:stretch;max-width:var(--home-col);min-width:0;background:var(--bg);
+  border:1px solid var(--line);border-radius:7px;overflow:hidden;
+  transition:box-shadow .28s var(--e-soft),border-color .28s
+}
+.db-home-search:hover{border-color:var(--accent-line)}
+.db-home-search:focus-within{
+  border-color:var(--accent);
+  box-shadow:0 0 0 4px rgba(27,50,85,.12),0 8px 22px rgba(27,50,85,.10)
+}
+.db-home-search-ico{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;color:var(--ink-soft);pointer-events:none;transition:color .22s
+}
+.db-home-search:focus-within .db-home-search-ico{color:var(--accent)}
+.db-home-search input{
+  flex:1 1 0;width:100%;min-width:0;font:inherit;font-size:15.5px;color:var(--ink);
+  background:transparent;border:none;border-radius:0;padding:13px 11px 13px 40px
+}
+.db-home-search input:focus-visible{outline:none}
+.db-home-search .db-home-search-btn{
+  appearance:none;font:inherit;font-size:14.5px;letter-spacing:.06em;cursor:pointer;
+  border:none;border-left:1px solid var(--line);border-radius:0;
+  background:var(--accent);color:#fff;padding:0 22px;transition:background .2s
+}
+.db-home-search .db-home-search-btn:hover{background:var(--accent-deep)}
+.db-home-search .db-home-search-btn:focus-visible{outline:2px solid var(--focus);outline-offset:-3px}
+.db-home-tags{display:flex;flex-wrap:wrap;gap:7px;align-items:center;font-size:13px;color:var(--ink-soft)}
+.db-home-tag{
+  appearance:none;font:inherit;font-size:13px;cursor:pointer;
+  color:var(--accent-deep);background:var(--bg-soft);border:1px solid var(--line);
+  border-radius:5px;padding:5px 11px;
+  transition:border-color .2s,color .2s,background .2s,box-shadow .2s,transform .2s var(--e-soft)
+}
+.db-home-tag:hover{border-color:var(--accent);background:var(--bg);box-shadow:0 3px 12px rgba(27,50,85,.14);transform:translateY(-1px)}
+.db-home-tag:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+
+/* 主視覺：目前為裝飾面板。要換成圖片時，把 .db-home-visual 內的 <svg> 換成
+   <img  data-cke-saved-src="…" src="…" alt="…" style="width:100%;height:100%;object-fit:cover;border-radius:8px">
+   即可，其餘樣式不必調整。 */
+.db-home-visual{
+  flex:0 0 auto;align-self:stretch;width:400px;min-height:300px;border-radius:8px;overflow:hidden;
+  background:var(--accent-tint-2);border:1px solid var(--accent-line);
+  display:flex;align-items:center;justify-content:center
+}
+.db-home-visual svg{width:150px;height:150px;color:var(--accent-line)}
+
+/* ── 關鍵數字看板 ─────────────────────────────────────── */
+/* 三格並列，且寬度縮到主視覺（右欄）的左緣為止，不延伸到圖片下方；
+   負的 margin-top 只是把 .db-home 的 34px 間距縮短，與標題區靠近一些。 */
+/* 刻意不用 grid：格線的欄數是固定的，只要 CMS 在容器裡多塞進任何一個項目
+   （空的 <p>、<div>，甚至一個裸的 &nbsp; 文字節點），它就會佔掉整整一欄，
+   把三張卡片擠到第 2、3 欄，第三張再掉到下一列——這正是線上看到的狀況，
+   而文字節點無法以 CSS 選取，光靠隱藏規則擋不住。
+   改用 flex 後：多出來的項目只佔自己的寬度；容器 font-size:0 讓裸文字節點
+   量到 0 寬；間距改用子層的 margin-right（不用 gap），故多出來的項目
+   連間距都不會產生。三張卡片以 flex:1 1 0 均分，外觀與原本的三欄完全相同。 */
+.db-home-stats{
+  display:flex;flex-wrap:wrap;align-items:stretch;
+  /* 寬度自 55% 放寬為 62%：案件總數卡加寬後，右側的成立／不成立需要橫向空間，
+     而這一列右方原本就是留白（英雄區的天平圖在其上方），放寬不擠壓任何元素。
+     窄畫面另見下方 @media 的 84%。 */
+  width:64%;min-width:0;margin-top:-18px;font-size:0
+}
+.db-home-stat{
+  flex:1 1 0;min-width:0;margin-right:14px;font-size:15px;
+  background:var(--bg);border:1px solid var(--line);border-top:3px solid var(--accent);
+  border-radius:8px;box-shadow:0 2px 12px rgba(43,43,46,.05);
+  padding:18px 20px 16px;display:flex;flex-direction:column;gap:7px
+}
+.db-home-stat:last-child{margin-right:0}
+/* 三張看板卡皆可點擊（案件總數→案件清單／資料涵蓋→統計／違失態樣→違失態樣）。
+   沿用首頁導覽卡同一套做法：<a  data-cke-saved-href="#頁籤" href="#頁籤"> ＋ data-homego 委派作保險。
+   依需求「不要特別的動畫或強調提示」，故不設任何 hover 的變色、陰影或位移；
+   只保留游標與鍵盤焦點框——前者是連結的基本可用性，後者是鍵盤操作的必要條件。 */
+.db-wrap a.db-home-stat{color:inherit;text-decoration:none;cursor:pointer}
+.db-wrap a.db-home-stat:hover{color:inherit}
+.db-wrap a.db-home-stat:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+/* 案件總數卡加寬以容納成立／不成立；另兩張等比縮窄，三張仍等高（align-items:stretch）。 */
+.db-home-stat-wide{flex:1.7 1 0}
+/* 主數字與右側兩行小統計並置；細直線只是分隔，不帶語意 */
+.db-home-stat-split{display:flex;align-items:center;min-width:0}
+.db-home-stat-split .db-home-stat-val{flex:none;white-space:nowrap}
+.db-home-stat-rule{align-self:stretch;width:1px;background:var(--line);margin-left:18px;flex:none}
+.db-home-stat-sub{display:flex;flex-direction:column;gap:5px;margin-left:16px;min-width:0;flex:1 1 auto}
+.db-home-stat-sub>div{
+  display:flex;align-items:baseline;gap:7px;white-space:nowrap;
+  font-size:12.5px;line-height:1.25;color:var(--ink-soft)
+}
+.db-home-stat-sub b{font-size:16px;line-height:1;font-variant-numeric:tabular-nums;margin-left:auto}
+.db-hs-dot{width:8px;height:8px;border-radius:2px;display:block;flex:none;transform:translateY(1px)}
+/* 成立＝主色藍、不成立＝金、其他（律聲字暫停職聲請）＝中性灰，
+   三者同時用於圓點、數字與比例條，改色只需改這三條。 */
+.db-hs-y{background:var(--accent)}
+.db-hs-n{background:var(--gold)}
+.db-hs-o{background:#C9C6C2}
+.db-hs-ny{color:var(--accent-deep)}
+.db-hs-nn{color:var(--annot-ink)}
+/* 堆疊比例條：寬度於 initHome 依實際件數設定，HTML 不寫死任何百分比 */
+.db-home-stat-bar{display:flex;height:5px;border-radius:3px;overflow:hidden;background:var(--line-soft)}
+.db-home-stat-bar i{display:block;height:100%}
+/* 非卡片的子元素一律不顯示（CMS 注入的空段落、空 div 等）。 */
+.db-home-stats>:not(.db-home-stat){display:none!important}
+/* 資料更新日期：置於標題區左欄的最後一列，寬度上限同搜尋框（--home-col），
+   靠右對齊，故右緣與搜尋框切齊；窄畫面兩者同樣隨欄寬縮放。 */
+.db-home-hero-main>.db-home-updated{
+  max-width:var(--home-col);margin:0;font-size:12.5px;line-height:1.5;color:#9B9A98;text-align:right
+}
+.db-home-updated b{color:var(--ink-soft);font-weight:600;font-variant-numeric:tabular-nums}
+.db-home-stat-label{font-size:13.5px;color:var(--ink-soft);letter-spacing:.05em}
+.db-home-stat-val{display:flex;align-items:baseline;gap:5px}
+.db-home-stat-val b{
+  font-size:34px;font-weight:700;color:var(--accent-deep);line-height:1;
+  font-variant-numeric:tabular-nums
+}
+.db-home-stat-val span{font-size:15px;color:var(--ink)}
+.db-home-stat-note{font-size:12.5px;color:#9B9A98;line-height:1.6}
+
+/* ── 區塊標題（沿用 .db-about-h 的左藍條樣式）─────────── */
+.db-home-h{
+  font-size:21px;font-weight:700;color:var(--accent-deep);letter-spacing:.05em;
+  margin:0 0 18px;padding:8px 14px;
+  background:linear-gradient(90deg,var(--accent-tint) 0%,rgba(238,243,249,0) 88%);
+  border-left:4px solid var(--accent);border-radius:0 5px 5px 0;
+  display:flex;align-items:baseline;justify-content:space-between;gap:16px
+}
+.db-home-h em{font-style:normal;font-size:13.5px;font-weight:400;color:var(--ink-soft);letter-spacing:0}
+
+/* ── 導航卡片 ─────────────────────────────────────────── */
+.db-home-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.db-home-grid + .db-home-grid{margin-top:16px}
+/* 卡片為 <a>：可鍵盤操作，且錨點本身（#list～#complaint）就是一次導覽，
+   瀏覽器會自行推入歷史，上一頁即可退回首頁。
+   一律以 .db-wrap a.xxx 提高特異性，蓋掉上方 .db-wrap a 的連結配色。 */
+.db-wrap a.db-home-card{
+  font:inherit;text-align:left;cursor:pointer;color:inherit;text-decoration:none;
+  background:var(--bg);border:1px solid var(--line);border-radius:8px;
+  box-shadow:0 2px 12px rgba(43,43,46,.05);padding:22px;
+  display:flex;flex-direction:column;gap:11px;
+  transition:border-color .2s,box-shadow .2s,transform .2s var(--e-soft)
+}
+.db-wrap a.db-home-card:hover{
+  color:inherit;text-decoration:none;border-color:var(--accent);
+  transform:translateY(-2px);box-shadow:0 6px 20px rgba(27,50,85,.13)
+}
+.db-wrap a.db-home-card:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.db-home-p{display:block;margin:0;font-size:13.5px;line-height:1.8;color:var(--ink-soft);text-wrap:pretty}
+.db-home-card-t{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-size:17.5px;font-weight:700;color:var(--accent-deep);letter-spacing:.04em
+}
+.db-home-ico{
+  width:38px;height:38px;flex:0 0 auto;border-radius:6px;
+  background:var(--accent-tint);border:1px solid var(--accent-line);color:var(--accent);
+  display:flex;align-items:center;justify-content:center
+}
+.db-home-ico svg{width:20px;height:20px}
+.db-home-go{margin-top:auto;padding-top:6px;color:var(--accent);display:flex}
+.db-home-go svg{width:17px;height:17px}
+.db-home-card:hover .db-home-go{transform:translateX(3px)}
+.db-home-go{transition:transform .2s var(--e-out)}
+
+/* 主卡：案件清單 */
+.db-wrap a.db-home-card-main{grid-column:span 2;background:var(--accent-tint);border-color:var(--accent-line);box-shadow:none}
+.db-home-card-main .db-home-head{display:flex;align-items:center;gap:13px}
+.db-home-card-main .db-home-ico{width:42px;height:42px;background:var(--accent);border-color:var(--accent);color:#fff}
+.db-home-card-main .db-home-ico svg{width:22px;height:22px}
+.db-home-card-main .db-home-card-t{font-size:20px;display:block}
+.db-home-kicker{display:block;font-size:12.5px;color:var(--accent);letter-spacing:.06em;margin-top:2px}
+.db-home-card-main .db-home-p{font-size:14.5px;line-height:1.85;color:var(--ink)}
+.db-home-chips{display:flex;flex-wrap:wrap;gap:7px}
+.db-home-chip{
+  font-size:12.5px;color:var(--accent-deep);background:var(--bg);
+  border:1px solid var(--accent-line);border-radius:5px;padding:4px 10px
+}
+.db-home-cta{display:flex;align-items:center;gap:6px;margin-top:auto;padding-top:6px;font-size:14.5px;font-weight:700;color:var(--accent)}
+
+/* 違失態樣：沿用態樣紫 */
+.db-home-card-pattern .db-home-ico{background:var(--c-p-bg);border-color:var(--c-p-line);color:var(--c-p)}
+/* 懲戒法規：六部法典的既有色小方塊 */
+.db-home-dots{display:flex;gap:3px}
+.db-home-dots i{width:9px;height:9px;border-radius:2px;display:block}
+.db-wrap a.db-home-card-row{flex-direction:row;align-items:center;gap:18px;grid-column:span 2}
+.db-home-card-row .db-home-body{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:6px}
+.db-home-card-row .db-home-card-t{display:block}
+.db-home-card-row .db-home-go{margin:0;padding:0;flex:0 0 auto}
+.db-home-bars{display:flex;align-items:flex-end;gap:4px;flex:0 0 auto;color:var(--accent)}
+.db-home-bars i{width:7px;background:currentColor;border-radius:1px;display:block}
+/* 改革主張：深藍實心卡，★ 保留香檳金 */
+.db-wrap a.db-home-card-reform{background:var(--accent-deep);border-color:var(--accent-deep);box-shadow:none}
+.db-wrap a.db-home-card-reform:hover{border-color:var(--accent-dark);box-shadow:0 6px 20px rgba(15,32,56,.28)}
+.db-home-card-reform .db-home-card-t{color:#F4F7FB}
+.db-home-card-reform .db-home-p{color:var(--accent-tint-2)}
+.db-home-card-reform .db-home-go{color:var(--gold-soft)}
+.db-home-star{font-size:15px;line-height:1;color:var(--gold);flex:0 0 auto}
+
+/* ── 我要申訴律師 ─────────────────────────────────────── */
+/* 申訴區塊：深金標題帶＋白底內容。
+   金色集中在一條標題帶上，比整塊淡金底更醒目（深色對比高），卻不會像整片色塊那樣
+   壓過下方的導覽卡；內容區白底，與步驟卡、提醒方塊的層次也更清楚。 */
+.db-home-complaint{
+  background:var(--bg);border:1px solid var(--annot-line);border-radius:10px;
+  padding:0;overflow:hidden;display:block;box-shadow:0 2px 12px rgba(43,43,46,.05)
+}
+.db-home-complaint-hd{
+  background:var(--annot-ink);color:var(--annot-bg);
+  padding:15px 28px;display:flex;align-items:center;gap:14px 26px;flex-wrap:wrap
+}
+.db-home-complaint-h{display:flex;align-items:center;gap:9px;font-size:19px;font-weight:700;color:var(--annot-bg);letter-spacing:.05em;flex:0 0 auto}
+.db-home-complaint-lead{margin:0;flex:1 1 320px;min-width:0;font-size:15px;line-height:1.75;color:#EADFC4;text-wrap:pretty}
+.db-home-complaint-lead b{color:#fff}
+.db-home-complaint-bd{padding:20px 28px 24px;display:flex;flex-direction:column;gap:16px}
+.db-home-complaint-side{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:240px}
+/* 標題帶內的按鈕反轉配色（深底淺鈕），才有足夠對比 */
+.db-home-complaint-hd .db-wrap a.db-home-btn-gold,.db-wrap .db-home-complaint-hd a.db-home-btn-gold{
+  background:var(--annot-bg);color:var(--annot-ink);border-color:var(--annot-bg)
+}
+.db-wrap .db-home-complaint-hd a.db-home-btn-gold:hover{
+  background:#fff;color:#5C4A22;border-color:#fff;box-shadow:0 3px 12px rgba(0,0,0,.2)
+}
+/* 白底之下，步驟卡與提醒方塊改用淡金底，以便與卡面區分 */
+.db-home-complaint .db-home-step{background:#FCF8F0}
+.db-home-complaint .db-home-tip{background:var(--annot-bg)}
+.db-wrap a.db-home-btn-gold{
+  display:inline-block;font:inherit;font-size:15px;font-weight:700;letter-spacing:.03em;cursor:pointer;
+  text-decoration:none;text-align:center;
+  background:var(--annot-ink);color:var(--annot-bg);border:1px solid var(--annot-ink);
+  border-radius:5px;padding:11px 22px;white-space:nowrap;
+  transition:background .2s,box-shadow .2s,transform .2s var(--e-soft)
+}
+.db-wrap a.db-home-btn-gold:hover{
+  color:var(--annot-bg);text-decoration:none;background:#5C4A22;
+  box-shadow:0 3px 12px rgba(122,98,49,.28);transform:translateY(-1px)
+}
+.db-wrap a.db-home-btn-gold:focus-visible{outline:2px solid var(--annot-ink);outline-offset:2px}
+.db-home-complaint-side small{font-size:12.5px;color:#8A7440;text-align:right;line-height:1.65}
+.db-home-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.db-home-step{
+  background:var(--bg);border:1px solid var(--annot-line);border-radius:8px;
+  padding:18px 20px;display:flex;flex-direction:column;gap:9px
+}
+.db-home-step-h{display:flex;align-items:center;gap:10px}
+.db-home-step-n{
+  width:26px;height:26px;flex:0 0 auto;border-radius:99px;background:var(--gold);color:#fff;
+  font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center
+}
+.db-home-step-t{font-size:16px;font-weight:700;color:var(--annot-ink);letter-spacing:.03em}
+.db-home-step p{margin:0;font-size:13.5px;line-height:1.8;color:var(--ink);text-wrap:pretty}
+.db-home-step a{color:var(--accent);text-decoration:underline}
+.db-home-step a:hover{color:var(--accent-deep)}
+.db-home-tips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.db-home-tip{
+  background:rgba(255,255,255,.55);border-left:3px solid var(--gold);
+  border-radius:0 5px 5px 0;padding:12px 16px
+}
+.db-home-tip b{display:block;font-size:13.5px;color:var(--annot-ink);margin-bottom:4px}
+.db-home-tip span{font-size:13px;line-height:1.8;color:#6A5527;display:block;text-wrap:pretty}
+.db-home-tip a{color:var(--annot-ink);text-decoration:underline}
+
+/* ── 資料速覽：兩張圖表卡 ───────────────────────────── */
+.db-home-charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.db-home-chart-card{
+  background:var(--bg);border:1px solid var(--line);border-radius:10px;
+  padding:16px 18px 14px;box-shadow:0 2px 12px rgba(43,43,46,.05);
+  display:flex;flex-direction:column
+}
+.db-home-chart-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 4px}
+.db-home-chart-h h3{margin:0;font-size:16px;font-weight:700;color:var(--accent-deep);letter-spacing:.04em}
+.db-wrap .db-home-chart-h a{font-size:12.5px;color:var(--accent);text-decoration:none;white-space:nowrap}
+.db-wrap .db-home-chart-h a:hover{color:var(--accent-deep);text-decoration:underline}
+.db-home-chart-sub{font-size:12.5px;color:var(--ink-soft);margin:0 0 12px}
+.db-home-chart-note{font-size:12px;color:#9B9A98;line-height:1.6;margin:12px 0 0;text-wrap:pretty}
+/* 甜甜圈：切片以 conic-gradient 繪製（由 initHome 依資料組出百分比），
+   中央挖空處放合計人數。不用 SVG 是因為此處只需要靜態切片，
+   conic-gradient 無需量測、不受字型載入影響，也不會與統計頁的 svgPieChart 互相牽動。 */
+.db-home-pie{display:flex;align-items:center;gap:20px;flex:1 1 auto}
+.db-home-donut{width:168px;height:168px;border-radius:50%;flex:none;position:relative;background:var(--line-soft)}
+.db-home-donut::after{content:"";position:absolute;inset:30%;background:var(--bg);border-radius:50%}
+.db-home-donut-c{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.db-home-donut-c b{font-size:26px;font-weight:700;color:var(--accent-deep);line-height:1;font-variant-numeric:tabular-nums}
+.db-home-donut-c span{font-size:11.5px;color:var(--ink-soft);margin-top:2px}
+.db-home-pie-lg{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-width:0}
+.db-home-pie-lg>div{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);white-space:nowrap}
+.db-home-pie-lg i{width:9px;height:9px;border-radius:2px;flex:none}
+.db-home-pie-lg .db-lg-n{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.db-home-pie-lg .db-lg-v{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);font-size:13px}
+.db-home-pie-lg .db-lg-u{font-weight:400;color:var(--ink-soft);font-size:12px;margin-left:3px}
+.db-home-pie-lg .db-lg-p{font-variant-numeric:tabular-nums;width:44px;text-align:right}
+
+/* ── 關於資料庫 ───────────────────────────────────── */
+.db-home-about{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px}
+.db-home-about-main{grid-column:span 2;display:flex;flex-direction:column;gap:14px}
+.db-home-about-main p{margin:0;font-size:var(--fs-read);line-height:1.9;color:var(--ink);text-wrap:pretty}
+.db-wrap a.db-home-btn-primary{
+  display:inline-block;font:inherit;font-size:15px;cursor:pointer;align-self:flex-start;
+  text-decoration:none;text-align:center;
+  background:var(--accent);color:#fff;border:1px solid var(--accent);border-radius:5px;padding:9px 20px;
+  transition:background .2s,box-shadow .2s,transform .2s var(--e-soft)
+}
+.db-wrap a.db-home-btn-primary:hover{
+  color:#fff;text-decoration:none;background:var(--accent-deep);
+  box-shadow:0 3px 12px rgba(27,50,85,.2);transform:translateY(-1px)
+}
+.db-wrap a.db-home-btn-primary:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.db-home-notes{display:flex;flex-direction:column;gap:14px}
+.db-home-notes-h{font-size:13px;letter-spacing:.12em;color:var(--ink-soft);padding-bottom:8px;border-bottom:1px solid var(--line)}
+.db-home-note{display:flex;gap:10px;align-items:flex-start}
+.db-home-note i{width:5px;height:5px;flex:0 0 auto;border-radius:2px;background:var(--gold);margin-top:8px;display:block}
+.db-home-note span{font-size:14px;line-height:1.8;color:var(--ink);text-wrap:pretty}
+
+/* ── 窄畫面 ───────────────────────────────────────────── */
+@media (max-width:1080px){
+  .db-home-visual{width:300px;min-height:240px}
+  .db-home-visual svg{width:120px;height:120px}
+  /* 1080px 以下容器本身變窄，百分比須再放大，否則案件總數卡的橫向內容會溢出 */
+  .db-home-stats{width:84%}
+  .db-home-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .db-home-charts{grid-template-columns:1fr}
+  .db-wrap a.db-home-card-main,.db-wrap a.db-home-card-row{grid-column:span 2}
+  .db-home-about{grid-template-columns:1fr;gap:28px}
+  .db-home-about-main{grid-column:auto}
+}
+@media (max-width:820px){
+  .db-home{gap:26px}
+  .db-home-hero{flex-direction:column;gap:22px;padding:24px 16px 22px}
+  .db-home-visual{align-self:auto;width:100%;min-height:200px}
+  .db-home-stats{flex-direction:column;width:100%;margin-top:0}
+  .db-home-stat{margin:0 0 11px}
+  /* 直排時三張卡等寬，加寬設定失去意義 */
+  .db-home-stat-wide{flex:1 1 auto}
+  .db-home-stat:last-child{margin-bottom:0}
+  .db-home-visual svg{width:110px;height:110px}
+  .db-home-h1{font-size:26px;line-height:1.45}
+  .db-home-grid{grid-template-columns:1fr}
+  .db-home-pie{flex-direction:column;align-items:stretch;gap:14px}
+  .db-home-donut{align-self:center;width:150px;height:150px}
+  .db-wrap a.db-home-card-main,.db-wrap a.db-home-card-row{grid-column:auto}
+  .db-wrap a.db-home-card-row{flex-direction:row}
+  .db-home-h{font-size:18px;flex-direction:column;align-items:flex-start;gap:4px}
+  .db-home-complaint{padding:0}
+  .db-home-complaint-hd{padding:14px 16px;gap:10px 16px}
+  .db-home-complaint-bd{padding:18px 16px 20px}
+  .db-home-complaint-side{align-items:stretch;max-width:none}
+  .db-wrap a.db-home-btn-gold{display:block;width:100%;padding:13px 0;min-height:44px}
+  .db-home-complaint-side small{text-align:left}
+  .db-home-steps{grid-template-columns:1fr}
+  .db-home-tips{grid-template-columns:1fr}
+  .db-home-search-btn{min-height:44px}
+  .db-wrap a.db-home-btn-primary{display:block;width:100%;padding:13px 0;min-height:44px}
+}
+/* 無障礙：偏好減少動態時，首頁一切位移效果停用 */
+@media (prefers-reduced-motion:reduce){
+  .db-wrap a.db-home-card,.db-wrap a.db-home-card:hover,.db-home-tag:hover,
+  .db-wrap a.db-home-btn-gold:hover,.db-wrap a.db-home-btn-primary:hover,
+  .db-home-card:hover .db-home-go{transform:none}
+}
+
+/* ===== [CSS-COMPLAINT] 申訴救濟管道：新增區塊 =========================
+   命名空間一律 db-cp-*，色票、圓角、陰影、曲線全部沿用 :root 既有變數。
+   標題三層：.db-cp-part（壹／貳，深藍帶狀）→ .db-about-h（一、二、三）
+   → .db-about-sh（（一）（二）），後二者沿用既有樣式，未改動。 */
+
+/* ── 頁內目錄 ─────────────────────────────────────────── */
+.db-cp-toc{
+  border:1px solid var(--line);border-radius:8px;background:var(--bg-soft);
+  padding:16px 20px 18px;margin:2px 0 26px
+}
+.db-cp-toc-h{font-size:13px;letter-spacing:.12em;color:var(--ink-soft);margin:0 0 10px}
+.db-cp-toc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 28px}
+.db-cp-toc-grp{font-size:13.5px;font-weight:700;color:var(--accent-deep);letter-spacing:.06em;margin:6px 0 2px}
+.db-wrap a.db-cp-toc-a{
+  display:block;font-size:14.5px;line-height:1.75;color:var(--accent);text-decoration:none;
+  padding:3px 0 3px 14px;position:relative;border-radius:4px;transition:color .2s,background .2s
+}
+.db-wrap a.db-cp-toc-a:hover{color:var(--accent-deep);background:var(--accent-tint);text-decoration:none}
+.db-wrap a.db-cp-toc-a:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+
+/* 目錄跳轉的避讓：與檔案上方 #annot-box 等同一套配方，讓標題停在固定頁首下方，
+   不被深藍色頁首蓋住。--sticky-h 由既有腳本量測後寫入。 */
+.db-complaint [id^="cp-"]{scroll-margin-top:calc(var(--sticky-h, 132px) + 12px)}
+
+/* ── 第一層大標：深藍帶狀 ─────────────────────────────── */
+.db-cp-part{
+  margin:38px 0 20px;padding:14px 22px;border-radius:8px;
+  background:linear-gradient(115deg,#0F2038 0%,#1B3255 55%,#2C4A73 100%);
+  border-left:5px solid var(--gold);
+  color:#F4F7FB;font-size:22px;font-weight:700;letter-spacing:.1em;
+  box-shadow:0 6px 18px rgba(15,32,56,.18)
+}
+.db-cp-part:first-child{margin-top:4px}
+.db-cp-part small{display:block;margin-top:5px;font-size:13.5px;font-weight:400;letter-spacing:.04em;color:#B9CBE0}
+
+/* ── 左右對照卡片（可能構成／通常不構成）───────────────── */
+.db-cp-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0 0 14px}
+.db-cp-card{
+  border:1px solid var(--line);border-radius:8px;background:var(--bg);
+  box-shadow:0 2px 12px rgba(43,43,46,.05);padding:18px 20px;
+  max-width:var(--cp-cardw)
+}
+.db-cp-card-h{
+  display:flex;align-items:center;gap:9px;font-size:16.5px;font-weight:700;
+  letter-spacing:.04em;color:var(--accent-deep);margin:0 0 10px
+}
+.db-cp-card ul{margin:0;padding-left:20px}
+.db-cp-card li{margin:0 0 7px;font-size:15px;line-height:1.8}
+.db-cp-card li:last-child{margin-bottom:0}
+.db-cp-yes{border-top:3px solid var(--c-m)}
+.db-cp-no{border-top:3px solid var(--accent-line)}
+.db-cp-no .db-cp-card-h{color:var(--ink-soft)}
+.db-cp-dot{width:9px;height:9px;border-radius:2px;flex:0 0 auto;display:block}
+
+/* ── 對照表（分流表、該找誰）───────────────────────────── */
+/* 本檔有一條通用規則 table{width:100%;min-width:1566px;table-layout:fixed}（為案件清單的
+   寬表格而設）。這三張對照表是純文字的兩欄表，必須逐項解除，否則不論視窗多寬都固定
+   1566px、窄畫面被迫橫向捲動，且兩欄各佔一半而短欄留下大片空白：
+     ．min-width:0        解除 1566px 下限 → 窄畫面自動縮到頁寬，不再有橫軸；
+     ．table-layout:auto  欄寬改依內容分配 → 短欄不再硬佔一半；
+     ．.db-cp-tw 的 max-width 讓寬螢幕下整個框依文字長度收斂，不撐滿整頁。
+   overflow-x:auto 保留為保險，正常情況下不會觸發。 */
+.db-cp-tw{
+  overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--bg);
+  margin:0 0 14px;max-width:var(--cp-maxw)
+}
+/* 卡片的寬度上限與對照表一致：寬螢幕下依內容收斂，不撐滿整頁。
+   數值只寫在 --cp-maxw 一處（見 :root），改寬窄時對照表與卡片一起變，不會走樣。
+   .db-cp-card 目前只用於單獨一張卡；若日後又放進 .db-cp-two 的兩欄格線中，
+   欄寬本來就小於此上限，這條不生作用，故不必另外排除。 */
+.db-cp-entry,.db-cp-faq{max-width:var(--cp-maxw)}
+/* 證據清單：卡寬隨最長一行收斂（fit-content），不足以支援時退回原本的滿版，不破版。 */
+.db-cp-check{width:fit-content;max-width:min(var(--cp-maxw),100%)}
+.db-cp-table{
+  border-collapse:collapse;width:100%;min-width:0;table-layout:auto;
+  font-size:15px;line-height:1.8
+}
+.db-cp-table th,.db-cp-table td{border:1px solid var(--line);padding:11px 14px;text-align:left;vertical-align:top}
+/* 首列（表頭）置中：與同頁的 .db-bar-form thead th 一致。
+   置中只加在 thead th，tbody 第一欄的 <th>（列標題）仍靠左，
+   否則長短不一的列標題會左右浮動、與右欄的說明文字對不齊。 */
+.db-cp-table thead th{background:var(--bg-soft);color:var(--accent-deep);font-weight:700;font-size:14px;white-space:nowrap;text-align:center}
+/* 不再指定固定百分比欄寬：交給 table-layout:auto 依內容分配；
+   只留一個下限，避免窄畫面被長句擠成一行兩三個字。 */
+.db-cp-table tbody th{background:var(--accent-tint);color:var(--accent-deep);font-weight:700;min-width:6.5em}
+.db-cp-table tbody tr:hover td,.db-cp-table tbody tr:hover th{background:var(--accent-tint-2)}
+
+/* ── 可勾選的證據清單（純前端，不儲存）─────────────────── */
+.db-cp-check{
+  border:1px solid var(--line);border-radius:8px;background:var(--bg);
+  box-shadow:0 2px 12px rgba(43,43,46,.05);padding:8px 20px 14px;margin:0 0 14px
+}
+.db-cp-ck{display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-bottom:1px solid var(--line-soft)}
+.db-cp-check .db-cp-ck:last-of-type{border-bottom:none}
+.db-cp-ck span{font-size:15px;line-height:1.8}
+.db-cp-ck b{display:block;font-weight:700;color:var(--accent-deep)}
+.db-cp-ck em{font-style:normal;color:var(--ink-soft);font-size:14px}
+
+/* ── 常見疑慮：可摺疊 ─────────────────────────────────── */
+.db-cp-faq{border:1px solid var(--line);border-radius:8px;background:var(--bg);overflow:hidden;margin:0 0 14px}
+.db-cp-q{border-bottom:1px solid var(--line)}
+.db-cp-faq .db-cp-q:last-child{border-bottom:none}
+.db-cp-q>summary{
+  list-style:none;cursor:pointer;padding:14px 18px;font-size:16px;font-weight:700;
+  color:var(--accent-deep);letter-spacing:.03em;display:flex;align-items:center;gap:10px;
+  transition:background .2s
+}
+.db-cp-q>summary::-webkit-details-marker{display:none}
+.db-cp-q>summary:hover{background:var(--accent-tint)}
+.db-cp-q>summary:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.db-cp-q>summary::after{
+  content:"";flex:0 0 auto;margin-left:auto;width:9px;height:9px;
+  border-right:2px solid var(--accent);border-bottom:2px solid var(--accent);
+  transform:rotate(45deg) translate(-2px,-2px);transition:transform .22s var(--e-out)
+}
+.db-cp-q[open]>summary::after{transform:rotate(-135deg) translate(-3px,-3px)}
+.db-cp-a{padding:0 18px 16px;font-size:15px;line-height:1.9}
+.db-cp-a p{margin:0 0 10px}
+.db-cp-a p:last-child{margin-bottom:0}
+
+/* ── 提醒方塊、資料庫入口 ─────────────────────────────── */
+/* 提醒方塊：緊接在「通常不是懲戒問題」那張卡之下，兩者等寬（--cp-cardw）；
+   底色改為與頁首、分部標題同一組深藍，與上方的白底卡形成對照。
+   目前全站只有這一個 .db-cp-note，故直接改本體，不另立修飾用 class。 */
+.db-cp-note{
+  background:linear-gradient(115deg,#0F2038 0%,#1B3255 55%,#2C4A73 100%);
+  border:1px solid var(--accent-dark);border-left:4px solid var(--gold);
+  border-radius:0 8px 8px 0;padding:13px 18px;margin:0 0 14px;max-width:var(--cp-cardw);
+  font-size:14.5px;line-height:1.85;color:#E8EEF6;
+  box-shadow:0 4px 14px rgba(15,32,56,.16)
+}
+.db-cp-note b{color:#F1DFB6}
+/* 警示方塊：深紅底白字，供「本會無權限、請逕向有權單位提出」這類
+   必須先看到、不能被誤讀為建議的聲明使用。形狀沿用上方的 .db-cp-note
+   （左側色條＋單邊圓角），只換色系，深紅取自統計圖表既有的 #8E1F33。
+   寬度與其下方的對照表同齊（--cp-maxw）而非 --cp-cardw：它接在整段
+   說明文字之後，不與任何卡片並排，不必等寬。 */
+.db-cp-alert{
+  background:linear-gradient(115deg,#6E1526 0%,#8E1F33 55%,#A8354A 100%);
+  border:1px solid #6E1526;border-left:4px solid var(--gold);
+  border-radius:0 8px 8px 0;padding:13px 18px;margin:0 0 18px;max-width:var(--cp-maxw);
+  font-size:14.5px;line-height:1.85;color:#fff;
+  box-shadow:0 4px 14px rgba(110,21,38,.20)
+}
+.db-cp-alert b{color:#fff}
+.db-cp-entry{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  border:1px solid var(--accent-line);border-radius:8px;background:var(--accent-tint);
+  padding:18px 22px;margin:0 0 14px
+}
+.db-cp-entry-main{flex:1 1 auto;min-width:0}
+/* 姓名檢索框：外觀與案件清單頁的 .db-searchbox-lg 一致，行為轉呼叫 gotoCaseSearch()。 */
+.db-cp-search{
+  position:relative;display:flex;align-items:stretch;max-width:420px;min-width:0;margin-top:12px;
+  background:var(--bg);border:1px solid var(--line);border-radius:7px;overflow:hidden;
+  transition:box-shadow .28s var(--e-soft),border-color .28s
+}
+.db-cp-search:hover{border-color:var(--accent-line)}
+.db-cp-search:focus-within{
+  border-color:var(--accent);
+  box-shadow:0 0 0 4px rgba(27,50,85,.12),0 8px 22px rgba(27,50,85,.10)
+}
+.db-cp-search-ico{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  width:17px;height:17px;color:var(--ink-soft);pointer-events:none;transition:color .22s
+}
+.db-cp-search:focus-within .db-cp-search-ico{color:var(--accent)}
+.db-cp-search input{
+  flex:1 1 0;width:100%;min-width:0;font:inherit;font-size:15.5px;color:var(--ink);
+  background:transparent;border:none;border-radius:0;padding:11px 11px 11px 38px
+}
+.db-cp-search input:focus-visible{outline:none}
+.db-cp-search-btn{
+  appearance:none;font:inherit;font-size:14.5px;letter-spacing:.06em;cursor:pointer;
+  border:none;border-left:1px solid var(--line);border-radius:0;
+  background:var(--accent);color:#fff;padding:0 20px;transition:background .2s
+}
+.db-cp-search-btn:hover{background:var(--accent-deep)}
+.db-cp-search-btn:focus-visible{outline:2px solid var(--focus);outline-offset:-3px}
+.db-cp-entry-t{font-size:16.5px;font-weight:700;color:var(--accent-deep);letter-spacing:.04em;margin:0 0 4px}
+.db-cp-entry-d{font-size:14.5px;line-height:1.8;color:var(--ink);margin:0;max-width:52em}
+.db-wrap a.db-cp-btn{
+  display:inline-block;flex:0 0 auto;font:inherit;font-size:15px;font-weight:700;letter-spacing:.03em;
+  text-decoration:none;text-align:center;white-space:nowrap;cursor:pointer;
+  background:var(--accent);color:#fff;border:1px solid var(--accent);border-radius:5px;padding:11px 22px;
+  transition:background .2s,box-shadow .2s,transform .2s var(--e-soft)
+}
+.db-wrap a.db-cp-btn:hover{
+  color:#fff;text-decoration:none;background:var(--accent-deep);
+  box-shadow:0 3px 12px rgba(27,50,85,.2);transform:translateY(-1px)
+}
+.db-wrap a.db-cp-btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* ── 窄畫面 ───────────────────────────────────────────── */
+@media (max-width:860px){
+  .db-cp-toc-grid{grid-template-columns:1fr;gap:4px}
+  .db-cp-part{font-size:18px;padding:12px 16px;letter-spacing:.06em}
+  .db-cp-two{grid-template-columns:1fr}
+  .db-cp-tw,.db-cp-card,.db-cp-note,.db-cp-alert,.db-cp-entry,.db-cp-faq{max-width:none}
+  .db-cp-check{width:auto;max-width:none}
+  .db-cp-table tbody th{min-width:5.5em}
+  .db-cp-table th,.db-cp-table td{padding:9px 11px;font-size:14.5px}
+  .db-cp-entry{flex-direction:column;align-items:stretch}
+  .db-cp-search{max-width:none}
+  .db-cp-search-btn{min-height:44px}
+  .db-wrap a.db-cp-btn{display:block;padding:13px 0;min-height:44px}
+  .db-cp-q>summary{padding:13px 14px;font-size:15.5px}
+  .db-cp-a{padding:0 14px 14px}
+}
+@media (prefers-reduced-motion:reduce){
+  .db-wrap a.db-cp-btn:hover{transform:none}
+}
+
+/* ===== [CSS-CMS-GUARD] 版面容器的 CMS 防禦 ==============================
+   jrf CMS 的編輯器會把區塊之間的空行轉成 <p>&nbsp;</p>。落在一般文章流裡看不出來，
+   但落在 grid／flex 容器裡就會成為一個「看不見卻佔一格」的項目——首頁的關鍵數字
+   看板即因此第一格被佔住，三張卡片被擠到第 2、3 格，第三張再掉到下一行。
+   對策有二，兩者並用：
+     ① 首頁與申訴頁的原始碼在這些容器內不留空行（CMS 沒有空行可轉）；
+     ② 以下規則把這些容器「直接子層」的 <p> 與 <br> 一律隱藏。
+   只列直接子層本來就不該出現 <p> 的容器；.db-home-hero-main、.db-home-about-main、
+   .db-home-step、.db-cp-entry-main、.db-complaint 等本來就有正當的 <p> 子層，
+   刻意不列入，勿順手補上。
+   同理，版面寬度一律改用百分比，不用 calc()——CMS 的樣式處理曾整條丟棄含 calc()
+   的宣告，導致看板失去寬度限制而滿版。 */
+.db-home-grid>:not(.db-home-card),
+.db-home-steps>:not(.db-home-step),
+.db-home-tips>:not(.db-home-tip),
+.db-cp-two>:not(.db-cp-card),
+.db-cp-toc-grid>:not(div){display:none!important}
+.db-home>p,.db-home-hero>p,.db-home-stats>p,.db-home-grid>p,
+.db-home-steps>p,.db-home-tips>p,.db-home-about>p,.db-home-notes>p,
+.db-home-tags>p,.db-home-chips>p,.db-home-search>p,
+.db-cp-toc-grid>p,.db-cp-two>p,.db-cp-faq>p,.db-cp-check>p,
+.db-cp-entry>p,.db-cp-tw>p{display:none!important}
+.db-home>br,.db-home-hero>br,.db-home-stats>br,.db-home-grid>br,
+.db-home-steps>br,.db-home-tips>br,.db-home-about>br,.db-home-notes>br,
+.db-home-tags>br,.db-home-chips>br,.db-home-search>br,
+.db-cp-toc-grid>br,.db-cp-two>br,.db-cp-faq>br,.db-cp-check>br,
+.db-cp-entry>br,.db-cp-tw>br{display:none!important}

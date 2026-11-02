@@ -1,0 +1,24 @@
+# 給 AI 代理的本機工作守則，不納入版控
+AGENTS.md
+
+# 作業系統
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# 編輯器
+.vscode/
+.idea/
+*.swp
+*~
+
+# 本機工具與暫存
+.claude/settings.local.json
+node_modules/
+*.log
+.env
+.env.*
+tmp/
+
+# GitHub Actions 發布時的暫存目錄
+_site/

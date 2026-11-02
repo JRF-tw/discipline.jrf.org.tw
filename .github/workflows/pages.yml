@@ -1,0 +1,40 @@
+name: Deploy to GitHub Pages
+
+# 只發布網站需要的檔案（白名單），README、設定檔等其他內容不會出現在網站上。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 檢查 JSON 格式
+        run: python3 -c "import json,glob;[json.load(open(f)) for f in glob.glob('data/*.json')]"
+
+      - name: 複製要發布的檔案
+        run: |
+          mkdir _site
+          cp -r index.html 404.html favicon.svg robots.txt sitemap.xml assets data _site/
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

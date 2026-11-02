@@ -1,0 +1,1614 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>臺灣律師懲戒案件資料庫｜民間司法改革基金會</title>
+<meta name="description" content="民間司法改革基金會彙整歷年律師懲戒案件，逐案標註違失條文、懲戒結果與法規依據，並提供決議書全文、違失態樣分類、懲戒法規對照、統計分析與申訴管道說明。">
+<link rel="canonical" href="https://discipline.jrf.org.tw/">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#2C4A73">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:site_name" content="民間司法改革基金會">
+<meta property="og:title" content="臺灣律師懲戒案件資料庫">
+<meta property="og:description" content="民間司法改革基金會彙整歷年律師懲戒案件，逐案標註違失條文、懲戒結果與法規依據，並提供決議書全文、違失態樣分類、懲戒法規對照、統計分析與申訴管道說明。">
+<meta property="og:url" content="https://discipline.jrf.org.tw/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="臺灣律師懲戒案件資料庫">
+<meta name="twitter:description" content="民間司法改革基金會彙整歷年律師懲戒案件，逐案標註違失條文、懲戒結果與法規依據，並提供決議書全文、違失態樣分類、懲戒法規對照、統計分析與申訴管道說明。">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://discipline.jrf.org.tw/#website",
+      "name": "臺灣律師懲戒案件資料庫",
+      "url": "https://discipline.jrf.org.tw/",
+      "inLanguage": "zh-TW",
+      "publisher": { "@id": "https://www.jrf.org.tw/#organization" }
+    },
+    {
+      "@type": "Dataset",
+      "name": "臺灣律師懲戒案件資料庫",
+      "description": "民間司法改革基金會彙整歷年律師懲戒案件，逐案標註違失條文、懲戒結果與法規依據，並提供決議書全文、違失態樣分類、懲戒法規對照、統計分析與申訴管道說明。",
+      "url": "https://discipline.jrf.org.tw/",
+      "inLanguage": "zh-TW",
+      "isAccessibleForFree": true,
+      "keywords": ["律師懲戒", "律師倫理", "律師法", "懲戒決議書", "司法改革"],
+      "creator": { "@id": "https://www.jrf.org.tw/#organization" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://www.jrf.org.tw/#organization",
+      "name": "財團法人民間司法改革基金會",
+      "alternateName": "民間司法改革基金會",
+      "url": "https://www.jrf.org.tw/",
+      "email": "contact@jrf.org.tw"
+    }
+  ]
+}
+</script>
+
+<link rel="preload" href="data/content-meta.json" as="fetch" crossorigin="anonymous">
+<link rel="preload" href="data/pattern-meta.json" as="fetch" crossorigin="anonymous">
+<link rel="preload" href="data/cases.json" as="fetch" crossorigin="anonymous">
+<link rel="stylesheet" href="assets/css/main.css">
+<script src="assets/js/load-data.js" defer></script>
+</head>
+<body>
+<noscript><p style="margin:0;padding:12px 16px;background:#FFF8E6;color:#5A4200;text-align:center">本資料庫的案件檢索、統計與決議書全文需要啟用 JavaScript 才能使用。</p></noscript>
+<!-- [HTML-ROOT] 資料庫可見 DOM -->
+<div class="db-wrap"><!-- 捲動哨兵兼緩衝區：緊貼在懸浮頁首（.db-sticky）之前。
+     height 即頁首上方的緩衝空間，覺得太多或太少可直接調整此數值。
+     點擊頁籤時捲動至本元素「下緣」（＝頁首上緣），
+     緩衝區恰好整段捲出視窗外，深藍色頁首切齊視窗最上緣、上方不留白。
+     即使嵌入環境的佈景使 sticky 失效，頁首本身仍會落在視窗頂端。 -->
+<div aria-hidden="true" id="db-scroll-top" style="height:75px;margin:0;padding:0;border:0">&nbsp;</div>
+
+<div class="db-sticky">
+<header class="db-head">
+<div class="db-head-main">
+<h1><button class="db-head-home" id="head-home" type="button">臺灣律師懲戒案件資料庫</button></h1>
+</div>
+<button aria-controls="db-nav" aria-expanded="false" aria-label="開啟選單" class="db-nav-toggle" id="nav-toggle" type="button"><span aria-hidden="true">&equiv;</span></button>
+
+<nav aria-label="資料庫檢視方式" class="db-tabs" id="db-nav" role="tablist"><button aria-controls="tab-home" aria-selected="true" class="db-tab-btn db-tab-home" id="tabbtn-home" role="tab" type="button">首頁</button><button aria-controls="tab-list" aria-selected="false" class="db-tab-btn" id="tabbtn-list" role="tab" type="button">案件清單</button><button aria-controls="tab-pattern" aria-selected="false" class="db-tab-btn" id="tabbtn-pattern" role="tab" type="button">違失態樣</button><button aria-controls="tab-laws" aria-selected="false" class="db-tab-btn" id="tabbtn-laws" role="tab" type="button">懲戒法規</button><button aria-controls="tab-stats" aria-selected="false" class="db-tab-btn" id="tabbtn-stats" role="tab" type="button">統計與分析</button><button aria-controls="tab-about" aria-selected="false" class="db-tab-btn" id="tabbtn-about" role="tab" type="button">資料庫說明</button><button aria-controls="tab-reform" aria-selected="false" class="db-tab-btn db-tab-reform" id="tabbtn-reform" role="tab" type="button"><span aria-hidden="true" class="db-tab-ico">★</span>改革主張</button><button aria-controls="tab-complaint" aria-selected="false" class="db-tab-btn db-tab-service" id="tabbtn-complaint" role="tab" type="button"><span aria-hidden="true" class="db-tab-ico">◆</span>申訴救濟管道</button></nav>
+</header>
+</div>
+<!-- /.db-sticky --><!-- 條文內容（錨定式漂浮卡片，點選條文後浮現於該按鈕旁） -->
+
+<div aria-label="條文內容" class="db-law-pop" hidden="" id="law-pop" role="dialog">
+<div class="db-modal-head"><span id="modal-title">​</span><button class="db-modal-close" id="modal-close" type="button">✕</button></div>
+
+<div class="db-modal-body" id="modal-body">&nbsp;</div>
+</div>
+<!-- [HTML-HOME] 首頁（進站著陸頁）：位於七個頁籤之前，無錨點時預設顯示。
+     本頁不自有任何資料：看板數字於載入時由 db-data／db-fulltext 推導（見 initHome），
+     檢索框沿用案件清單的 gotoCaseSearch()，導覽卡片一律轉呼叫既有的 tabbtn-* 點擊流程。 -->
+
+<section aria-labelledby="tabbtn-home" id="tab-home" role="tabpanel">
+<div class="db-home"><!-- 一、標題區 -->
+<div class="db-home-hero">
+<div class="db-home-hero-main">
+<div class="db-home-eyebrow">民間司法改革基金會</div>
+
+<h2 class="db-home-h1">查詢律師懲戒案例</h2>
+
+<p class="db-home-lead">為保障民眾權益、提升律師之執業環境，本資料庫彙整歷年律師懲戒案件，並逐案標註違失條文、懲戒結果與法規依據，並有決議書全文供查詢。</p>
+
+<div class="db-home-search"><svg aria-hidden="true" class="db-home-search-ico" focusable="false" viewbox="0 0 24 24"><circle cx="10.5" cy="10.5" fill="none" r="6.5" stroke="currentColor" stroke-width="2"></circle><line stroke="currentColor" stroke-linecap="round" stroke-width="2" x1="15.4" x2="21" y1="15.4" y2="21"></line></svg> <input aria-label="快速檢索律師姓名、案號、法條或全文關鍵字" autocomplete="off" id="home-q" placeholder="律師姓名、案號、法條、全文關鍵字…" type="search" /><button class="db-home-search-btn" id="home-q-btn" type="button">檢索</button></div>
+
+<div class="db-home-tags"><span>常見檢索：</span><button class="db-home-tag" data-homeq="應予除名" type="button">應予除名</button><button class="db-home-tag" data-homeq="故意犯罪經判刑確定" type="button">故意犯罪經判刑確定</button><button class="db-home-tag" data-homeq="律師法第32條" type="button">律師法第 32 條</button><button class="db-home-tag" data-homeq="性騷擾" type="button">性騷擾</button></div>
+
+<div class="db-home-updated" id="home-updated">&nbsp;</div>
+</div>
+<!-- 主視覺：目前為裝飾面板。要換成實際圖片時，把下面的 <svg> 整段換成
+     <img src="圖片網址" alt="替代文字" style="width:100%;height:100%;object-fit:cover" />
+     即可，外框樣式不必調整。 -->
+
+<div aria-hidden="true" class="db-home-visual"><svg focusable="false" viewbox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"><path d="M60 18v78"></path><path d="M38 96h44"></path><path d="M22 34h76"></path><circle cx="60" cy="26" fill="currentColor" r="4" stroke="none"></circle><path d="M22 34l-10 26a11 11 0 0 0 20 0z"></path><path d="M98 34l10 26a11 11 0 0 1-20 0z"></path></g></svg></div>
+</div>
+<!-- 二、關鍵數字看板（數值由 initHome 於載入時推導，不寫死） -->
+
+<div class="db-home-stats" id="home-stats">
+<div class="db-home-stat-label"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list">案件總數</a></div>
+
+<div class="db-home-stat-split">
+<div class="db-home-stat-val"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list"><b id="home-n-person">&mdash;</b> <span>人次</span></a></div>
+
+<div aria-hidden="true" class="db-home-stat-rule">&nbsp;</div>
+
+<div class="db-home-stat-sub">
+<div><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list"><i aria-hidden="true" class="db-hs-dot db-hs-y"></i><span>成立</span><b class="db-hs-ny" id="home-n-yes">&mdash;</b></a></div>
+
+<div><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list"><i aria-hidden="true" class="db-hs-dot db-hs-n"></i><span>不成立</span><b class="db-hs-nn" id="home-n-no">&mdash;</b></a></div>
+</div>
+</div>
+
+<div aria-hidden="true" class="db-home-stat-bar" id="home-stat-bar"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list"><i class="db-hs-y" id="home-bar-y"></i><i class="db-hs-n" id="home-bar-n"></i><i class="db-hs-o" id="home-bar-o"></i></a></div>
+
+<div class="db-home-stat-note" id="home-n-person-note"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list">同一人同一事件，跨審級僅計一次</a></div>
+
+<div class="db-home-stat-label"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="#stats/data">資料涵蓋</a></div>
+
+<div class="db-home-stat-val"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="#stats/data"><b id="home-n-years">&mdash;</b> <span>年</span></a></div>
+
+<div class="db-home-stat-note" id="home-n-range"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="#stats/data">依決議日期最早與最新推算</a></div>
+
+<div class="db-home-stat-label"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="#pattern">違失態樣</a></div>
+
+<div class="db-home-stat-val"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="#pattern"><b id="home-n-pat">&mdash;</b> <span>類</span></a></div>
+
+<div class="db-home-stat-note"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="#pattern">依懲戒法規分類</a></div>
+</div>
+<!-- 三、資料速覽：左為法務部年度統計之處分結果（近年），右為本資料庫的處分輕重分布。
+     兩者母體不同（統計為確定案件之人數，資料庫為逐案收錄），故各自標明來源與期間。
+     內容一律由 initHome 於載入時推導，HTML 內不寫死任何數字。 -->
+
+<div class="db-home-charts">
+<section aria-labelledby="home-kind-h" class="db-home-chart-card">
+<div class="db-home-chart-h">
+<h3 id="home-kind-h">近 5 年懲戒結果分布</h3>
+<a data-homego="stats" href="#stats/data">前往統計 &rarr;</a></div>
+
+<div class="db-home-chart-sub" id="home-kind-sub">&nbsp;</div>
+
+<div class="db-home-pie">
+<div aria-hidden="true" class="db-home-donut" id="home-kind-donut">
+<div class="db-home-donut-c"><b id="home-kind-total">&mdash;</b><span>人</span></div>
+</div>
+
+<div class="db-home-pie-lg" id="home-kind-legend">&nbsp;</div>
+</div>
+
+<p class="db-home-chart-note">資料來源：法務部統計；併命研習者併入該處分計算，不含不受理、免議及暫時停職。</p>
+</section>
+
+<section aria-labelledby="home-sev-h" class="db-home-chart-card">
+<div class="db-home-chart-h">
+<h3 id="home-sev-h">懲戒結果量處統計</h3>
+<a data-homego="list" href="#list">前往案件清單 &rarr;</a></div>
+
+<div class="db-home-chart-sub" id="home-sev-sub">&nbsp;</div>
+
+<div class="db-home-pie">
+<div aria-hidden="true" class="db-home-donut" id="home-sev-pie">
+<div class="db-home-donut-c"><b id="home-sev-total">&mdash;</b><span>人</span></div>
+</div>
+
+<div class="db-home-pie-lg" id="home-sev-legend">&nbsp;</div>
+</div>
+
+<p class="db-home-chart-note">圖示為相對比例；併命研習者併入該處分計算。</p>
+</section>
+</div>
+<!-- 四、我要申訴律師（內容取自申訴救濟管道頁籤，首頁只放三步驟與兩則提醒） -->
+
+<div class="db-home-complaint">
+<div class="db-home-complaint-hd">
+<div class="db-home-complaint-h"><span aria-hidden="true" class="db-home-star">◆</span>怎麼申訴？</div>
+
+<p class="db-home-complaint-lead">民眾遇到律師有違倫理風紀的情形，一般可<b>向該律師所屬的地方律師公會申訴</b>。</p>
+
+<div class="db-home-complaint-side"><a aria-label="前往申訴救濟管道" class="db-home-btn-gold" data-homego="complaint" href="#complaint">查看申訴流程</a></div>
+</div>
+
+<div class="db-home-complaint-bd">
+<div class="db-home-steps">
+<div class="db-home-step">
+<div class="db-home-step-h"><span class="db-home-step-n">1</span> <span class="db-home-step-t">確認所屬公會</span></div>
+
+<p>到「<a href="https://lawyerbc.moj.gov.tw" rel="noopener" target="_blank">法務部律師查詢系統</a>」查詢該律師登錄的地方律師公會&mdash;&mdash;申訴要向他所屬的公會提出。</p>
+</div>
+
+<div class="db-home-step">
+<div class="db-home-step-h"><span class="db-home-step-n">2</span> <span class="db-home-step-t">備妥申訴書與證據</span></div>
+
+<p>確認該公會的申訴辦法，並備妥相關證據（如：委任契約書、法院文書或判決、與律師的對話紀錄擷圖）。</p>
+</div>
+
+<div class="db-home-step">
+<div class="db-home-step-h"><span class="db-home-step-n">3</span> <span class="db-home-step-t">向公會提出申訴</span></div>
+
+<p>部分公會規定須紙本提出申訴，並同時繳納作業處理費（申訴成立時退還）。</p>
+</div>
+</div>
+
+<div class="db-home-tips">
+<div class="db-home-tip"><b>如果是法扶指派的律師</b> <span>除向地方律師公會申訴外，也可透過法律扶助基金會的「<a href="https://www.laf.org.tw/appeal" rel="noopener" target="_blank">📩申訴制度</a>」直接向各地法扶分會申訴；違失行為達到「停止派案」的程度時，法扶也會將律師移送懲戒。</span></div>
+
+<div class="db-home-tip"><b>申訴前先看案例</b> <span>除了本資料庫的案例外，台北律師公會的「<a href="https://www.tba.org.tw/public-service/?group=report" rel="noopener" target="_blank">📖律師倫理案例選輯</a>」是目前唯一有公開的公會案例，可先參考、判斷受任律師的行為是否構成違失。</span></div>
+</div>
+</div>
+</div>
+<!-- 五、五個入口，一律轉呼叫既有頁籤按鈕-->
+
+<div>
+<div class="db-home-grid"><a aria-label="前往案件清單" class="db-home-card db-home-card-main" data-homego="list" href="#list"><span class="db-home-head"><span class="db-home-ico"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"><path d="M5.5 3.5h9L18.5 7v13.5h-13z"></path><path d="M8.5 10h7M8.5 13.5h7M8.5 17h4.5"></path></g></svg></span><span><span class="db-home-card-t">案件清單</span><span class="db-home-kicker">主要檢索介面</span></span></span> <span class="db-home-p">全部案件列表。可依姓名、案號、日期、移送機關、懲戒結果輕重、各法條、違失態樣或全文檢索，或依各欄位資料排序。</span> <span class="db-home-chips"><span class="db-home-chip">姓名／案號</span><span class="db-home-chip">依懲戒結果輕重排序</span><span class="db-home-chip">法條查詢／切換為違失態樣</span><span class="db-home-chip">決議書全文</span></span> <span class="db-home-cta">進入案件清單 <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></span></a> <a aria-label="前往違失態樣" class="db-home-card db-home-card-pattern" data-homego="pattern" href="#pattern"><span class="db-home-ico"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"><rect height="6.6" rx="1.4" width="6.6" x="3.6" y="3.6"></rect><rect height="6.6" rx="1.4" width="6.6" x="13.8" y="3.6"></rect><rect height="6.6" rx="1.4" width="6.6" x="3.6" y="13.8"></rect><path d="M14.2 17.1h6M17.2 14.1v6"></path></g></svg></span> <span class="db-home-card-t">違失態樣</span> <span class="db-home-p">將案件依不同的行為類型分類，並有說明與案例。</span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a> <a aria-label="前往懲戒法規" class="db-home-card" data-homego="laws" href="#laws"><span class="db-home-ico"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"><path d="M5 5.2A1.5 1.5 0 016.5 3.7H19v16.6H6.5A1.5 1.5 0 005 21.8z"></path><path d="M5 18.6h14M9 8h6"></path></g></svg></span> <span class="db-home-card-t">懲戒法規 <span aria-hidden="true" class="db-home-dots"><i style="background:var(--c-j)"></i><i style="background:var(--c-k)"></i><i style="background:var(--c-l)"></i><i style="background:var(--c-m)"></i><i style="background:var(--c-n)"></i><i style="background:var(--c-o)"></i></span></span> <span class="db-home-p">新舊《律師法》、《律師倫理規範》與《法律扶助法》條文對照。</span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a></div>
+
+<div class="db-home-grid"><a aria-label="前往統計" class="db-home-card db-home-card-row" data-homego="stats" href="#stats/data"><span aria-hidden="true" class="db-home-bars"><i style="height:16px;opacity:.4"></i><i style="height:28px;opacity:.7"></i><i style="height:21px;opacity:.55"></i><i style="height:34px"></i></span> <span class="db-home-body"><span class="db-home-card-t">統計</span> <span class="db-home-p">懲戒件數與種類的年度趨勢，並可察看本國律師人數、入會執業人數等資訊。</span> </span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a> <a aria-label="前往改革主張" class="db-home-card db-home-card-row db-home-card-reform" data-homego="reform" href="#reform"><span aria-hidden="true" class="db-home-star">★</span> <span class="db-home-body"><span class="db-home-card-t">改革主張</span> <span class="db-home-p">民間司法改革基金會對律師懲戒制度的具體改革主張。</span> </span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a></div>
+</div>
+<!-- 六、關於資料庫 -->
+
+<div>
+<div class="db-home-h"><span>關於資料庫</span></div>
+
+<div class="db-home-about">
+<div class="db-home-about-main">
+<p>民眾委任律師時，有時需要瞭解律師的說法與做法是否合理。然而，因為在法律專業知識、訴訟實務經驗有所落差，時常有難以判斷的情形。雖然法務部建有律師懲戒決議書查詢系統，但除了有資料分布在不同網站、較不易檢索的缺點外，民眾也很難透過決議書全文獲知必要資訊。除此之外，相關的權益資訊也處於散落於各網站的狀態</p>
+
+<p>為了促進資訊的流通，改善民眾委任律師的資訊落差，我們建立了這個資料庫，並提出我們對於強化律師懲戒制度的改革想法。</p>
+<a aria-label="前往資料庫說明" class="db-home-btn-primary" data-homego="about" href="#about">閱讀資料庫說明</a></div>
+
+<div class="db-home-notes">
+<div class="db-home-notes-h">資料來源與維護</div>
+
+<div class="db-home-note"><i aria-hidden="true"></i> <span>本資料庫懲戒資訊，皆來自於政府機關之公開資訊。</span></div>
+
+<div class="db-home-note"><i aria-hidden="true"></i> <span>違失態樣是依照懲戒法規的分類，供理解與檢索之便，引用上仍以各法規為主。</span></div>
+
+<div class="db-home-note"><i aria-hidden="true"></i> <span>如發現錯誤、提出改善建議或有其他研究及學術合作，歡迎來信聯繫 contact@jrf.org.tw。</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- [HTML-LIST] 頁籤 1：案件清單 -->
+
+<section aria-labelledby="tabbtn-list" hidden="" id="tab-list" role="tabpanel">
+<div aria-label="案件類型" class="db-subtabs" id="list-subtabs" role="group"><button aria-pressed="true" class="db-subtab" data-kind="disc" type="button">懲戒處分<span class="db-subtab-n" id="kind-n-disc">&nbsp;</span></button><button aria-pressed="false" class="db-subtab" data-kind="prov" type="button">暫時處分<span class="db-subtab-n" id="kind-n-prov">&nbsp;</span></button></div>
+
+<div class="db-search-row">
+<div class="db-searchbox db-searchbox-lg"><svg aria-hidden="true" class="db-search-ico" focusable="false" viewbox="0 0 24 24"><circle cx="10.5" cy="10.5" fill="none" r="6.5" stroke="currentColor" stroke-width="2"></circle><line stroke="currentColor" stroke-linecap="round" stroke-width="2" x1="15.4" x2="21" y1="15.4" y2="21"></line></svg> <input aria-label="關鍵字檢索" autocomplete="off" id="flt-q" placeholder="律師姓名、全文關鍵字…" type="search" /><button class="db-btn" id="btn-q" type="button">檢索</button><button aria-label="檢索規則說明" class="db-q-help" id="btn-qhelp" title="檢索規則說明" type="button">?</button></div>
+<button class="db-btn db-clear-all" id="btn-clear" type="button">清空檢索條件</button></div>
+
+<div class="db-controls" id="list-filters">
+<div class="db-ctl"><label for="flt-J" id="lbl-J">舊律師法</label> <select autocomplete="off" id="flt-J"></select></div>
+
+<div class="db-ctl"><label for="flt-K" id="lbl-K">新律師法</label> <select autocomplete="off" id="flt-K"></select></div>
+
+<div class="db-ctl"><label for="flt-L" id="lbl-L">舊倫理規範</label> <select autocomplete="off" id="flt-L"></select></div>
+
+<div class="db-ctl"><label for="flt-M" id="lbl-M">新倫理規範</label> <select autocomplete="off" id="flt-M"></select></div>
+</div>
+
+<div class="db-prov-note" hidden="" id="list-provnote">
+<p>暫時停止職務的依據為新《律師法》第 74 條第 1 項。其引用的行為規範為同法第 7 條：「因涉嫌犯最重本刑五年以上之貪污、行賄、侵占、詐欺、背信或最輕本刑一年以上有期徒刑之罪，經檢察官提起公訴...。」</p>
+</div>
+
+<div id="annot-box">&nbsp;</div>
+
+<div class="db-table-toprow">
+<div aria-atomic="true" aria-live="polite" class="db-result-count" id="list-count" role="status">&nbsp;</div>
+
+<div class="db-pager-slot" id="list-pager-top">&nbsp;</div>
+<label class="db-rev-toggle db-table-hint"><input data-rev-scope="list" id="rev-cb-list" type="checkbox" />顯示覆審與備註欄</label> <span class="db-scroll-hint">&harr; 表格可左右滑動</span></div>
+
+<div id="list-table">&nbsp;</div>
+
+<div id="list-pager">&nbsp;</div>
+</section>
+<!-- [HTML-PATTERN] 頁籤 2：違失態樣 -->
+
+<section aria-labelledby="tabbtn-pattern" hidden="" id="tab-pattern" role="tabpanel">
+<p class="db-hint">各類案件中，包含認定不成立的案件。如為部分成立、部分不成立，就不成立的規定請參照備註欄。另有少數案件，決議認定的事實雖屬於某一樣態，卻未援引該樣態法條；此一情形，本資料庫將其列入並於備註欄說明。</p>
+<!-- [暫時：撰寫進度標示] 說明文字全部撰寫完成後，請刪除本元素與相關的 CSS、程式碼。 -->
+
+<p id="pat-todo-note">&nbsp;</p>
+
+<div class="db-pattern-list" id="pattern-list">&nbsp;</div>
+
+<div class="db-pl-toggle"><button id="pl-toggle-btn" type="button"></button></div>
+<!-- 違失態樣定位錨點：高度等於懸浮頁首（--sticky-h，由腳本量測）。
+     點選態樣後直接捲到本元素「上緣」，懸浮頁首正好覆蓋這段緩衝高度，
+     態樣標題便緊接於頁首下緣。定位只依據本元素自身位置，
+     不需推算任何遮蔽高度，故嵌入官網後仍然精準。 -->
+
+<div aria-hidden="true" id="pattern-anchor">&nbsp;</div>
+
+<div class="db-pattern-detail" id="pattern-detail">&nbsp;</div>
+</section>
+<!-- [HTML-LAWS] 頁籤 3：懲戒法規 -->
+
+<section aria-labelledby="tabbtn-laws" hidden="" id="tab-laws" role="tabpanel">
+<div aria-label="選擇法規" class="db-lawsel" id="lawsel" role="group">&nbsp;</div>
+
+<div class="db-law-title-wrap">
+<h2 class="db-law-title" id="law-title">&nbsp;</h2>
+
+<p class="db-law-source" id="law-source">&nbsp;</p>
+</div>
+
+<p class="db-law-note-fixed" id="law-note-fixed">&nbsp;</p>
+<label class="db-law-used-toggle" id="law-used-toggle"><input id="law-used-only" type="checkbox" /> <span>僅顯示曾作為懲戒依據之條文</span> </label>
+
+<div id="law-body">&nbsp;</div>
+</section>
+<!-- [HTML-ETHIC-HISTORY] 懲戒法規子頁：舊倫理規範歷史版本
+     入口在「懲戒法規 →（律師倫理規範新舊對照）」頁上方的按鈕，或網址錨點 #8。
+     tabbtn-ethichist 為隱藏的切換鈕，只為沿用既有 tabs 陣列的切換機制而存在，
+     不加 .db-tab-btn class，故不會被頁首列與頁籤動畫模組掃到。 -->
+
+<section aria-label="舊倫理規範歷史版本" hidden="" id="tab-ethichist" role="tabpanel"><button hidden="" id="tabbtn-ethichist" type="button">舊倫理規範歷史版本</button><button class="db-eh-back" id="eh-back" type="button">&larr; 返回懲戒法規</button>
+
+<div class="db-law-title-wrap">
+<h2 class="db-law-title" id="eh-title">舊《律師倫理規範》歷史版本</h2>
+
+<p class="db-law-source" id="eh-source">&nbsp;</p>
+</div>
+
+<p class="db-law-note-fixed" id="eh-note">&nbsp;</p>
+
+<div id="eh-time">&nbsp;</div>
+
+<div class="db-eh-toolbar"><button class="db-eh-all" id="eh-all" type="button">展開全部修正沿革</button></div>
+
+<div id="eh-body">&nbsp;</div>
+</section>
+<!-- [HTML-STATS] 頁籤 4：統計與分析 -->
+
+<section aria-labelledby="tabbtn-stats" hidden="" id="tab-stats" role="tabpanel">
+<div aria-label="統計與分析" class="db-subtabs" id="stats-subtabs" role="group"><button aria-pressed="true" class="db-subtab" data-ssub="analysis" type="button">專題分析</button><button aria-pressed="false" class="db-subtab" data-ssub="data" type="button">統計</button></div>
+<!-- [HTML-ANALYSIS] 統計與分析：專題分析（列表＋各篇文章；文章代號 data-ana-id 與列表 data-ana-open 一致） -->
+
+<div class="db-ana-sub" id="stats-sub-analysis">
+<ul class="db-ana-list" id="ana-list">
+<li><a class="db-ana-item" data-ana-open="disbar" href="#stats/a=disbar"><span class="db-ana-item-t">律師犯罪後的懲戒與除名標準</span> <time class="db-ana-item-d" datetime="2026-10-29">2026年10月29日</time> <span class="db-ana-item-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a></li>
+</ul>
+
+<article class="db-ana-art" data-ana-asof="2026-09-10" data-ana-id="disbar" hidden="" id="ana-art-disbar"><button class="db-ana-back" type="button">&larr; 專題分析列表</button>
+<header class="db-ana-art-hd">
+<h2 class="db-ana-art-t">律師犯罪後的懲戒與除名標準</h2>
+
+<p class="db-ana-art-m">發布日期　<time datetime="2026-10-29">2026年10月29日</time></p>
+</header>
+
+<div class="db-ana-body">
+<p>律師犯罪後，法院的刑事判決決定了應受的刑罰；而律師懲戒制度則必須回答另一個問題：這名律師是否仍值得信賴，可以當事人權益為優先處理法律事務？</p>
+<p>「除名」是律師懲戒中唯一能讓律師永久退出執業的處分，判斷的關鍵在於律師是否「已喪失執行律師之信譽」。然而，法律並未明定這個判斷應採什麼標準。本文要追問的是：實務上，什麼樣的行為會讓懲戒機關作出除名？刑事判決的刑度、緩刑或事後和解，在這個判斷中扮演什麼角色？同樣嚴重破壞委任信賴或司法公信的行為，是否得到一致的評價？</p>
+<p>本文以資料庫收錄的懲戒決議為基礎，依序說明：第一部分整理除名的數量與歷年趨勢；第二部分逐案檢視 28 件除名案件的犯罪事實與刑度，指出除名在實務上全數與刑事犯罪有關；第三部分以 146 件因故意犯罪受懲戒的案件，分析刑種、刑度、緩刑與處分輕重的關係，比較相近刑度下除名與未除名的案件，並檢視決議理由與覆審的立場；最後一部分則討論，犯罪以外的嚴重失信行為，是否也可能達到除名的程度。本會認為，刑度可以作為參考，卻不能代替對「是否已喪失執行律師之信譽」的獨立、嚴格判斷。</p>
+<h3 class="db-ana-h">一、除名罕見且占比呈下降趨勢</h3>
+<p>資料庫收錄的 664 筆資料，扣除 12 件暫時停止執行職務聲請後，共有 652 件終局懲戒決議，其中最終除名者為 28 件，占 4.3%。</p>
+<h4 class="db-ana-sh">民國 94 年以來的 652 件終局懲戒決議中　除名僅28件（4.3%）</h4>
+<div class="db-ana-fig-svg" id="ana-fig1">&nbsp;</div><p class="db-ana-fig-note">上圖以每點代表一件決議，以左上角開始從 2005 年延伸至 2026 年；紅點代表最終除名案件。除名案件較集中於前期，後期案件增加，除名件數卻未隨之增加。</p></figure>
+<h4 class="db-ana-sh">按案號年度分組的除名情形</h4>
+<figure class="db-ana-fig" data-anafig="year"><figcaption class="db-ana-fig-t">各期案件數與除名率</figcaption><div class="db-ana-fig-svg" id="ana-fig-year">&nbsp;</div><p class="db-ana-fig-note">長條為各期案件數，折線為除名率；數字取自下表。</p></figure>
+
+<div class="db-ana-scroll"><table class="db-ana-table db-ana-numtab">
+<thead>
+<tr>
+<th>案號年度（民國）</th>
+<th>案件</th>
+<th>除名</th>
+<th>除名率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>94–99</td>
+<td>126</td>
+<td>12</td>
+<td>9.5%</td>
+</tr>
+<tr>
+<td>100–104</td>
+<td>124</td>
+<td>5</td>
+<td>4.0%</td>
+</tr>
+<tr>
+<td>105–109</td>
+<td>205</td>
+<td>6</td>
+<td>2.9%</td>
+</tr>
+<tr>
+<td>110–114</td>
+<td>197</td>
+<td>5</td>
+<td>2.5%</td>
+</tr>
+</tbody>
+</table></div>
+<p>若依時間順序分為4組觀察，最早一組有 126 件案件、12 件除名，最近一組則有 197 件案件、5 件除名，除名率由 9.5% 降至 2.5%。趨勢上，懲戒案件的除名占比持續下降，值得進一步檢視。</p>
+<h3 class="db-ana-h">二、除名案件，全都涉及刑事犯罪</h3>
+<p>28 件除名案件中，27 件以犯罪經判刑確定為懲戒事由；唯一例外為 96年度律懲字第2號，但該案在懲戒時已有刑事有罪判決，只是尚未確定。<strong>換言之，過去 22 年的律師懲戒案件中，只有涉犯刑事犯罪才會被除名。</strong></p>
+<p>下表列出全部 28 件除名案件及其刑度、行為摘要。</p>
+<div class="db-ana-scroll"><table class="db-ana-table db-ana-t28">
+<thead>
+<tr>
+<th>案號</th>
+<th>刑度</th>
+<th>行為摘要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td rowspan="5">102年度律懲字第9號、102年度律懲字第18號、105年度律懲字第8號</td>
+<td>殺人未遂：14 年</td>
+<td>為報復社會並放空期貨獲利，與他人共同在載有約千名乘客的高鐵列車上，放置裝有汽油、鹽酸、氰化鈉及定時點火裝置的行李箱</td>
+</tr>
+<tr>
+<td>殺人未遂：9 年</td>
+<td>冒用警察服飾，將同樣裝置的行李箱送往立法委員服務處，意圖攻擊參加繞境活動的企業負責人；並偽造總統簽名附於行李箱上</td>
+</tr>
+<tr>
+<td colspan="2">上列 2 罪，應執行 20 年</td>
+</tr>
+<tr>
+<td>恐嚇得利未遂：4 月（得易科罰金）</td>
+<td>以受託查核公司時取得的負責人承諾書、本票為由，向公司施壓，索求董事席次</td>
+</tr>
+<tr>
+<td>背信：5 月（得易科罰金）</td>
+<td>為籌措上述計畫資金，違背任務，使其管理的投資公司受損 200 萬元</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="3">101年度律懲字第21號</td>
+<td>共同對於職務上之行為收受賄賂：9 年</td>
+<td>與熟識的檢察官共謀，偽造告發狀指名該檢察官收文，使其取得醫院詐領勞保案的偵查權，再向被告收受賄賂 550 萬元，換取不起訴處分</td>
+</tr>
+<tr>
+<td>共同對於職務上之行為收受賄賂：7 年</td>
+<td>以同樣手法冒用告訴人名義寫檢舉函指名該檢察官收文，使其取得偽造文書告訴案的偵查權，向告訴人收受 70 萬元</td>
+</tr>
+<tr>
+<td colspan="2">上列 2 罪，應執行 14 年</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>98年度律懲字第8號</td>
+<td>殺人：12 年</td>
+<td>因感情糾紛，當街持菜刀殺害交往對象</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>106年度律懲字第33號</td>
+<td>詐欺取財（18 罪）：1 年 10 月、1 年 6 月、1 年（10 罪）、10 月（4 罪）、9 月、7 月，應執行 8 年 6 月</td>
+<td>法官轉任律師後，佯稱熟識最高法院、高等法院及高等行政法院法官，可代為行賄、關說，向 13 名訴訟當事人詐取共 1,900 萬元</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>113年度律懲字第69號、114年度律懲字第10號</td>
+<td>收受賄賂：7 年 6 月</td>
+<td>擔任臺北市議員期間，就雙子星大樓開發案的廠商甄選，在自己的律師事務所收受廠商賄賂 100 萬元</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="2">111年度律懲字第50號、113年度律懲字第2號、113年度律懲字第18號、114年度律懲字第38號</td>
+<td>幫助違背職務收受賄賂：5 年 6 月</td>
+<td>檢察官轉任律師後，明知舊同事檢察官收受分案賄款，仍以其洩漏的被告資料製作不實告訴狀遞送地檢署，操縱分案，幫助其收賄</td>
+</tr>
+<tr>
+<td>填製不實會計憑證（12 罪）：各 3 月，應執行 11 月（得易科罰金）</td>
+<td>取得不實發票 296 張、金額 4,891 萬餘元，填製不實會計憑證</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="5">112年度律懲字第44號、113年度律懲字第21號、114年度律懲字第40號</td>
+<td>背信：2 年 6 月</td>
+<td>擔任公司發起人處理設立登記，未經股東同意，挪用股東出資款 1,700 萬元</td>
+</tr>
+<tr>
+<td>背信：1 年 8 月</td>
+<td>再挪用其他股東繳付的出資款 800 萬元</td>
+</tr>
+<tr>
+<td>背信：8 月</td>
+<td>受任處理民事訴訟，挪用委任人匯入繳納裁判費的 72 萬餘元</td>
+</tr>
+<tr>
+<td colspan="2">上列 3 罪，應執行 4 年 2 月</td>
+</tr>
+<tr>
+<td>背信：1 年 10 月</td>
+<td>擔任建案信託受託人，建案完售後遲不結算分配，將信託專戶中應分配給出資人及地主的款項陸續流用於其他經辦案件殆盡，犯罪所得 1,275 萬元</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="6">105年度律懲字第23號、106年度律懲字第34號、106年度律懲字第36號</td>
+<td>業務侵占：8 月</td>
+<td>受任訴訟代理，侵占委任人匯付的保證金 45 萬餘元</td>
+</tr>
+<tr>
+<td>業務侵占：3 年 6 月</td>
+<td>侵占同一委任人匯付的假扣押擔保金 644 萬元</td>
+</tr>
+<tr>
+<td colspan="2">上列 2 罪，應執行 4 年</td>
+</tr>
+<tr>
+<td>業務侵占：2 年</td>
+<td>受另一委任人委託聲請假扣押，收取擔保金後未於期限內聲請執行，侵占其中 171 萬餘元</td>
+</tr>
+<tr>
+<td>詐欺取財：1 年 4 月</td>
+<td>再佯稱須對相對人其他財產假扣押，向同一委任人詐取 102 萬 5,000 元</td>
+</tr>
+<tr>
+<td colspan="2">上列 2 罪，應執行 3 年 2 月</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="3">96年度律懲字第19號</td>
+<td>詐欺：2 年 2 月</td>
+<td>法官轉任律師，擔任背信案辯護人時，佯稱承辦法官是舊同事、須先打點，向委任人詐取 300 萬元（事後退還）</td>
+</tr>
+<tr>
+<td>連續詐欺：2 年</td>
+<td>擔任辯護人期間，連續向三案當事人方面佯稱可用 30 萬元疏通承辦檢察官或法官，詐得 2 筆共 60 萬元、另 1 次未遂（事後退還 54 萬元）</td>
+</tr>
+<tr>
+<td colspan="2">上列 2 罪，應執行 3 年 10 月</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>109年度律懲字第22號</td>
+<td>非法經營銀行業務：3 年</td>
+<td>以契作方案名義，向多數人吸收資金 4,885 萬餘元</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>108年度律懲字第12號、112年度律懲字第11號</td>
+<td>詐欺取財：3 年</td>
+<td>佯稱可買通二審合議庭法官，向當事人詐取 30 萬元</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>100年度律懲字第8號</td>
+<td>交付賄賂：2 年 10 月</td>
+<td>曾任法官，擔任煙毒案被告的辯護人時，與承審的昔日同事法官議定賄款，向委任人收取 100 萬元後交付該法官；該法官隨即枉法改判無罪</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>109年度律懲字第10號</td>
+<td>使公司為非常規交易等：2 年 8 月</td>
+<td>擔任上市公司法務部門最高主管期間，虛設名稱與既有律師事務所近似的境外空殼公司，使公司以委外法律服務名義付款，不法取得 7,600 餘萬元並洗錢</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="2">105年度律懲字第15號</td>
+<td>詐欺取財（6 罪）：1 年 2 月（2 罪）、10 月（2 罪）、9 月、8 月，應執行 2 年 6 月</td>
+<td>受任處理合作農場耕地租約爭議後，與農場人員共同向場員佯稱承租的耕地違規，須委任其辦理才能領取補償金，從 6 筆補償金中抽成共 555 萬 9,772 元</td>
+</tr>
+<tr>
+<td>詐欺取財（4 罪）：6 月、4 月（3 罪），應執行 1 年 2 月（得易科罰金）</td>
+<td>同上手法，從另 4 筆補償金中抽成共 82 萬 5,571 元</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="3">99年度律懲字第13號</td>
+<td>詐欺取財：1 年 6 月減為 9 月</td>
+<td>法官退休轉任律師，受任民事二審訴訟代理人後，佯稱認識承審法官可以疏通，向委任人詐取 40 萬元（事後退還）</td>
+</tr>
+<tr>
+<td>詐欺取財：1 年 9 月</td>
+<td>佯稱與另一案的承審庭長熟識，可以「喬」官司，向委任人詐取 150 萬元，並約定勝訴後再付 150 萬元（事後退還）</td>
+</tr>
+<tr>
+<td colspan="2">上列 2 罪，應執行 2 年 4 月</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="3">111年度律懲字第47號、112年度律懲字第2號</td>
+<td>背信：1 年</td>
+<td>未經委任人同意，擅自撤回其聲請的強制執行，並終止委任</td>
+</tr>
+<tr>
+<td>行使偽造準公文書：1 年 8 月</td>
+<td>剪貼法院收件章偽造投標金封存袋，假裝已繳款，侵占委任人交付的投標金等 495 萬餘元</td>
+</tr>
+<tr>
+<td colspan="2">上列 2 罪，應執行 2 年 2 月</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>99年度律懲字第2號</td>
+<td>詐欺：2 年</td>
+<td>擔任詐欺案被告的辯護人，佯稱若要判無罪，須給法官 20 萬元活動費，向委任人詐取 20 萬元</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>99年度律懲字第22號、102年度律懲字第20號</td>
+<td>教唆偽證：2 年</td>
+<td>擔任涉貪高院法官的辯護人，於看守所接見時替其傳遞串證內容，教唆證人偽證</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="2">101年度律懲字第16號、101年度律懲字第23號</td>
+<td>妨害自由：2 年減為 1 年</td>
+<td>受債權人委託追債，率具幫派背景的助理等人在地檢署外強拉債務人上車，恫稱可讓其斷手斷腳，逼其提領 350 萬元（自取 310 萬元）並出售股票，之後派人輪流監視、限制通訊，剝奪其行動自由達 5 日</td>
+</tr>
+<tr>
+<td>詐欺：6 月</td>
+<td>利用被害人對其律師職業的信賴，詐取 1,000 萬元</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="6">103年度律懲字第16號、103年度律懲字第22號</td>
+<td>恐嚇：6 月</td>
+<td>配偶因其吸毒、施暴搬回娘家後，兩週內接續寄發 15 則簡訊，揚言要對方一起死、要讓對方哭著求饒、把對方簽的本票賣給地下錢莊；並以律師身分對配偶的母親、姊姊提告，揚言讓她們坐牢</td>
+</tr>
+<tr>
+<td>誹謗：5 月</td>
+<td>在交友網站張貼影射配偶私德的文字</td>
+</tr>
+<tr>
+<td>施用第二級毒品：3 月</td>
+<td>觀察勒戒後 5 年內再度施用甲基安非他命</td>
+</tr>
+<tr>
+<td>私行拘禁：6 月</td>
+<td>透過交友軟體約出被害人，以手銬銬住，限制其行動自由</td>
+</tr>
+<tr>
+<td>詐欺：6 月</td>
+<td>同一事件中冒稱警察並出示律師證取信，取走被害人現金 1,600 元、身分證、駕照、行照及手機</td>
+</tr>
+<tr>
+<td colspan="2">上列 5 罪，應執行 1 年 9 月（得易科罰金）</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>96年度律懲字第17號</td>
+<td>藏匿人犯、湮滅刑事證據等：1 年 8 月</td>
+<td>擔任強盜案嫌犯的辯護人，指示嫌犯同居人藏匿贓款 420 萬元，並安排遭警方通知到案的該同居人躲藏；再向其佯稱須打通關係，詐取 20 萬元，又以代為保管為由取得贓款 340 萬元，存入自己名下的保管箱（遭檢方凍結）</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="2">99年度律懲字第15號</td>
+<td>教唆偽證：1 年 8 月減為 10 月</td>
+<td>擔任擄人勒贖案被告的辯護人期間，代被告聯絡證人時，教唆原無偽證意思的證人，在被告另涉的贓物案中向檢察官作虛偽證述</td>
+</tr>
+<tr>
+<td>詐欺：10 月</td>
+<td>受任強盜案二審辯護後，向委任人佯稱可邀承審法官餐敘、探詢減刑可能，另收取交際費及鐘點費 2 萬元，實際並未邀宴</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>99年度律懲字第22號、102年度律懲字第20號</td>
+<td>偽證：1 年 6 月</td>
+<td>於高院法官貪污案審判中，以證人身分具結作虛偽陳述</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>98年度律懲字第12號</td>
+<td>業務侵占：1 年 2 月</td>
+<td>受任處理債務清償，僅將部分款項交付債權人，其餘 290 餘萬元侵吞入己</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>94年度律懲字第3號</td>
+<td>詐欺：10 月</td>
+<td>受任妨害風化案二審辯護後，佯稱有管道疏通承審法官，要求 30 萬元活動費，詐得 20 萬元（隔日退還）；並對委任人的友人佯稱可疏通受命法官及檢察官不再上訴</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td rowspan="2">95年度律懲字第3號</td>
+<td>恐嚇取財：10 月</td>
+<td>明知友人等以暴力強押兩名被害人（其中一人受傷）至其事務所，仍參與強迫兩人簽立和解書；再與他人押送其中一人返家，逼簽支票 4 張共 1,050 萬元，恫稱不兌現就殺他全家，另一人則被留置事務所看守</td>
+</tr>
+<tr>
+<td>業務侵占：10 月</td>
+<td>侵占受任收取的現金及支票共 303 萬餘元</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>111年度律懲字第28號</td>
+<td>湮滅、隱匿刑事證據：10 月</td>
+<td>與他人共同湮滅、隱匿企業集團的保單、財產資料及電腦檔案等刑事證據</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>96年度律懲字第2號</td>
+<td>偽造文書：2 年（懲戒時尚未確定）</td>
+<td>偽造四個律師公會的印章，冒用公會名義對外發文，並冒名向懲戒委員會發文</td>
+</tr>
+</tbody>
+</table></div>
+<p>依主要行為內容，28 件可分為以下三組：</p>
+<figure class="db-ana-fig" data-anafig="cats"><figcaption class="db-ana-fig-t">28 件除名案件的行為類型</figcaption><div class="db-ana-cats"><div class="db-ana-cat"><div class="db-ana-sq"><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i><i style="background:#8E1F33"></i></div><p>把司法程序當成牟利或攻擊的對象<b>15 件</b></p></div><div class="db-ana-cat"><div class="db-ana-sq"><i style="background:#C0606F"></i><i style="background:#C0606F"></i><i style="background:#C0606F"></i><i style="background:#C0606F"></i><i style="background:#C0606F"></i><i style="background:#C0606F"></i><i style="background:#C0606F"></i></div><p>侵占、詐取委任人或公司的財產<b>7 件</b></p></div><div class="db-ana-cat"><div class="db-ana-sq"><i style="background:#A8A29C"></i><i style="background:#A8A29C"></i><i style="background:#A8A29C"></i><i style="background:#A8A29C"></i><i style="background:#A8A29C"></i><i style="background:#A8A29C"></i></div><p>其他重大犯罪<b>6 件</b></p></div></div><p class="db-ana-fig-note">一格代表一件除名案件。</p></figure>
+
+<ul>
+<li><p><strong>把司法程序本身當成牟利或攻擊的對象，共 15 件</strong>：</p></li>
+</ul>
+<ol>
+<li><p>佯稱可以買通法官以詐取財物（俗稱「司法黃牛」）7 件（94年度律懲字第3號、96年度律懲字第19號、99年度律懲字第2號、99年度律懲字第13號、99年度律懲字第15號、106年度律懲字第33號、108年度律懲字第12號等）；</p></li>
+<li><p>行賄法官（100年度律懲字第8號）；</p></li>
+<li><p>為涉貪法官串證或作偽證（99年度律懲字第22號等兩人）；</p></li>
+<li><p>與檢察官共謀，以偽造告發狀操縱分案並收賄（101年度律懲字第21號）；</p></li>
+<li><p>幫助檢察官收賄（111年度律懲字第50號等）；</p></li>
+<li><p>湮滅證據或藏匿人犯、贓物（111年度律懲字第28號、96年度律懲字第17號）；</p></li>
+<li><p>偽造律師公會印章冒名發文（96年度律懲字第2號）。</p></li>
+</ol>
+<p class="db-ana-indent">其中5案的律師是由法官或檢察官轉任（96年度律懲字第19號、99年度律懲字第13號、100年度律懲字第8號、106年度律懲字第33號、111年度律懲字第50號等），101年度律懲字第21號的律師則曾任法院書記官。</p>
+<ul>
+<li><p><strong>侵占、詐取委任人或公司的財產，共 7 件</strong>：98年度律懲字第12號、105年度律懲字第23號等、112年度律懲字第44號等、111年度律懲字第47號等、109年度律懲字第10號、105年度律懲字第15號、95年度律懲字第3號。</p></li>
+<li><p><strong>其他重大犯罪</strong>，共 6 件：殺人（98年度律懲字第8號）、在高鐵及立法委員服務處放置危險裝置（102年度律懲字第9號等）、公職任內收賄（113年度律懲字第69號等）、非法經營銀行業務（109年度律懲字第22號）、暴力追債及妨害自由（101年度律懲字第16號等），以及恐嚇、私行拘禁等多項犯行（103年度律懲字第16號等）。其中部分行為亦涉及受任關係或利用律師身分，不能一概視為與律師職務無關。</p></li>
+</ul>
+<p>除懲戒時刑事判決尚未確定的 96年度律懲字第2號外，其餘 27 件中，24 件的統計刑度在 1 年以上。未滿 1 年仍遭除名的 3 件，分別為向委任人詐財（94年度律懲字第3號）、恐嚇取財及業務侵占（95年度律懲字第3號），以及湮滅、隱匿刑事證據（111年度律懲字第28號）。這些案件說明，即使刑度未達 1 年，行為對委任信賴或司法程序的破壞，仍足以支持除名。</p>
+<h3 class="db-ana-h">三　因故意犯罪受懲戒的結果分布</h3>
+<p>如果對「故意犯罪經判刑確定」的懲戒案件進行分析，共有 158 筆。扣除「取得律師資格前的犯罪」（4 筆），以及同一行為重複移送而免議、不受理者（8 筆）後，共有 146 件。其懲戒結果如下：</p>
+<figure class="db-ana-fig" data-anafig="bands"><figcaption class="db-ana-fig-t">刑種與刑度別的懲戒結果組成</figcaption><div class="db-ana-fig-svg" id="ana-fig-bands">&nbsp;</div><div class="db-ana-key"><span><i style="background:#8E1F33"></i>除名</span><span><i style="background:#2C4A73"></i>停職 1 年以上</span><span><i style="background:#9DB4D0"></i>停職未滿 1 年</span><span><i style="background:#D5CFC9"></i>申誡、警告</span></div><p class="db-ana-fig-note">每條橫條為一個刑種或刑度區間，右側數字為除名率；數字取自下表。</p></figure>
+
+<div class="db-ana-scroll"><table class="db-ana-table db-ana-numtab db-ana-sum">
+<thead>
+<tr>
+<th>刑種與刑度</th>
+<th>件數</th>
+<th>除名</th>
+<th>停職 1 年以上</th>
+<th>停職未滿 1 年</th>
+<th>申誡、警告</th>
+<th>除名率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>罰金</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>3</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>拘役</td>
+<td>19</td>
+<td>0</td>
+<td>0</td>
+<td>7</td>
+<td>12</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>有期徒刑6 月以下</td>
+<td>37</td>
+<td>0</td>
+<td>1</td>
+<td>29</td>
+<td>7</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>有期徒刑 6 月～1 年</td>
+<td>43</td>
+<td>3</td>
+<td>20</td>
+<td>18</td>
+<td>2</td>
+<td>7%</td>
+</tr>
+<tr>
+<td>有期徒刑 1 年～2 年</td>
+<td>18</td>
+<td>5</td>
+<td>9</td>
+<td>4</td>
+<td>0</td>
+<td>28%</td>
+</tr>
+<tr>
+<td>有期徒刑 2 年～5 年</td>
+<td>19</td>
+<td>13</td>
+<td>4</td>
+<td>2</td>
+<td>0</td>
+<td>68%</td>
+</tr>
+<tr>
+<td>有期徒刑 5 年以上</td>
+<td>6</td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td><strong>合計</strong></td>
+<td><strong>146</strong></td>
+<td><strong>27</strong></td>
+<td><strong>34</strong></td>
+<td><strong>61</strong></td>
+<td><strong>24</strong></td>
+<td><strong>18%</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>由上述結果可知，處分結果與刑度呈現關聯性：有期徒刑未滿 1 年的 80 件中，只有 3 件除名；拘役 19 件與罰金 4 件則無一除名，最重僅停職 6 月，其中 15 件只受申誡或警告。27 件除名案件中，全部均受有期徒刑宣告；5 年以上的 6 件，則全數除名。</p>
+<figure class="db-ana-fig" data-anafig="probation"><figcaption class="db-ana-fig-t">有無緩刑宣告與懲戒結果</figcaption><div class="db-ana-bars"><div class="db-ana-barrow"><span class="db-ana-barlbl">有緩刑宣告<small>49 件</small></span><div class="db-ana-bar"><span style="width:16.3%;background:#2C4A73" title="停職 1 年以上 8 件"></span><span style="width:63.3%;background:#9DB4D0" title="停職未滿 1 年 31 件"></span><span style="width:20.4%;background:#D5CFC9" title="申誡、警告 10 件"></span></div><span class="db-ana-barpct">除名 0%</span></div><div class="db-ana-barrow"><span class="db-ana-barlbl">無緩刑宣告<small>97 件</small></span><div class="db-ana-bar"><span style="width:27.8%;background:#8E1F33" title="除名 27 件"></span><span style="width:26.8%;background:#2C4A73" title="停職 1 年以上 26 件"></span><span style="width:30.9%;background:#9DB4D0" title="停職未滿 1 年 30 件"></span><span style="width:14.4%;background:#D5CFC9" title="申誡、警告 14 件"></span></div><span class="db-ana-barpct">除名 28%</span></div></div><div class="db-ana-key"><span><i style="background:#8E1F33"></i>除名</span><span><i style="background:#2C4A73"></i>停職 1 年以上</span><span><i style="background:#9DB4D0"></i>停職未滿 1 年</span><span><i style="background:#D5CFC9"></i>申誡、警告</span></div><p class="db-ana-fig-note">有緩刑宣告的 49 件中無一除名，但有 39 件（約 80%）仍受停職處分。範圍同上表 146 件；緩刑以懲戒決議書記載為準，決議書未載者另查刑事判決。</p></figure>
+
+<figure class="db-ana-fig" data-anafig="2"><figcaption class="db-ana-fig-t">刑度 1 年以上案件之懲處結果對照</figcaption><div class="db-ana-fig-svg" id="ana-fig2">&nbsp;</div></figure>
+<p>在刑度 1 年以上的案件，在《律師法》的解釋上尤其有重要意義。舊《律師法》第 4 條第 1 項、現行《律師法》第 5 條第 1 項所定「不得充律師」或「不得發給律師證書」的消極資格要件，包含「受1年有期徒刑以上刑之裁判確定」、「依其罪名及情節足認有害於律師之信譽」，且非「受緩刑宣告而緩刑期滿未經撤銷，或因過失犯罪」。</p>
+<p>因此在懲戒實務上，有不少案件以之作為判斷是否除名的標準（110 年度台覆字第 10 號；106 年度台覆字第 10 號；112 年度律懲字第 44 號等；109 年度律懲字第 10 號；108 年度律懲字第 12 號等）。但縱使宣告刑為 1 年以下，依其犯罪性質認其已喪失律師之信譽者；仍有除名案例（111 年度律懲字第 28 號；94 年度律懲字第 3 號）。</p>
+<p>從這個角度來看，可以從「刑度」以及「行為已喪失律師信譽」的角度，整體比較除名與未除名的案例。</p>
+<h4 class="db-ana-sh">相近刑度下的懲戒處分比較</h4>
+<div aria-label="相近刑度下的懲戒處分比較" class="db-ana-cmp" role="region">
+<section class="db-ana-cmp-band">
+<div class="db-ana-cmp-hd"><span class="db-ana-cmp-lbl">刑度 4 年以上</span><span class="db-ana-cmp-n">除名 2 件・未除名 1 件</span></div>
+<div class="db-ana-cmp-cols">
+<div class="db-ana-cmp-col"><span class="db-ana-cmp-tag is-dis">除名</span><div class="db-ana-cmp-card"><p class="db-ana-cno">112年度律懲字第44號、113年度律懲字第21號、114年度律懲字第40號</p><div class="db-ana-chips"><span class="db-ana-chip is-sum">應執行 4 年 2 月（背信：2 年 6 月；背信：1 年 8 月；背信：8 月）</span><span class="db-ana-chip">背信：1 年 10 月</span></div><p class="db-ana-cmp-sum">擔任公司發起人處理設立登記，未經股東同意，挪用股東出資款 1,700 萬元；再挪用其他股東繳付的出資款 800 萬元；受任處理民事訴訟，挪用委任人匯入繳納裁判費的 72 萬餘元；擔任建案信託受託人，建案完售後遲不結算分配，將信託專戶中應分配給出資人及地主的款項陸續流用於其他經辦案件殆盡，犯罪所得 1,275 萬元</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">113年度律懲字第69號、114年度律懲字第10號</p><div class="db-ana-chips"><span class="db-ana-chip">收受賄賂：7 年 6 月</span></div><p class="db-ana-cmp-sum">擔任臺北市議員期間，就雙子星大樓開發案的廠商甄選，在自己的律師事務所收受廠商賄賂 100 萬元</p></div></div>
+<div class="db-ana-cmp-col"><span class="db-ana-cmp-tag is-non">未除名</span><div class="db-ana-cmp-card"><p class="db-ana-cno">108年度律懲字第44號</p><div class="db-ana-chips"><span class="db-ana-chip">圖利：4 年 6 月（褫奪公權 4 年）</span><span class="db-ana-res">停職 2 年</span></div><p class="db-ana-cmp-sum">擔任立法委員期間，受廠商請託，邀集管理國有財產機關的首長到其辦公室協調、關說，干預國有市場用地出租讓售的決定，圖廠商取得租購權利，並獲得以政治捐獻名義捐款 50 萬元的利益</p></div></div>
+</div></section>
+<section class="db-ana-cmp-band">
+<div class="db-ana-cmp-hd"><span class="db-ana-cmp-lbl">刑度 3 年</span><span class="db-ana-cmp-n">除名 2 件・未除名 1 件</span></div>
+<div class="db-ana-cmp-cols">
+<div class="db-ana-cmp-col"><span class="db-ana-cmp-tag is-dis">除名</span><div class="db-ana-cmp-card"><p class="db-ana-cno">109年度律懲字第22號</p><div class="db-ana-chips"><span class="db-ana-chip">非法經營銀行業務：3 年</span></div><p class="db-ana-cmp-sum">以契作方案名義，向多數人吸收資金 4,885 萬餘元</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">108年度律懲字第12號、112年度律懲字第11號</p><div class="db-ana-chips"><span class="db-ana-chip">詐欺取財：3 年</span></div><p class="db-ana-cmp-sum">佯稱可買通二審合議庭法官，向當事人詐取 30 萬元</p></div></div>
+<div class="db-ana-cmp-col"><span class="db-ana-cmp-tag is-non">未除名</span><div class="db-ana-cmp-card"><p class="db-ana-cno">107年度律懲字第31號</p><div class="db-ana-chips"><span class="db-ana-chip">偽造文書等：3 年</span><span class="db-ana-res">停職 2 年（未提出申辯）</span></div><p class="db-ana-cmp-sum">受多名委任人委任處理民事、刑事、行政、家事訴訟或支付命令，因業務繁忙遲未遞狀；為免委任人發現，偽造並行使法院公文書及準公文書</p></div></div>
+</div></section>
+<section class="db-ana-cmp-band">
+<div class="db-ana-cmp-hd"><span class="db-ana-cmp-lbl">刑度 2 年</span><span class="db-ana-cmp-n">除名 2 件・未除名 3 件</span></div>
+<div class="db-ana-cmp-cols">
+<div class="db-ana-cmp-col"><span class="db-ana-cmp-tag is-dis">除名</span><div class="db-ana-cmp-card"><p class="db-ana-cno">99年度律懲字第2號</p><div class="db-ana-chips"><span class="db-ana-chip">詐欺：2 年</span></div><p class="db-ana-cmp-sum">擔任詐欺案被告的辯護人，佯稱若要判無罪，須給法官 20 萬元活動費，向委任人詐取 20 萬元</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">99年度律懲字第22號、102年度律懲字第20號</p><div class="db-ana-chips"><span class="db-ana-chip">教唆偽證：2 年</span></div><p class="db-ana-cmp-sum">擔任涉貪高院法官的辯護人，於看守所接見時替其傳遞串證內容，教唆證人偽證</p></div></div>
+<div class="db-ana-cmp-col"><span class="db-ana-cmp-tag is-non">未除名</span><div class="db-ana-cmp-card"><p class="db-ana-cno">110年度律懲字第22號等</p><div class="db-ana-chips"><span class="db-ana-chip is-sum">應執行 2 年（行使偽造公文書：1 年 6 月；行使偽造公文書：1 年 6 月；背信：1 年），緩刑 5 年</span><span class="db-ana-res">停職 3 月</span></div><p class="db-ana-cmp-sum">擔任車禍致死案被害人家屬的訴訟代理人，逾期未繳裁判費致民事訴訟遭駁回，隱瞞近 7 年並謊稱仍在審理，其後偽造勝訴判決書及蓋有偽造法院印文的判決確定證明書交給委任人；另於他案謊稱不必到庭，再未經委任人同意當庭撤回上訴，致一審判決確定</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">106年度律懲字第39號</p><div class="db-ana-chips"><span class="db-ana-chip">幫助非法經營收受存款業務：各 2 年（緩刑 5 年）</span><span class="db-ana-res">各停職 2 年</span></div><p class="db-ana-cmp-sum">兩名律師為吸金公司的投資契約辦理律師見證，幫助公司非法經營收受存款業務，分別獲得犯罪所得 51 萬餘元、20 萬餘元</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">113年度律懲字第23號</p><div class="db-ana-chips"><span class="db-ana-chip">共同偽造有價證券：2 年（緩刑 5 年）</span><span class="db-ana-res">停職 8 月併研習</span></div><p class="db-ana-cmp-sum">受委任處理員工侵占公司款項事件，教唆讓侵占者在本票上偽簽不知情家人（包括兒童）的姓名作為共同發票人，簽發面額各 5,000 萬元的本票 5 張，再代為聲請本票裁定</p></div></div>
+</div></section>
+<section class="db-ana-cmp-band">
+<div class="db-ana-cmp-hd"><span class="db-ana-cmp-lbl">刑度 1 年～2 年</span><span class="db-ana-cmp-n">除名 4 件・未除名 3 件</span></div>
+<div class="db-ana-cmp-cols">
+<div class="db-ana-cmp-col"><span class="db-ana-cmp-tag is-dis">除名</span><div class="db-ana-cmp-card"><p class="db-ana-cno">103年度律懲字第16號、103年度律懲字第22號</p><div class="db-ana-chips"><span class="db-ana-chip is-sum">應執行 1 年 9 月（恐嚇：6 月；誹謗：5 月；施用第二級毒品：3 月；私行拘禁：6 月；詐欺：6 月），得易科罰金</span></div><p class="db-ana-cmp-sum">配偶因其吸毒、施暴搬回娘家後，兩週內接續寄發 15 則簡訊，揚言要對方一起死、要讓對方哭著求饒、把對方簽的本票賣給地下錢莊；並以律師身分對配偶的母親、姊姊提告，揚言讓她們坐牢；在交友網站張貼影射配偶私德的文字；觀察勒戒後 5 年內再度施用甲基安非他命；透過交友軟體約出被害人，以手銬銬住，限制其行動自由；同一事件中冒稱警察並出示律師證取信，取走被害人現金 1,600 元、身分證、駕照、行照及手機</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">96年度律懲字第17號</p><div class="db-ana-chips"><span class="db-ana-chip">藏匿人犯、湮滅刑事證據等：1 年 8 月</span></div><p class="db-ana-cmp-sum">擔任強盜案嫌犯的辯護人，指示嫌犯同居人藏匿贓款 420 萬元，並安排遭警方通知到案的該同居人躲藏；再向其佯稱須打通關係，詐取 20 萬元，又以代為保管為由取得贓款 340 萬元，存入自己名下的保管箱（遭檢方凍結）</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">99年度律懲字第15號</p><div class="db-ana-chips"><span class="db-ana-chip">教唆偽證：1 年 8 月減為 10 月</span><span class="db-ana-chip">詐欺：10 月</span></div><p class="db-ana-cmp-sum">擔任擄人勒贖案被告的辯護人期間，代被告聯絡證人時，教唆原無偽證意思的證人，在被告另涉的贓物案中向檢察官作虛偽證述；受任強盜案二審辯護後，向委任人佯稱可邀承審法官餐敘、探詢減刑可能，另收取交際費及鐘點費 2 萬元，實際並未邀宴</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">98年度律懲字第12號</p><div class="db-ana-chips"><span class="db-ana-chip">業務侵占：1 年 2 月</span></div><p class="db-ana-cmp-sum">受任處理債務清償，僅將部分款項交付債權人，其餘 290 餘萬元侵吞入己</p></div></div>
+<div class="db-ana-cmp-col"><span class="db-ana-cmp-tag is-non">未除名</span><div class="db-ana-cmp-card"><p class="db-ana-cno">98年度律懲字第11號</p><div class="db-ana-chips"><span class="db-ana-chip">背信：1 年 8 月（已執行完畢）</span><span class="db-ana-res">停職 1 年 6 月</span></div><p class="db-ana-cmp-sum">擔任信用合作社放款審議委員會委員，明知擔保土地鑑價過高、增貸比率不當，仍與理事主席等人決議通過多筆超額貸款，致金融機構受有未能受償的損害</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">101年度律懲字第18號、101年度律懲字第19號、101年度律懲字第20號</p><div class="db-ana-chips"><span class="db-ana-chip is-sum">應執行 1 年 4 月（業務侵占：6 月；業務侵占：6 月；業務侵占：6 月；業務侵占：6 月），得易科罰金</span><span class="db-ana-res">停職 1 年 6 月</span></div><p class="db-ana-cmp-sum">收取委任人匯付的反訴裁判費約 30 萬元，以及再審裁判費、停止執行擔保金約 190 萬元後，未依約提起訴訟或提供擔保，挪為事務所周轉；另有收費後未出庭、未退費等情</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">100年度律懲字第7號</p><div class="db-ana-chips"><span class="db-ana-chip is-sum">應執行 1 年 2 月（業務侵占 2 罪，各罪宣告刑決議書未載），得易科罰金，緩刑 3 年</span><span class="db-ana-res">停職 10 月</span></div><p class="db-ana-cmp-sum">受委任聲請假扣押，收取委任人匯付的擔保金等費用後未辦理，侵占入己（其中一案逾 100 萬元），經委任人追討後才陸續返還</p></div></div>
+</div></section>
+<section class="db-ana-cmp-band">
+<div class="db-ana-cmp-hd"><span class="db-ana-cmp-lbl">刑度未滿 1 年</span><span class="db-ana-cmp-n">除名 3 件・未除名 2 件</span></div>
+<div class="db-ana-cmp-cols">
+<div class="db-ana-cmp-col"><span class="db-ana-cmp-tag is-dis">除名</span><div class="db-ana-cmp-card"><p class="db-ana-cno">94年度律懲字第3號</p><div class="db-ana-chips"><span class="db-ana-chip">詐欺：10 月</span></div><p class="db-ana-cmp-sum">受任妨害風化案二審辯護後，佯稱有管道疏通承審法官，要求 30 萬元活動費，詐得 20 萬元（隔日退還）；並對委任人的友人佯稱可疏通受命法官及檢察官不再上訴</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">111年度律懲字第28號</p><div class="db-ana-chips"><span class="db-ana-chip">湮滅、隱匿刑事證據：10 月</span></div><p class="db-ana-cmp-sum">與他人共同湮滅、隱匿企業集團的保單、財產資料及電腦檔案等刑事證據</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">99年度律懲字第15號</p><div class="db-ana-chips"><span class="db-ana-chip">詐欺：10 月</span></div><p class="db-ana-cmp-sum">受任強盜案二審辯護後，向委任人佯稱可邀承審法官餐敘、探詢減刑可能，另收取交際費及鐘點費 2 萬元，實際並未邀宴</p></div></div>
+<div class="db-ana-cmp-col"><span class="db-ana-cmp-tag is-non">未除名</span><div class="db-ana-cmp-card"><p class="db-ana-cno">102年度律懲字第21號</p><div class="db-ana-chips"><span class="db-ana-chip">詐欺取財：10 月</span><span class="db-ana-res">停職 1 年 6 月（未提出申辯）</span></div><p class="db-ana-cmp-sum">擔任業務侵占案被告的辯護人，私下解除委任卻不告知，仍假意協助和解，並佯稱有大陸投資管道、兩個月可獲利一倍，誘使委任人向親友借款 120 萬元交付後侵吞；委任人因未能和解，二審刑度反遭加重</p></div><div class="db-ana-cmp-card"><p class="db-ana-cno">98年度律懲字第9號</p><div class="db-ana-chips"><span class="db-ana-chip">詐欺：8 月</span><span class="db-ana-res">停職 1 年</span></div><p class="db-ana-cmp-sum">向贓物案被告詐稱可代為關說、洗刷冤情，收取 50 萬元活動費，實際並未活動</p></div></div>
+</div></section>
+</div>
+<p>從上述案例來看，可發現除名的標準有所浮動的同時，決議理由也未能詳細的說明作成不同懲處的原因。針對欺騙當事人、挪用財產的嚴重案例，如何判度是否「已喪失律師信譽」也缺乏說理。「偽造司法文書」的案件也呈現懲戒偏輕的問題。110年度律懲字第22號等與 107年度律懲字第31號，均涉及為掩飾受任事務的疏失而偽造法院公文書，最終分別停職 3 月、2 年，前者更涉及多年隱瞞及擅自撤回上訴。但相較於偽造律師公會印章、冒名發文而遭除名的 96年度律懲字第2號案件，未除名案件可能有必要交代，何以仍可認為當事人得繼續信賴該律師。</p>
+<h4 class="db-ana-sh">從量處因素檢視除名標準</h4>
+<figure class="db-ana-fig" data-anafig="factors"><figcaption class="db-ana-fig-t">影響除名判斷的因素</figcaption><div class="db-ana-fig-svg"><svg viewBox="0 0 760 330" role="img" aria-label="影響除名判斷的因素：刑事判決提供的客觀因素，經懲戒機關未成文的判斷因素，得出是否已喪失信譽與處分結果">
+<g font-size="14" fill="#2B2B2E">
+<rect x="10" y="40" width="190" height="250" rx="10" fill="#F6F3F1" stroke="#E2DEDA"/>
+<text x="105" y="68" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3255">刑事判決</text>
+<text x="105" y="88" text-anchor="middle" font-size="12.5" fill="#6B6F76">法院已決定</text>
+<rect x="32" y="104" width="146" height="34" rx="6" fill="#fff" stroke="#E2DEDA"/><text x="105" y="126" text-anchor="middle">刑種</text>
+<rect x="32" y="148" width="146" height="34" rx="6" fill="#fff" stroke="#E2DEDA"/><text x="105" y="170" text-anchor="middle">刑度</text>
+<rect x="32" y="192" width="146" height="34" rx="6" fill="#fff" stroke="#E2DEDA"/><text x="105" y="214" text-anchor="middle">緩刑</text>
+<rect x="32" y="236" width="146" height="34" rx="6" fill="#fff" stroke="#E2DEDA"/><text x="105" y="258" text-anchor="middle">易科罰金</text>
+<path d="M204 165 H242" stroke="#6B6F76" stroke-width="1.6" fill="none"/><path d="M236 159 L244 165 L236 171" stroke="#6B6F76" stroke-width="1.6" fill="none"/>
+<rect x="250" y="40" width="260" height="250" rx="10" fill="#fff" stroke="#8E1F33" stroke-width="1.4" stroke-dasharray="6 4"/>
+<text x="380" y="68" text-anchor="middle" font-size="15" font-weight="700" fill="#8E1F33">懲戒機關的判斷</text>
+<text x="380" y="88" text-anchor="middle" font-size="12.5" fill="#6B6F76">法律未明定標準</text>
+<rect x="272" y="104" width="216" height="34" rx="6" fill="#F7ECEE" stroke="#E6C7CD"/><text x="380" y="126" text-anchor="middle" fill="#6E1828">侵害的法益</text>
+<rect x="272" y="148" width="216" height="34" rx="6" fill="#F7ECEE" stroke="#E6C7CD"/><text x="380" y="170" text-anchor="middle" fill="#6E1828">與律師職務的關聯</text>
+<rect x="272" y="192" width="216" height="34" rx="6" fill="#F7ECEE" stroke="#E6C7CD"/><text x="380" y="214" text-anchor="middle" fill="#6E1828">懲戒紀錄</text>
+<rect x="272" y="236" width="216" height="34" rx="6" fill="#F7ECEE" stroke="#E6C7CD"/><text x="380" y="258" text-anchor="middle" fill="#6E1828">和解、返還、犯後態度？</text>
+<path d="M514 165 H552" stroke="#6B6F76" stroke-width="1.6" fill="none"/><path d="M546 159 L554 165 L546 171" stroke="#6B6F76" stroke-width="1.6" fill="none"/>
+<rect x="560" y="96" width="190" height="62" rx="8" fill="#8E1F33"/>
+<text x="655" y="122" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">已喪失信譽</text><text x="655" y="144" text-anchor="middle" font-size="13" fill="#F3DDE1">除名</text>
+<rect x="560" y="172" width="190" height="62" rx="8" fill="#2C4A73"/>
+<text x="655" y="198" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">未喪失信譽</text><text x="655" y="220" text-anchor="middle" font-size="13" fill="#DCE7F3">停職、申誡、警告</text>
+<text x="380" y="318" text-anchor="middle" font-size="12.5" fill="#6B6F76">虛線框：實務上左右結果、卻未寫入法律的判斷空間</text>
+</g></svg></div></figure>
+
+<p>綜合上述案件，刑度之外還有若干因素影響處分。但這些因素是否被用來嚴格檢驗專業信譽，或只是成為減輕處分的理由，必須分別觀察。</p>
+<p>首先，「律師信譽」不是一般意義上的社會評價，而是委任人能否放心把自己的權利交到律師手中。委任關係的核心之一是授權與訴訟代理：律師以委任人的名義遞狀、上訴、撤回、和解、收付款項，委任人通常缺乏辨別真偽、知悉訴訟實務的專業能力。正因如此，律師的誠信必須達到「客觀上不讓委任人有懷疑餘地」的程度。《律師法》第 2 條要求律師「砥礪品德、維護信譽」設定的是專業倫理的高標準，而不是「沒有犯下重罪」的低門檻。</p>
+<p>就此來看，作為除名標準的「已喪失執行律師之信譽」除了輔以從刑度判斷外，也應具體檢視行為的動機、手段、持續期間、侵害對象，以及與受任事務的關係。同時也應注意，事後和解、返還款項或獲判緩刑，都不能當作信譽已經回復的證明。和解與返還，填補的是被害人的財產損失；緩刑反映的是刑事法院對刑罰執行必要性的判斷，著眼於行為人的再社會化。兩者與「是否已喪失律師信譽」的懲戒標準並不相同。律師信譽之所以重要，正因為委任人仰賴的是律師在無人監督時的作為，能夠謹守專業與誠信。</p>
+<p>因此，上述案例的比較不只是呈現量處結果欠缺一致性。當故意侵害委任人權益、偽造司法文書等行為仍僅受短期停職，而不予除名的理由主要落在緩刑、和解或刑度較低，懲戒即有低估專業失信嚴重性的疑慮。對此，律師懲戒制度需要的是更嚴格且可檢驗的信譽判斷，而不只是將既有寬鬆結果整理成一致標準。</p>
+<h4 class="db-ana-sh">覆審未見由較輕處分改為除名</h4>
+<p>另一值得注意的現象是，238 件有覆審決定的懲戒案件中，有 15 件加重、28 件減輕，其餘維持或駁回。加重例子包括由警告改為停職 3 月（104年度律懲字第5號）、由不予懲戒改為申誡（105年度律懲字第7號等），但沒有一件改為除名。原決議除名而經覆審變更的雖有 3 件，但其中有2件涉及的是「舊法下執業前的犯罪行為可否受懲戒」的問題，只有106年度律懲字第12號案件是將「除名」改為「停職 2 年」。</p>
+<figure class="db-ana-fig" data-anafig="review"><figcaption class="db-ana-fig-t">238 件覆審決定的調整方向</figcaption><div class="db-ana-rev"><div class="db-ana-rev-c is-keep"><b>195</b><span>維持、駁回等</span></div><div class="db-ana-rev-c is-up"><b>15</b><span>加重</span><small>無一改為除名</small></div><div class="db-ana-rev-c is-down"><b>28</b><span>減輕</span><small>含 3 件撤銷除名</small></div></div></figure>
+
+<p>該案涉及的一名律師為入主一家開發公司，兩次增資共 4,200 萬元均未實際繳納股款，並為爭取大樓開發案，在開發建議書等文件上不實登載。虛偽增資 2 罪部分應執行 10 月（得易科罰金）；行使業務登載不實文書 2 罪部分應執行 1 年。覆審雖認為原決議除名「固非無據」，接著指出他的犯行「係以公司負責人名義對外為法律行為，並未以律師名義為之」，雖然「犯罪情節及所生危害非輕」，但參酌有利與不利事證，除名「尚嫌過重」，改為停職 2 年。</p>
+<h3 class="db-ana-h">除了犯罪，還有沒有除名的可能？</h3>
+<p>法律並沒有把除名限於犯罪，然而 22 年來的 28 件除名，全部循此路徑而來。實務上，「已喪失執行律師之信譽」幾乎等同「受刑事判決」，可能是把律師倫理的最終判斷交給了刑事法院。然而，有些最傷害委任人權益的行為，可能難會進入刑事程序。</p>
+<p>不當推展業務的類型就是典型的例子。律師的收入，可能與是否提出告訴或訴訟相連；但對委任人最有利的，可能是及早和解或適時止損。換句話說，「律師的經濟利益」與「委任人的最佳利益」，很多時候是相反的。律師倫理的核心之一，正是在這種利益衝突中，把委任人放在前面。如果律師為了收取委任費，誇大勝算，勸誘當事人提起顯無理由的訴訟；或為了延續委任，讓本可成立的和解破局，濫行提出多件訴訟；或刻意隱瞞對委任人有利、卻不利於自己收費的選項，這些行為多半不構成犯罪，卻已經把專業判斷變成推銷工具。</p>
+<p>律師信譽在於委任人能否相信，律師的建議是為了自己的利益而提出。委任人仰賴律師判斷要不要打官司、該不該和解，正因為他自己無從判斷。當律師以自身經濟利益為先，系統性地利用這種資訊落差，委任人損失的不只是律師費，還有時間、精力、錯失的和解機會，甚至可能因濫訴而招致反訴或訴訟費用負擔，法院也要承擔無謂的案件。《律師法》第 1 條要求律師「誠正信實執行職務」，第 40 條禁止挑唆訴訟及以不正當方法推展業務，第 43 條第 2 項禁止對受任事件有不正當行為。這類行為違反的，正是律師職業最根本的誠信義務。判斷其嚴重程度時，應具體檢視：律師是否明知請求顯無理由、是否利用當事人的弱勢或急迫、是否反覆為之而形成營業模式、是否隱瞞重要資訊，以及造成多大的損害。情節重大者，即使未涉犯罪，也可能達到「已喪失執行律師之信譽」的程度。</p>
+<p>目前的懲戒實務還沒有走到這一步。資料庫中以推展業務規定論處的決議約有 8 件，最重的是停職 1 年（106年度律懲字第30號，覆審由停職 2 年改判），其餘多為申誡、警告或命研習，沒有一件除名。為了收費而挑唆訴訟、阻撓和解的行為，更少成為懲戒案件，原因不難理解：委任人往往不知道自己被誤導，只會以為是官司輸了。但案件少，不代表問題不存在。在高標準的倫理要求下，律師公會與懲戒機關未來受理這類申訴時，應正面檢視、重新評價上述不當行為；應將情節重大、反覆為之者，納入除名的範圍。唯有如此，才能真正維護當事人權益，也讓律師倫理風紀不只是「不犯罪」的最低標準。</p>
+
+</div>
+<button class="db-ana-back" type="button">&larr; 專題分析列表</button></article>
+</div>
+
+<div class="db-ana-sub" hidden="" id="stats-sub-data">
+<h2 class="db-stats-h">一、律師懲戒人數統計（民國94&ndash;114年）</h2>
+
+<h3 class="db-about-sh">（一）懲戒人數與類型</h3>
+
+<div class="db-chart-card">
+<div class="db-stats-scroll" id="stats-table">&nbsp;</div>
+
+<div class="db-about-note">
+<p><b>備註</b>　1、本表人數為處分決議確定後，送法務部執行的人數。</p>
+
+<p class="db-src-num">2、主文為「不付懲戒」的決議，併入「不予懲戒」計算。</p>
+
+<p class="db-src-num">3、法務部於民國100年前無相關統計，民國94年至99年部分係依本資料庫收錄的決議書自行統計。</p>
+
+<p class="db-an-src"><b>資料來源</b>　<a href="https://www.rjsd.moj.gov.tw/RJSDWeb/common/WebList3_Report.aspx?menu=INF_COMMON_LAWYER&amp;list_id=1531" rel="noopener" target="_blank">法務部法務統計（統計查詢專區 &gt; 常用統計表 &gt; 律師統計 &gt; 律師懲戒人數）</a>。</p>
+</div>
+</div>
+
+<h3 class="db-about-sh">（二）懲戒案件數與人數</h3>
+
+<div class="db-chart-card">
+<div id="chart-total">&nbsp;</div>
+
+<div class="db-chart-legend" id="legend-total">&nbsp;</div>
+
+<div class="db-about-note">
+<p><b>備註</b>　1、確定案件數含懲戒處分及「不予懲戒」、「不受理」、「免議」、「暫時停職」等各類決議的執行人數。</p>
+
+<p class="db-src-num">2、受懲戒人數為確定案件數扣除「暫時停職（全部）」、「不予懲戒」、「不受理」、「免議」後的人數。</p>
+</div>
+</div>
+
+<h3 class="db-about-sh">（三）各類懲戒處分結果分布</h3>
+
+<div class="db-chart-card">
+<div aria-label="選擇統計年度區間" class="db-pie-range" id="pie-range" role="group"><span class="db-pie-range-lbl">統計年度</span><button aria-pressed="true" class="db-btn db-pie-range-btn db-is-on" id="pie-range-all" type="button">全部年度</button><button aria-pressed="false" class="db-btn db-pie-range-btn" id="pie-range-recent" type="button">民國109&ndash;114年</button></div>
+
+<div id="chart-kind">&nbsp;</div>
+
+<div class="db-chart-legend" id="legend-kind">&nbsp;</div>
+
+<p class="db-about-note" id="chart-kind-note">&nbsp;</p>
+</div>
+
+<h2 class="db-stats-h">二、律師人數統計（民國100&ndash;114年）</h2>
+
+<h3 class="db-about-sh">（一）考試及格、新領證、加入公會人數</h3>
+
+<div class="db-chart-card">
+<div id="chart-lawyer-y">&nbsp;</div>
+
+<div class="db-chart-legend" id="legend-lawyer-y">&nbsp;</div>
+
+<div class="db-about-note">
+<p><b>備註</b>　1、法務部於民國100年前無相關統計。</p>
+
+<p class="db-src-num">2、考試及格人數有民國94至99年的資料（依序為427、448、455、494、536、600人）。</p>
+
+<p class="db-src-num">3、民國106年以前，「加入公會人數」包含律師多區入會的情形。</p>
+</div>
+
+<div class="db-about-note db-an-src">
+<p class="db-an-src"><b>資料來源</b>　1、<a href="https://www.rjsd.moj.gov.tw/RJSDWeb/common/WebList3_Report.aspx?menu=INF_COMMON_LAWYER&amp;list_id=1527" rel="noopener" target="_blank">法務部法務統計（統計查詢專區 &gt; 常用統計表 &gt; 律師統計 &gt; 本國律師人數）</a>。</p>
+
+<p class="db-src-num">2、<a href="https://stats.exam.gov.tw/exam/webMain.aspx?sys=100&amp;funid=vueindex" rel="noopener" target="_blank">考試院統計資料查詢網</a>（單表查詢 &gt; 考選統計 &gt; 專門職業及技術人員考試 &gt; 高等考試 &gt; 2.2.8）。</p>
+</div>
+</div>
+
+<h3 class="db-about-sh">（二）累計已領證、累計加入公會人數</h3>
+
+<div class="db-chart-card">
+<div id="chart-lawyer-c">&nbsp;</div>
+
+<div class="db-chart-legend" id="legend-lawyer-c">&nbsp;</div>
+
+<div class="db-about-note">
+<p><b>備註</b>　1、法務部於民國100年前無相關統計。</p>
+
+<p class="db-src-num">2、民國106年，因統方法改變導致「累計加入公會人數」較前一年減少。</p>
+
+<p class="db-an-src"><b>資料來源</b>　<a href="https://www.rjsd.moj.gov.tw/RJSDWeb/common/WebList3_Report.aspx?menu=INF_COMMON_LAWYER&amp;list_id=1527" rel="noopener" target="_blank">法務部法務統計（統計查詢專區 &gt; 常用統計表 &gt; 律師統計 &gt; 本國律師人數）</a>。</p>
+</div>
+</div>
+</div>
+</section>
+<!-- [HTML-ABOUT] 頁籤 5：資料庫說明 -->
+
+<section aria-labelledby="tabbtn-about" hidden="" id="tab-about" role="tabpanel">
+<div class="db-about">
+<h2 class="db-about-h">一、資料來源與範圍</h2>
+
+<p>本資料庫皆透過公開資料建置，如有檢索需要，請訪問以下資料來源：</p>
+
+<ul class="db-about-src">
+	<li><a href="https://lawyerbc.moj.gov.tw/" rel="noopener" target="_blank">法務部律師懲戒決議書公開及查詢系統</a> ↗</li>
+	<li><a href="https://gazette.nat.gov.tw/egFront/advancedSearchResult.do?action=doGroupQuery&amp;styleL=5&amp;log=filter&amp;filterId=215" rel="noopener" target="_blank">行政院公報資訊網</a> ↗</li>
+	<li><a href="https://www.twba.org.tw/publication/articles/7a60e5e5-29bd-4c6a-903d-3128a9fce486" rel="noopener" target="_blank">全國律師聯合會《律師懲戒案例選輯》</a> ↗</li>
+</ul>
+
+<div>
+<dl>
+	<dt>時間範圍</dt>
+	<dd>民國 94 年 1 月 1 日～民國 115 年 7 月 2 日（民國 94 年以前部分案件，請參考上述《律師懲戒案例選輯》）</dd>
+</dl>
+</div>
+
+<div>
+<dl>
+	<dt>資料筆數</dt>
+	<dd>共 642 人次（同一人對同一事件之救濟，於本資料庫計為 1 筆）</dd>
+</dl>
+</div>
+
+<dl class="db-about-meta">
+</dl>
+
+<p class="db-about-note"><b>備註</b>　《律師法》於民國 109 年修正以前，依舊《律師懲戒規則》第 25 條規定，法務部僅公告「確定案件」的決議書；且就「不予懲戒」、「免議」、「不受理」之情形，原則上亦不公告。因此部分資料的內容可能不完整。</p>
+
+<h2 class="db-about-h">二、懲戒法規</h2>
+
+<p><b>《律師法》</b>於民國 109 年 1 月 15 日全文修正後，懲戒引用的條次已大幅變更。本資料庫將此前的條文稱之為「舊律師法」，此後的條文稱之為「新律師法」，以資區分。</p>
+
+<p><b>《律師倫理規範》</b>《律師倫理規範》自民國 84 年修訂為 50 條後，睽違近 30 年於民國 111 年 5 月 29 日再次進行全文修正，此後懲戒引用的條次已大幅變更。本資料庫將全文修正前一版的條文稱之為「舊倫理規範」；此後的條文稱之為「新倫理規範」，以資區分。</p>
+
+<p class="db-about-note"><b>備註</b>　因發生時間、付懲戒時間的不同，於新法施行後作成的懲戒案件，仍有以舊法為依據的情形。</p>
+
+<h2 class="db-about-h">三、表記說明</h2>
+
+<div class="db-mark-scroll">
+<table class="db-mark-table">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>案號</th>
+			<th class="db-th-1line">被付懲戒人</th>
+			<th>決議日</th>
+			<th>移送懲戒單位</th>
+			<th>懲戒決定</th>
+			<th colspan="2">違反（或移送<button aria-describedby="db-ft-tip" aria-label="欄位說明" class="db-th-help" data-ft-tip="若結果為「不予懲戒（不付懲戒）」、「免議」、「不受理」的案件，本欄位顯示移送懲戒單位移送之條文依據與違失態樣。" data-help="norm" type="button">?</button>）之規範及態樣</th>
+			<th>覆審案號</th>
+			<th>覆審日</th>
+			<th>覆審決定</th>
+			<th>備註</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>&nbsp;</td>
+			<td>同時有數案號者，表示經律師懲戒委員會併案。點擊資料夾圖示，可檢索「一案多人」的案件。</td>
+			<td>改名者，同時記載其原本姓名。點擊人物圖示，可檢索「一人多案」的案件。</td>
+			<td>由律師懲戒委員會作成初次決定的日期。</td>
+			<td>以單位現行的名稱為主，「台」統一以「臺」字表示。資料過舊且未懲戒者，可能因缺乏全文而無資料。</td>
+			<td>被付懲戒人得依法提起覆審救濟之，就懲戒決定是否確定，請參閱法務部律師懲戒決議書公開及查詢系統。經覆審撤銷原決議者，同時以括號標示。</td>
+			<td>未作成懲戒的案件，記載其移送依據。不記載與違失行為態樣無關聯的條文（如：懲戒種類之相關規定）。</td>
+			<td>左欄各條文依對照表所屬的違失態樣，同一態樣只列一次。滑鼠停在任一標籤上，同列不相關者會一起淡出。對照表未收錄之規範（公會章程、法扶要點等）不列於本欄。</td>
+			<td>&nbsp;</td>
+			<td>由律師懲戒覆審委員會作成覆審決定的日期。</td>
+			<td>&nbsp;</td>
+			<td>記載經移送但不成立或未認定的規範。又再審議案件皆未有成功推翻原決定之例，故本資料庫僅於備註簡要說明。</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<h2 class="db-about-h">四、資料庫維護</h2>
+
+<p>本資料庫由財團法人民間司法改革基金會維護、更新。因「法務部懲戒決議書公開及查詢系統」不會於決議書作成當日立即更新，故資料更新可能有時間落差。如發現錯誤、提出改善建議或有其他研究及學術合作，歡迎來信聯繫 <a href="mailto:contact@jrf.org.tw">contact@jrf.org.tw</a>。</p>
+</div>
+</section>
+<!-- [HTML-REFORM] 頁籤 6：改革主張 -->
+
+<section aria-labelledby="tabbtn-reform" hidden="" id="tab-reform" role="tabpanel">
+<div class="db-reform-hero"><span aria-hidden="true" class="db-reform-mark">改</span>
+
+<p class="db-kicker">民間司法改革基金會</p>
+
+<h2>強化律師倫理風紀制度</h2>
+
+<p>為<b>保障民眾權益</b>、<b>彰顯律師懲戒制度之效能</b>、<b>改善律師執業環境</b>，本會提出以下 12 項改革訴求：</p>
+</div>
+
+<div class="db-reform-grid">
+<div class="db-reform-card db-rc-j"><span class="db-num">01</span>
+
+<h3>擴充懲戒處分類型</h3>
+
+<p>修正《律師法》第101條增訂「罰款」為懲戒處分的種類，俾便律師懲戒機關靈活運用；同法第105條應明訂其執行方式，罰款所得並應挹注於維繫律師倫理風紀、律師懲戒的相關事務。為使「停止執行職務」的處分能對嚴重的違失行為為進行相應評價，應增加其期間上限。</p>
+</div>
+
+<div class="db-reform-card db-rc-m"><span class="db-num">02</span>
+
+<h3>檢討懲戒處分之輕重</h3>
+
+<p>為明確懲戒標準，達成「律師違失行為」與「懲戒處分輕重」相當的目標，應檢討現行懲戒處分的權衡是否適當、是否有未能彰顯懲戒成效的情形；相關機關（構）並應透過自行研究或委託研究的方式，定期編纂懲戒案例及律師倫理規範評釋。若一定期間內，律師有再次違反倫理風紀的行為，應屬法定的加重懲戒事由。</p>
+</div>
+
+<div class="db-reform-card db-rc-k"><span class="db-num">03</span>
+
+<h3>設置專責調查機制</h3>
+
+<p>律師公會應成立「律師倫理風紀調查小組」，增聘專任人員負責協助倫理風紀委員會調查申訴案件、監督懲戒處分的執行、向會員進行律師倫理風紀的宣導；並於每年公布報告、相關統計數據，以說明辦理律師倫理風紀業務的成效。但考量各地方各律師公會的規模及量能不同，數律師公會得聯合或委由全國律師聯合會成立調查小組。</p>
+</div>
+
+<div class="db-reform-card db-rc-l"><span class="db-num">04</span>
+
+<h3>明確化停職處分範圍及違反效果、防杜規避行為</h3>
+
+<p>為嚴格執行「停止執行職務」的懲戒處分，有關機關（構）應釐清「執行律師職務」的範圍，於保障委任當事人權益的基礎下採取實質的認定方式。受懲戒人經停職後，仍以「擔任受僱律師雇主並繼續提供法律服務」、「未受委任但實際執行律師業務」等方式規避懲戒者，應予嚴格禁止。律師於停職期間，再有實際執行律師職務之行為者，法務部應依《律師法》第131條處罰鍰，並命限期停止該行為；屆期不停止者，應再處罰鍰並廢止其律師證書。法務部應成立工作小組，以訪查、調查、請求司法機關協力、接受檢舉等方式落實上述規定。</p>
+</div>
+
+<div class="db-reform-card db-rc-j"><span class="db-num">05</span>
+
+<h3>強化律師公會之調查權限</h3>
+
+<p>為強化各律師公會的自律，應修正《律師法》，賦予律師公會就倫理風紀事項有相應的調查權，拒絕接受調查、報告或有妨礙行為者，應受懲戒或為加重事由。</p>
+</div>
+
+<div class="db-reform-card db-rc-m"><span class="db-num">06</span>
+
+<h3>律師公會審議倫理案件應引入外部委員</h3>
+
+<p>地方律師公會審議倫理風紀事件，宜參考《律師法》第 75 條第 2 項，引入非屬執業律師之社會公正人士擔任委員，其人數不應低於三分之一。</p>
+</div>
+
+<div class="db-reform-card db-rc-k"><span class="db-num">07</span>
+
+<h3>完善懲戒時效制度</h3>
+
+<p>考量被申訴的律師於發生不當行為後，仍可能持續為申訴人辦理受任事務。故應參照《法官法》第36條意旨修正《律師法》第102條，以終止委任或受任事務辦理完成為起算時點。同時為保障民眾權益，申訴人向權責機關（構）提出申訴後，應中斷時效計算。</p>
+</div>
+
+<div class="db-reform-card db-rc-l"><span class="db-num">08</span>
+
+<h3>訂定公會倫理案件之處理期間</h3>
+
+<p>為彰顯律師懲戒制度的效能、及時維護申訴民眾的權益，全國律師聯合會、各地方律師公會應訂定處理倫理風紀案件的適當期限。但因案件繁雜或調查程序必要（如申訴人補充陳述），得延長或更新期限。</p>
+</div>
+
+<div class="db-reform-card db-rc-j"><span class="db-num">09</span>
+
+<h3>擴大律師公會揭露懲處案件的範圍、公布相關統計</h3>
+
+<p>為使公眾瞭解律師自律的成效、提高律師的社會公信力，各地方律師公會就未達移送懲戒程度，但經決議有懲處必要的案件，應視情形分別以去識別化或未去識別化的方式全面公開之（可參考台北律師公會公布的「律師倫理案例選輯」）。全國律師聯合會就申覆案件的公開，亦應比照辦理。全國律師聯合會、各地方律師公會辦理倫理風紀案件，應每年公布案件收結統計（可參考法律扶助基金會於年報公布的律師評鑑相關統計）。</p>
+</div>
+
+<div class="db-reform-card db-rc-m"><span class="db-num">10</span>
+
+<h3>強化懲戒案件之審理效能</h3>
+
+<p>律師懲戒委員會、律師懲戒覆審委員會、律師懲戒覆審再審議委員會宜依《律師懲戒及審議細則》第 4 條第 1 項但書遴聘專任人員，以提升懲戒案件的審理效能，並避免法院書記官於法院業務外兼辦該項業務。同時，宜研議分庭審理案件的制度，以促進審理效率。</p>
+</div>
+
+<div class="db-reform-card db-rc-k"><span class="db-num">11</span>
+
+<h3>強化資訊公開</h3>
+
+<p>全國律師聯合會、各地方律師公會應改善現有的網站，充分提供民眾提出倫理風紀申訴的相關資訊，並向民眾宣導委任律師的須知及權益資訊。各級法院、檢察署等司法機關，亦宜協助宣導相關資訊。</p>
+</div>
+
+<div class="db-reform-card db-rc-l"><span class="db-num">12</span>
+
+<h3>偕同司法人員促進自律</h3>
+
+<p>全國律師聯合會、各地方律師公會應積極與司法院、法務部合作（如：登錄案件辯護人或訴訟代理人時，自動連線驗證其執業狀態），促使司法人員於執行職務中發現律師有違背《律師法》或《律師倫理規範》的情事時，應積極移送，共同維護法治之清明。</p>
+</div>
+</div>
+
+<p class="db-reform-foot">★ 專業自律，是律師公信力的基石 ★</p>
+</section>
+<!-- [HTML-COMPLAINT] 頁籤 7：申訴救濟管道 -->
+
+<section aria-labelledby="tabbtn-complaint" hidden="" id="tab-complaint" role="tabpanel">
+<div class="db-complaint"><!-- 頁內目錄：連結指向 #complaint/1-1 這類複合錨點，捲動由 [JS-ROUTE] 負責
+     （元素 id 仍是 cp-1-1，與錨點刻意不同名，才不會被瀏覽器搶先捲動）。 -->
+<nav aria-label="本頁導覽" class="db-cp-toc">
+<div class="db-cp-toc-h">導覽</div>
+
+<div class="db-cp-toc-grid">
+<div>
+<div class="db-cp-toc-grp">壹、申訴之前</div>
+<a class="db-cp-toc-a" href="#complaint/1-1">一、什麼樣的情形可以申訴？</a> <a class="db-cp-toc-a" href="#complaint/1-2">二、我想要的結果是什麼？</a> <a class="db-cp-toc-a" href="#complaint/1-3">三、我該向誰申訴？</a> <a class="db-cp-toc-a" href="#complaint/1-4">四、常見疑慮</a></div>
+
+<div>
+<div class="db-cp-toc-grp">貳、實際提出申訴</div>
+<a class="db-cp-toc-a" href="#complaint/2-1">一、申訴流程</a> <a class="db-cp-toc-a" href="#complaint/2-2">二、我要準備什麼？</a> <a class="db-cp-toc-a" href="#complaint/2-3">三、送出去之後會發生什麼？</a> <a class="db-cp-toc-a" href="#complaint/2-4">四、各公會的申訴辦法、費用與聯繫方式</a></div>
+</div>
+</nav>
+
+<h2 class="db-cp-part" id="cp-p1">壹、申訴之前<small>先確認自己遇到的是什麼事、想要什麼結果，再決定要不要申訴、向誰申訴。</small></h2>
+
+<h3 class="db-about-h" id="cp-1-1">一、律師怎樣的行為，會被懲戒？</h3>
+
+<p class="db-complaint-intro">首先要注意，「律師表現與期待不符」和「律師懲戒事由」是兩件事。前者未必能申訴，後者才是懲戒制度處理的範圍。</p>
+
+<h4 class="db-about-sh">（一）哪些情形通常不構成違失？</h4>
+
+<div class="db-cp-card db-cp-no">
+<div class="db-cp-card-h">這些情形，通常不是懲戒問題</div>
+
+<ul>
+	<li>官司輸了，或結果不如預期</li>
+	<li>律師的訴訟策略與自己的想法不同</li>
+	<li>未即時回復訊息</li>
+	<li>費用比較貴</li>
+	<li>「對造」律師訴訟上的合理攻防</li>
+	<li>未處理委任範圍以外的事</li>
+</ul>
+</div>
+
+<div class="db-cp-note">不構成懲戒事由，仍然可以終止委任、更換律師，或就費用與損害另循民事途徑處理&mdash;&mdash;請見下一節「我想要的結果是什麼？」</div>
+
+<h4 class="db-about-sh">（二）常見的違失類型</h4>
+<!-- 民眾入口：內容一律由 renderPublicEntry() 依 PUBLIC_ENTRY 產生，
+     態樣名稱與件數皆於渲染時取得，本處不寫死任何文字。 -->
+
+<div id="pub-entry">&nbsp;</div>
+
+<h4 class="db-about-sh">（三）先查詢這位律師以前有沒有被懲戒過</h4>
+
+<div class="db-cp-entry">
+<div class="db-cp-entry-main">
+<p class="db-cp-entry-t">用律師姓名查詢懲戒紀錄</p>
+
+<p class="db-cp-entry-d">輸入律師姓名即可看到他是否曾被懲戒、被懲戒的原因、最後的處分是什麼。請注意，事務所名稱通常不會在懲戒決議中出現。</p>
+
+<div class="db-cp-search"><svg aria-hidden="true" class="db-cp-search-ico" focusable="false" viewbox="0 0 24 24"><circle cx="10.5" cy="10.5" fill="none" r="6.5" stroke="currentColor" stroke-width="2"></circle><line stroke="currentColor" stroke-linecap="round" stroke-width="2" x1="15.4" x2="21" y1="15.4" y2="21"></line></svg> <input aria-label="以律師姓名查詢懲戒紀錄" autocomplete="off" id="cp-name-q" placeholder="輸入律師姓名" type="search" /><button class="db-cp-search-btn" id="cp-name-btn" type="button">查詢</button></div>
+</div>
+</div>
+
+<h3 class="db-about-h" id="cp-1-2">二、我想要的結果是什麼？</h3>
+
+<p class="db-complaint-intro">申訴的結果是<b>律師受到處分</b>，不是把錢拿回來，也不會讓案件重新來過。先想清楚要的是什麼，才不會走錯管道、白費力氣。</p>
+
+<div class="db-cp-tw">
+<table class="db-cp-table">
+	<thead>
+		<tr>
+			<th>想要的結果</th>
+			<th>應該走的途徑</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th>律師受懲戒處分</th>
+			<td>向該律師所屬的地方律師公會申訴，由公會決定是否移送懲戒。這一頁講的就是這條路。</td>
+		</tr>
+		<tr>
+			<th>拿回「不相當」的律師費、要求賠償</th>
+			<td>屬於與律師之間的民事爭議，須另行以民事途徑請求。申訴成立與否，與能不能拿回錢是兩回事；向律師公會申訴時，也可透過公會的「調處」來解決糾紛。但若成立申訴，可能有利於民事訴訟的請求。但應注意在民事請求時效內，至法院起訴。</td>
+		</tr>
+		<tr>
+			<th>改變判決結果</th>
+			<td>只能透過上訴、抗告、再審或非常上訴等訴訟程序處理。懲戒程序不會影響原案件的判決結果。</td>
+		</tr>
+		<tr>
+			<th>律師涉及犯罪（例如侵占、背信、偽造文書、洩密）</th>
+			<td>可向警察機關或地方檢察署提出告訴、告發。檢察署本身也是可以將律師移送懲戒的單位之一，兩者可以並行。</td>
+		</tr>
+		<tr>
+			<th>換掉現在的律師</th>
+			<td>本可以隨時終止委任，多數情況下，會建議先思考案件本身有人接手（自己處理、另委任律師，或申請法律扶助）。</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<h3 class="db-about-h" id="cp-1-3">三、我該向誰申訴？</h3>
+
+<p class="db-complaint-intro">依《律師法》第 76 條、《法律扶助法》第 26 條第 4 項規定，共有檢察署、<b>各地方律師公會</b>、全國律師聯合會、<b>法律扶助基金會</b>、中央主管機關（就其主管業務範圍）等 5 類單位可以將律師移送懲戒。</p>
+
+<div class="db-cp-alert">民間司法改革基金會<b>不具有將律師移送懲戒的法定權限</b>，也無法進行調查、蒐證。請直接向有權單位提出申訴。</div>
+
+<h4 class="db-about-sh">（一）依不同情形處理</h4>
+
+<div class="db-cp-tw">
+<table class="db-cp-table">
+	<thead>
+		<tr>
+			<th>情形</th>
+			<th>可以找的單位</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th>自行委任的律師、依法指定的義務辯護律師</th>
+			<td>該律師所屬的<b>地方律師公會</b>。律師所屬公會可透過「<a href="https://lawyerbc.moj.gov.tw" rel="noopener" target="_blank">⚖️法務部律師查詢系統</a>」查詢。</td>
+		</tr>
+		<tr>
+			<th>法律扶助基金會指派的律師</th>
+			<td>除地方律師公會外，也可直接向<b>各地法扶分會</b>申訴，兩者可以並行。詳見下方「申訴流程」。</td>
+		</tr>
+		<tr>
+			<th>律師涉及犯罪</th>
+			<td><b>向警察機關、檢察署提告</b>。檢察署同時也是移送懲戒的單位之一。</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<h4 class="db-about-sh">（二）這些情形不適用律師懲戒制度</h4>
+
+<div class="db-cp-tw">
+<table class="db-cp-table">
+	<thead>
+		<tr>
+			<th>情況</th>
+			<th>說明</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th>公設辯護人</th>
+			<td>公設辯護人為法院編制人員，並非執業律師故不適用律師懲戒制度。如遇到問題，應向法院反應。</td>
+		</tr>
+		<tr>
+			<th>機關或公司內部不具律師資格的法務人員</th>
+			<td>不具律師資格者不受律師懲戒制度規範，只能循該機關、公司內部管道或民事途徑處理。</td>
+		</tr>
+		<tr>
+			<th>冒充律師、未取得律師資格而執行律師業務</th>
+			<td>因為對象非律師，故不適用律師懲戒。但可能構成刑事責任，可向警察機關或檢察署告發。</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<h3 class="db-about-h" id="cp-1-4">四、常見問題</h3>
+<!--<p class="db-complaint-intro">以下是最常被問到的幾個問題：</p>-->
+
+<div class="db-cp-faq">
+<details class="db-cp-q"><summary>申訴之後，我會不會被律師反告妨害名譽？</summary>
+
+<div class="db-cp-a">
+<p>向公會提出申訴，是法律與公會章程所設的正式管道，屬於向權責單位陳述，與在網路上公開指控他人不同。於申訴程序中提出自己親身經歷的事實據實陳述，一般不會構成妨害名譽。</p>
+</div>
+</details>
+
+<details class="db-cp-q"><summary>案件還在進行中，可以申訴嗎？會不會影響我的案子？</summary>
+
+<div class="db-cp-a">
+<p>可以。但申訴程序與你的案件是兩條分開的程序，公會的處理不會改變法院或檢察機關對你案件的判斷。</p>
+
+<p>但實際上要考量的是：如果你打算繼續讓同一位律師處理，提出申訴後信任關係可能已經破裂。多數情況下，會建議先確保案件本身有人接手（自己處理、另委任律師，或申請法律扶助），再處理申訴</p>
+</div>
+</details>
+
+<details class="db-cp-q"><summary>可以匿名申訴嗎？律師會知道是我嗎？</summary>
+
+<div class="db-cp-a">
+<p>不能匿名申訴。各公會的申訴辦法多要求申訴人填寫真實姓名與聯絡方式，以便查證與回覆；被申訴的律師在答辯過程中，通常也會知道申訴的來源，才有辦法回應。</p>
+</div>
+</details>
+
+<details class="db-cp-q"><summary>律師會不會報復我，或在同業間讓我找不到律師？</summary>
+
+<div class="db-cp-a">
+<p>律師如果因為被提出申訴而對有不當行為，本身就可能構成新的違失事由。實務上，委任與否是每位律師的個別判斷，對律師的違失行為提出申訴，一般而言不會影響其他律師的受任意願。</p>
+
+<p>如果在申訴後遇到任何形式的騷擾、恐嚇或不當對待，請保留證據，這既可以另行申訴，也可能構成刑事責任。</p>
+</div>
+</details>
+
+<details class="db-cp-q"><summary>我沒有錢再請一位律師，有人可以幫我嗎？</summary>
+
+<div class="db-cp-a">
+<p>可以尋求協助的管道包括：<b>法律扶助基金會</b>各地分會（符合資力條件者可申請扶助）、各地方政府的<b>免費法律諮詢</b>、消費爭議可洽各縣市<b>消費者服務中心與消保官</b>，以及民間團體的法律諮詢服務。</p>
+
+<p>申訴本身則不需要委任律師，可以自己提出。</p>
+</div>
+</details>
+
+<details class="db-cp-q"><summary>事情已經過了很久，還可以申訴嗎？</summary>
+
+<div class="db-cp-a">
+<p>依《律師法》第102條第1項規定，原則上要在違失行為發生後的5年內，才能給予律師懲戒處分。但如果違失程度嚴重到「除名」的程度，時效可延長至10年。</p>
+
+<p>必須注意的是，向律師公會申訴不會使時效中斷。如果所剩時間不多才提出申訴，公會可能難以充分的調查或是在時效屆滿前移送。同時，時間拖得越久，證據越難保全，事實也越難查證，因此建議儘早提出。</p>
+</div>
+</details>
+</div>
+
+<h2 class="db-cp-part" id="cp-p2">貳、提出申訴</h2>
+
+<h3 class="db-about-h" id="cp-2-1">一、申訴流程</h3>
+
+<h4 class="db-about-sh">（一）向各地方律師公會申訴</h4>
+
+<p class="db-complaint-intro">民眾遇到律師有違倫理風紀的情形，一般而言是<b>向該律師所屬的各地方律師公會申訴</b>（律師所屬公會可透過「<a href="https://lawyerbc.moj.gov.tw" rel="noopener" target="_blank">法務部律師查詢系統</a>」查詢）。向地方律師公會提出申訴的流程如下：</p>
+
+<div class="db-flow-wrap"><svg aria-label="律師申訴流程圖" id="flow-svg" role="img" viewbox="0 0 940 470" xmlns="http://www.w3.org/2000/svg"></svg></div>
+
+<p class="db-complaint-intro" style="margin-top:18px">值得注意的是，各律師公會除了不成立（不予處分）與移送懲戒之外，另有「注意」、「勸告」、「告誡」等較輕微的其他處分。</p>
+
+<h4 class="db-about-sh">（二）向法律扶助基金會各地方分會申訴</h4>
+
+<p class="db-complaint-intro">若為法律扶助基金會指派的律師，除了向各地方律師公會申訴外，也可透過「<a href="https://www.laf.org.tw/appeal" rel="noopener" target="_blank">📩申訴制度</a>」直接向各地法扶分會申訴。當法律扶助基金會認為申訴成立並達到「停止派案」的程度時，也可依《法律扶助法》第 26 條第 3 項（另參考《<a href="https://www.laf.org.tw/law-detail/28" rel="noopener" target="_blank">📖申訴處理要點</a>》第 14 條第 6 項），將律師移送懲戒。<a href="https://www.laf.org.tw/lawyer-statement/4" rel="noopener" target="_blank">📊律師評鑑制度</a>的頁面中，則有「近 3 年律師申訴異議及評鑑處分類型表」供律師及民眾參考。</p>
+
+<h3 class="db-about-h" id="cp-2-2">二、我要準備什麼？</h3>
+
+<p class="db-complaint-intro">申訴要說清楚的是「什麼時候、發生了什麼事」，不一定要清楚引用法條。除了陳述之外，必須要有相關證據申訴單位才可以認定事實。若未提出相關證據，往往很難成立申訴。以下證據，可依申訴的內容決定是否需要提出：</p>
+
+<div class="db-cp-check">
+<div class="db-cp-ck"><span><b>委任契約書、委任狀</b><em>證明委任關係的存在與範圍。沒有書面契約時，可用其他往來紀錄佐證。</em></span></div>
+
+<div class="db-cp-ck"><span><b>匯款紀錄、收據、請款憑證</b><em>付了多少錢、什麼時候付款、付款或請款的名目。在以現金付款的情況下，特別注意應開立收據以茲證明。</em></span></div>
+
+<div class="db-cp-ck"><span><b>訊息往來紀錄</b><em>LINE、簡訊、電子郵件等紀錄。截圖藥保留日期與對話者名稱，完整且連續。</em></span></div>
+
+<div class="db-cp-ck"><span><b>開庭通知、筆錄、書狀、判決及裁定等文書</b><em>可用來證明法定期限、案件處理情形等。</em></span></div>
+
+<div class="db-cp-ck"><span><b>時間序</b><em>建議可清楚列出「日期－發生事件－證據」，以供接受申訴的單位釐清事實。</em></span></div>
+</div>
+
+<p class="db-complaint-intro">原則上，律師公會可能會規定處理案件的期限。但如果申訴人有補充證據或理由，期限會重新計算。如希望案件能盡快處理完畢，應於申訴時盡可能提供完整的資料。</p>
+
+<h3 class="db-about-h" id="cp-2-3">三、案件送到律師公會後，會怎麼進行？</h3>
+
+<p class="db-complaint-intro">若向律師公會提出申訴，案件會先由公會調查，若認為情節重大，才會移付懲戒。</p>
+
+<h4 class="db-about-sh">（一）公會的調查</h4>
+
+<p class="db-complaint-intro">公會受理後，會將申訴內容交由倫理風紀委員會查處，通常由公會的律師組成，並設有迴避的規定。程序上，如認為申訴內容或證據不清楚，或請申訴人補正資料或到會說明；後再請被申訴的律師提出說明或答辯，最後作成處理結果。結果可能是不成立（不予處分），可能是「注意」、「勸告」、「告誡」等較輕微的處分；認為情節重大者，則移付懲戒。</p>
+
+<h4 class="db-about-sh">（二）移送懲戒之後</h4>
+
+<p class="db-complaint-intro">案件經移送後，當事人為被移付懲戒的律師與移送單位，現行法上申訴人或案件當事人程序上並無對應的地位。如有意見（如：違失行為造成的損害），宜請求移送單位代為表達。律師懲戒委員會審議並作成決議後，對決議不服者，得請求覆審，由律師懲戒覆審委員會審議。又依《律師法》第 89 條第 1 項規定，律師懲戒委員會應於受理懲戒事件後 3 個月內完成審議，必要時得延長至 6 個月。</p>
+
+<h3 class="db-about-h" id="cp-2-4">四、各公會的申訴辦法、費用與聯繫方式</h3>
+
+<h4 class="db-about-sh">（一）申訴辦法與費用</h4>
+
+<p class="db-complaint-intro">台北律師公會有彙整較完整的申訴律師資訊（見其<a href="https://www.tba.org.tw/public-service/?group=report" rel="noopener" target="_blank">👔倫理風紀專區</a>）；其中的「律師倫理案例選輯」（分別有<a href="https://www.tba.org.tw/about?group=regulation&amp;category=morale" rel="noopener" target="_blank">📜網頁版</a>與<a href="https://tbafiles.blob.core.windows.net/lawyerresource/download_picture/1497350234774/%E5%BE%8B%E5%B8%AB%E6%B3%95.pdf" rel="noopener" target="_blank">📖PDF版</a>，兩者內容不同），是各地方律師公會中唯一有公布的公會案例。提出申訴時前可參考。</p>
+
+<p class="db-complaint-intro">提出申訴前，建議先確認各公會的申訴辦法；公會未公告者，宜先透過電話或E-Mail向各地方律師公會確認申訴程序。向部分公會提出申訴時，須先繳納一筆作業處理費，會於申訴成立時全額退還。</p>
+
+<div class="db-bar-form-band">
+<div class="db-bar-form-wrap">
+<table class="db-bar-form" id="bar-form-table">
+	<colgroup>
+		<col class="db-c-bar" />
+		<col class="db-c-doc" />
+		<col class="db-c-rule" />
+		<col class="db-c-fee" />
+	</colgroup>
+	<thead>
+		<tr>
+			<th>律師公會</th>
+			<th>申訴表</th>
+			<th>申訴辦法</th>
+			<th>費用</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td class="db-bar">基隆</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">不詳</td>
+		</tr>
+		<tr>
+			<td class="db-bar">台北</td>
+			<td><a aria-label="公告連結" href="https://tba-revtel2-com-prod.s3.ap-northeast-1.amazonaws.com/%E5%8C%97%E5%BE%8B%E5%80%AB%E7%B4%80%E6%A1%88%E4%BB%B6%E7%94%B3%E8%A8%B4%E6%9B%B811501%E7%89%88-1150109%E7%90%86%E7%9B%A3%E4%BA%8B%E6%9C%83%E9%80%9A%E9%81%8E-%EF%BC%88%E5%8A%A0%E4%B8%8A%E5%8C%AF%E6%AC%BE%E8%B3%87%E8%A8%8A%EF%BC%89_%E5%AE%9A%E7%A8%BF0115-1768446442.docx" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="公告連結" href="https://www.tba.org.tw/about/?group=regulation&amp;category=practicing" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td>3,000 元</td>
+		</tr>
+		<tr>
+			<td class="db-bar">桃園</td>
+			<td><a aria-label="公告連結" href="https://www.tybar.org.tw/Download" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">不詳</td>
+		</tr>
+		<tr>
+			<td class="db-bar">新竹</td>
+			<td class="db-na">未公告</td>
+			<td><a aria-label="公告連結" href="https://hcbara.org.tw/about/index/27" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td>3,000 元</td>
+		</tr>
+		<tr>
+			<td class="db-bar">苗栗</td>
+			<td><a aria-label="公告連結" href="https://mlba.org.tw/%e8%8b%97%e6%a0%97%e5%be%8b%e5%b8%ab%e5%85%ac%e6%9c%83%e5%be%8b%e5%b8%ab%e7%94%b3%e8%a8%b4%e6%9b%b81150608-2/" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="公告連結" href="https://mlba.org.tw/%e8%8b%97%e6%a0%97%e5%be%8b%e5%b8%ab%e5%85%ac%e6%9c%83%e5%be%8b%e5%b8%ab%e5%80%ab%e7%90%86%e9%a2%a8%e7%b4%80%e5%a7%94%e5%93%a1%e6%9c%83%e8%99%95%e7%90%86%e4%ba%8b%e5%8b%99%e8%be%a6%e6%b3%95-2/" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td>6,000 元</td>
+		</tr>
+		<tr>
+			<td class="db-bar">台中</td>
+			<td><a aria-label="公告連結" href="https://www.tcbar.org.tw/download/view?download_category_id=2&amp;download_id=26" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="公告連結" href="https://www.tcbar.org.tw/about/view?about_category_id=16&amp;about_id=94" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td>5,000 元</td>
+		</tr>
+		<tr>
+			<td class="db-bar">彰化</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">不詳</td>
+		</tr>
+		<tr>
+			<td class="db-bar">南投</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">不詳</td>
+		</tr>
+		<tr>
+			<td class="db-bar">雲林</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">不詳</td>
+		</tr>
+		<tr>
+			<td class="db-bar">嘉義</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">不詳</td>
+		</tr>
+		<tr>
+			<td class="db-bar">台南</td>
+			<td><a aria-label="公告連結" href="https://tnnbar.org.tw/%e8%a1%a8%e5%96%ae%e4%b8%8b%e8%bc%89/" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="公告連結" href="https://tnnbar.org.tw/%e3%80%90-%e5%85%ac%e6%9c%83%e8%a6%8f%e7%ab%a0-%e3%80%91/" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td>2,800 元</td>
+		</tr>
+		<tr>
+			<td class="db-bar">高雄</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">不詳</td>
+		</tr>
+		<tr>
+			<td class="db-bar">屏東</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">不詳</td>
+		</tr>
+		<tr>
+			<td class="db-bar">宜蘭</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">未公告</td>
+			<td class="db-na">不詳</td>
+		</tr>
+		<tr>
+			<td class="db-bar">花蓮</td>
+			<td><a aria-label="公告連結" href="https://hualienbar-association.org.tw/contact-all-comcontact-views/%E6%9C%83%E5%93%A1%E5%80%AB%E7%90%86%E9%A2%A8%E7%B4%80%E8%99%95%E7%90%86%E7%A8%8B%E5%BA%8F.html" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="公告連結" href="https://hualienbar-association.org.tw/contact-all-comcontact-views/%E6%9C%83%E5%93%A1%E5%80%AB%E7%90%86%E9%A2%A8%E7%B4%80%E8%99%95%E7%90%86%E7%A8%8B%E5%BA%8F.html" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td>免費</td>
+		</tr>
+		<tr>
+			<td class="db-bar">台東</td>
+			<td class="db-na">無網站</td>
+			<td class="db-na">無網站</td>
+			<td class="db-na">不詳</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<button aria-controls="bar-form-table" aria-expanded="false" class="db-bar-form-toggle" hidden="" id="bar-form-toggle" type="button">展開全部 ▼</button></div>
+
+<h4 class="db-about-sh">（二）公會聯繫資訊</h4>
+
+<div class="db-bar-layout">
+<div class="db-map-col">
+<div class="db-map-inner"><button class="db-twba-chip" data-bar="TWBA" id="twba-chip" type="button">全國律師聯合會</button><button class="db-twba-chip db-laf-chip" data-bar="LAF" id="laf-chip" type="button">法律扶助基金會</button>
+
+<div class="db-map-box"><svg aria-label="臺灣律師公會分區地圖" id="tw-map" role="img" viewbox="170 35 500 915" xmlns="http://www.w3.org/2000/svg"></svg></div>
+</div>
+</div>
+
+<div class="db-bar-info" id="bar-info">&nbsp;</div>
+</div>
+</div>
+</section>
+
+<footer class="db-foot" id="db-foot">&nbsp;</footer>
+</div>
+
+</body>
+</html>
