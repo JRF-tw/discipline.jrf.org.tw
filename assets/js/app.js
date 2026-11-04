@@ -7221,15 +7221,15 @@ var ROUTE_TARGET = null;
 var LAW_TAB_KEY = {F:'act', E:'ethics', X:'others'};
 var LAW_TAB_OF_KEY = {act:'F', ethics:'E', others:'X'};
 var ROUTE_TITLES = {
-  home:'臺灣律師懲戒案件資料庫｜查詢律師懲戒紀錄與決議書全文',
-  list:'案件清單｜臺灣律師懲戒案件資料庫',
-  pattern:'違失態樣｜臺灣律師懲戒案件資料庫',
-  laws:'懲戒法規｜臺灣律師懲戒案件資料庫',
-  stats:'統計與分析｜臺灣律師懲戒案件資料庫',
-  about:'資料庫說明｜臺灣律師懲戒案件資料庫',
-  reform:'改革主張｜臺灣律師懲戒案件資料庫',
-  complaint:'申訴救濟管道｜臺灣律師懲戒案件資料庫',
-  ethichist:'律師倫理規範歷史版本｜臺灣律師懲戒案件資料庫'
+  home:'律師懲戒案件資料庫',
+  list:'案件清單｜律懲資料庫',
+  pattern:'違失態樣｜律懲資料庫',
+  laws:'懲戒法規｜律懲資料庫',
+  stats:'統計與分析｜律懲資料庫',
+  about:'資料庫說明｜律懲資料庫',
+  reform:'改革主張｜律懲資料庫',
+  complaint:'申訴救濟管道｜律懲資料庫',
+  ethichist:'懲戒法規｜律懲資料庫'
 };
 
 function currentTabKey(){
