@@ -3689,12 +3689,32 @@ var FT_XREF_CASE = null;
   host.appendChild(sel);
 });
 
+/* 四部主要法規在尚未篩選時，以施行時間範圍提示新舊法的分界。
+   原本的「未選擇」仍留在展開的選單內；選取後會立即回到空值，故收合時仍顯示
+   時間範圍，既有 readFilters、清空條件與網址還原邏輯也可繼續以空字串判斷。 */
+var FILTER_EMPTY_LABEL = {
+  J:'109年1月15日以前',
+  K:'109年1月15日以後',
+  L:'111年5月29日以前',
+  M:'111年5月29日以後'
+};
+var FILTER_CLEAR_VALUE = '__none__';
+
 /* 法條下拉（各法規一個），載入時即建好全部選項 */
 ALL_SRC.forEach(function(s){
   var sel = el('flt-'+s.key);
   var o0 = document.createElement('option');
-  o0.value = ''; o0.textContent = '未選擇';
+  o0.value = '';
+  o0.textContent = FILTER_EMPTY_LABEL[s.key] || '未選擇';
+  /* hidden option 仍會作為 select 收合時的顯示值，但不會在展開清單中重複出現。 */
+  if(FILTER_EMPTY_LABEL[s.key]) o0.hidden = true;
   sel.appendChild(o0);
+  if(FILTER_EMPTY_LABEL[s.key]){
+    var clear = document.createElement('option');
+    clear.value = FILTER_CLEAR_VALUE;
+    clear.textContent = '未選擇';
+    sel.appendChild(clear);
+  }
   DATA.articleIndex[s.key].forEach(function(a, i){
     /* 篩選器只存在於懲戒處分分頁，故件數與選項都只算該分頁的案件。
        一條條文若只被暫時處分案件引用（現行資料為新律師法第7條），列在這裡只會是
@@ -3710,6 +3730,8 @@ ALL_SRC.forEach(function(s){
     sel.appendChild(o);
   });
   sel.addEventListener('change', function(){
+    /* 「未選擇」是給使用者操作的清除項；實際狀態仍統一保存為空字串。 */
+    if(sel.value === FILTER_CLEAR_VALUE) sel.value = '';
     if(sel.value !== ''){ /* 單選：選了其中一個，其餘清空 */
       ALL_SRC.forEach(function(o2){
         if(o2.key !== s.key) el('flt-'+o2.key).value = '';
