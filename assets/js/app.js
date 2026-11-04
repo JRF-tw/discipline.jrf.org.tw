@@ -7,6 +7,9 @@ function scrollToInstant(x, y){
 /* 獨立網站路由：頁籤使用網址路徑，篩選狀態使用 query string。 */
 var DBROUTE = (function(){
   var TABS = {home:1, list:1, pattern:1, laws:1, stats:1, about:1, reform:1, complaint:1, ethichist:1};
+  var TOLERANCE = 2;
+  var holdUntil = 0, holding = false, released = false;
+  function now(){ return (window.performance && performance.now) ? performance.now() : Date.now(); }
   function decodePart(s){ try{ return decodeURIComponent(s); }catch(e){ return s; } }
   function legacyRoute(){
     var h = String(location.hash || '').replace(/^#/, '');
@@ -47,10 +50,37 @@ var DBROUTE = (function(){
   function snap(){
     var y = targetY();
     if(y === null) return;
+    if(Math.abs(window.pageYOffset - y) <= TOLERANCE) return;
     scrollToInstant(0, y);
   }
-  return {active:active, key:key, route:route, snap:snap, hold:snap,
-    resume:function(){}, release:function(){}, target:target};
+  function release(){
+    released = true;
+    holdUntil = 0;
+  }
+  function resume(){ released = false; }
+  function hold(ms){
+    if(released) return;
+    holdUntil = Math.max(holdUntil, now() + (ms || 0));
+    if(holding) return;
+    holding = true;
+    (function step(){
+      if(released){ holding = false; return; }
+      snap();
+      if(now() < holdUntil){
+        if(window.requestAnimationFrame) window.requestAnimationFrame(step);
+        else setTimeout(step, 16);
+      }else{
+        holding = false;
+      }
+    })();
+  }
+  /* 版面尚在建立時持續追蹤目標；使用者自行捲動後立即停止，避免搶捲軸。
+     頁內導覽的 click handler 會在套用新目標前呼叫 resume()。 */
+  ['wheel','touchstart','keydown','pointerdown','mousedown'].forEach(function(ev){
+    window.addEventListener(ev, release, {passive:true});
+  });
+  return {active:active, key:key, route:route, snap:snap, hold:hold,
+    resume:resume, release:release, target:target};
 })();
 
 /* [JS-BOOT] 主 App 啟動函式：以下所有資料模型、renderer、feature module 都在此作用域。 */
@@ -8062,10 +8092,10 @@ function initHome(){
      hc===0 為非懲戒，其中律聲字（暫停職聲請，h 為 1001／1001.1／1002）
      性質上既非成立也非不成立，另計為第三類，不併入任何一邊。
      三個數字與比例條一律在此由 DATA 推導，HTML 內不寫死。 */
-  var nYes = 0, nNo = 0, nOther = 0;
+  var nYes = 0, nNo = 0, nTemp = 0;
   DATA.cases.forEach(function(c){
     if(HC_OF(c.h) !== 0){ nYes++; return; }
-    if(+c.h >= 1000) nOther++; else nNo++;
+    if(+c.h >= 1000) nTemp++; else nNo++;
   });
 
   function put(id, v){ var node = el(id); if(node) node.textContent = v; }
@@ -8073,17 +8103,14 @@ function initHome(){
   put('home-n-person', numFmt(DATA.cases.length));
   put('home-n-yes', numFmt(nYes));
   put('home-n-no', numFmt(nNo));
+  put('home-n-temp', numFmt(nTemp));
   (function(){
-    var tot = nYes + nNo + nOther;
+    var tot = nYes + nNo + nTemp;
     if(!tot) return;
-    [['home-bar-y', nYes], ['home-bar-n', nNo], ['home-bar-o', nOther]].forEach(function(p){
+    [['home-bar-y', nYes], ['home-bar-n', nNo], ['home-bar-t', nTemp]].forEach(function(p){
       var node = el(p[0]);
       if(node) node.style.width = (p[1] / tot * 100) + '%';
     });
-    var note = el('home-n-person-note');
-    if(note && nOther){
-      note.textContent = '同一人同一事件，跨審級僅計一次；' + numFmt(nOther) + ' 件為暫時停職案件';
-    }
   })();
   put('home-n-pat', numFmt(DATA.patterns.length));
   if(minD && maxD){
@@ -8464,55 +8491,66 @@ function anaFig2(box){
   if(bad.length && window.console && console.warn) console.warn('[律師懲戒案件資料庫] 專題分析圖二：' + bad.join('；'));
 }
 
-/* 刑度組成橫條與年度趨勢圖：數字一律讀自文中緊接的表格（不另存一份），
-   表格改了，圖跟著變。表格欄序：刑度組成表＝刑種與刑度、件數、除名、停職 1 年以上、
-   停職未滿 1 年、申誡警告、除名率；年度表＝年度、案件、除名、除名率。 */
-function anaNextTable(fig, cls){
-  var n = fig;
-  while(n && (n = n.nextElementSibling)){
-    var t = n.matches && n.matches('table') ? n : (n.querySelector ? n.querySelector('table.' + cls) : null);
-    if(t && t.classList.contains(cls)) return t;
-  }
-  return null;
-}
-function anaTableRows(t){
-  var out = [];
-  if(!t) return out;
-  t.querySelectorAll('tbody tr').forEach(function(tr){
-    out.push(Array.prototype.map.call(tr.querySelectorAll('td'), function(td){ return td.textContent.replace(/\s+/g, ' ').trim(); }));
-  });
-  return out;
-}
+/* 刑度組成橫條與年度趨勢圖的統計值。原本以圖下方的表格充當資料來源；圖已完整
+   呈現所有數字後移除重複表格，改由這兩份陣列集中維護，避免資料散在 SVG 字串中。 */
+var ANA_BANDS = [
+  ['罰金', 4, 0, 0, 1, 3, '0%'],
+  ['拘役', 19, 0, 0, 7, 12, '0%'],
+  ['有期徒刑 6 月以下', 37, 0, 1, 29, 7, '0%'],
+  ['有期徒刑 6 月～1 年', 43, 3, 20, 18, 2, '7%'],
+  ['有期徒刑 1 年～2 年', 18, 5, 9, 4, 0, '28%'],
+  ['有期徒刑 2 年～5 年', 19, 13, 4, 2, 0, '68%'],
+  ['有期徒刑 5 年以上', 6, 6, 0, 0, 0, '100%']
+];
+var ANA_YEAR_PERIODS = [[94,99], [100,104], [105,109], [110,115]];
 function anaFigBands(box){
-  var t = anaNextTable(box.closest('figure'), 'db-ana-sum'), rows = anaTableRows(t);
   var C = [ANA_DIS_COLOR, ANA_NON_COLOR, '#9DB4D0', ANA_DOT_GREY], NAMES = ['除名', '停職 1 年以上', '停職未滿 1 年', '申誡、警告'];
-  var h = '<div class="db-ana-bars">', prevKind = '';
-  rows.forEach(function(r){
-    if(r.length < 7 || /合計/.test(r[0])) return;
+  var h = '<div class="db-ana-bars"><div class="db-ana-barhead" aria-hidden="true"><span></span><span></span><span>除名率</span></div>', prevKind = '';
+  ANA_BANDS.forEach(function(r){
     var n = +r[1] || 0, parts = [+r[2] || 0, +r[3] || 0, +r[4] || 0, +r[5] || 0];
     var kind = /有期徒刑/.test(r[0]) ? 'p' : 'o';
     if(prevKind && kind !== prevKind) h += '<div class="db-ana-barsep"></div>';
     prevKind = kind;
     h += '<div class="db-ana-barrow"><span class="db-ana-barlbl">' + esc(r[0].replace(/^有期徒刑\s*/, '有期徒刑 ')) + '<small>' + n + ' 件</small></span><div class="db-ana-bar">';
     parts.forEach(function(v, i){
-      if(v > 0 && n > 0) h += '<span style="width:' + (v / n * 100).toFixed(1) + '%;background:' + C[i] + '" title="' + NAMES[i] + ' ' + v + ' 件"></span>';
+      var tip = NAMES[i] + ' ' + v + ' 件';
+      if(v > 0 && n > 0) h += '<span style="width:' + (v / n * 100).toFixed(1) + '%;background:' + C[i] + '" data-tip="' + tip + '" aria-label="' + tip + '" tabindex="0"></span>';
     });
     h += '</div><span class="db-ana-barpct">' + esc(r[6] || '') + '</span></div>';
   });
   box.innerHTML = h + '</div>';
 }
-function anaFigYear(box){
-  var t = anaNextTable(box.closest('figure'), 'db-ana-numtab'), rows = anaTableRows(t).filter(function(r){ return r.length >= 4; });
-  if(!rows.length) return;
+function anaFigYear(box, asof){
+  /* 分期以決議日期計算：有覆審者取覆審決議日期，否則取原懲戒決議日期。
+     再審議只可能出現在 note／全文等敘述欄位，不讀取、不影響本圖的期別。 */
+  var rows = ANA_YEAR_PERIODS.map(function(period){
+    var count = 0, disbarred = 0;
+    DATA.cases.forEach(function(c, i){
+      if(IS_PROV[i]) return;
+      var decisionDate = String(c.revDate || c.date || '');
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(decisionDate) || (asof && decisionDate > asof)) return;
+      var rocYear = parseInt(decisionDate.slice(0, 4), 10) - 1911;
+      if(rocYear < period[0] || rocYear > period[1]) return;
+      count++;
+      if(HC_OF(c.h) === 1) disbarred++;
+    });
+    return [period[0] + '–' + period[1], count, disbarred,
+      count ? (disbarred / count * 100).toFixed(1) + '%' : '0.0%'];
+  });
   var W = 680, H = 260, X0 = 70, X1 = 650, Y0 = 210, Y1 = 40, maxN = 0, maxR = 0;
   rows.forEach(function(r){ maxN = Math.max(maxN, +r[1] || 0); maxR = Math.max(maxR, parseFloat(r[3]) || 0); });
-  var step = (X1 - X0) / rows.length, bw = Math.min(80, step * 0.5), pts = [], h = '';
+  var step = (X1 - X0) / rows.length, bw = Math.min(48, step * 0.34), dw = Math.min(30, step * 0.21), pts = [], labels = [], h = '';
   h += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="#C9C4BF" stroke-width="1"></line>';
   rows.forEach(function(r, i){
-    var cx = X0 + step * (i + 0.5), n = +r[1] || 0, bh = (Y0 - Y1 - 40) * n / maxN, rate = parseFloat(r[3]) || 0;
+    var cx = X0 + step * (i + 0.5), n = +r[1] || 0, dis = +r[2] || 0;
+    var bh = (Y0 - Y1 - 40) * n / maxN, dh = (Y0 - Y1 - 40) * dis / maxN, rate = parseFloat(r[3]) || 0;
     var ry = Y1 + 8 + (1 - rate / maxR) * (Y0 - Y1 - 70);
-    h += '<rect x="' + (cx - bw / 2).toFixed(1) + '" y="' + (Y0 - bh).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="3" fill="#DCE7F3"></rect>';
-    h += '<text x="' + cx.toFixed(1) + '" y="' + (Y0 - bh - 8).toFixed(1) + '" text-anchor="middle" font-size="13" fill="#2C4A73">' + n + ' 件</text>';
+    var caseX = cx - dw / 2 - 3, disX = cx + bw / 2 + 3;
+    h += '<rect x="' + (caseX - bw / 2).toFixed(1) + '" y="' + (Y0 - bh).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="3" fill="#DCE7F3"><title>案件 ' + n + ' 件</title></rect>';
+    h += '<rect x="' + (disX - dw / 2).toFixed(1) + '" y="' + (Y0 - Math.max(3, dh)).toFixed(1) + '" width="' + dw.toFixed(1) + '" height="' + Math.max(3, dh).toFixed(1) + '" rx="3" fill="#DFA6AF"><title>除名 ' + dis + ' 件</title></rect>';
+    /* 數字最後才畫，確保位於折線之上；案件數放在淺藍長條內側頂部。 */
+    labels.push('<text x="' + caseX.toFixed(1) + '" y="' + (Y0 - bh + 16).toFixed(1) + '" text-anchor="middle" font-size="13" font-weight="700" fill="#2C4A73">' + n + ' 件</text>');
+    labels.push('<text x="' + disX.toFixed(1) + '" y="' + (Y0 - Math.max(3, dh) - 7).toFixed(1) + '" text-anchor="middle" font-size="12" font-weight="700" fill="#A84455">' + dis + ' 件</text>');
     h += '<text x="' + cx.toFixed(1) + '" y="' + (Y0 + 22) + '" text-anchor="middle" font-size="13" fill="#6B6F76">' + esc(r[0]) + '</text>';
     pts.push([cx, ry, r[3]]);
   });
@@ -8521,8 +8559,64 @@ function anaFigYear(box){
     h += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="5" fill="' + ANA_DIS_COLOR + '"></circle>' +
          '<text x="' + (p[0] + 10).toFixed(1) + '" y="' + (p[1] - 8).toFixed(1) + '" font-size="14" font-weight="700" fill="' + ANA_DIS_COLOR + '">' + esc(p[2]) + '</text>';
   });
+  h += labels.join('');
   box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="各期案件數與除名率">' + h + '</svg>' +
-    '<div class="db-ana-key"><span><i style="background:#DCE7F3;border-radius:2px"></i>案件數（民國，按案號年度）</span><span><i style="background:' + ANA_DIS_COLOR + '"></i>除名率</span></div>';
+    '<div class="db-ana-key"><span><i style="background:#DCE7F3;border-radius:2px"></i>案件數</span><span><i style="background:#DFA6AF;border-radius:2px"></i>除名件數</span><span><i style="background:' + ANA_DIS_COLOR + '"></i>除名率</span></div>';
+}
+
+/* 橫條圖色段的即時資料標籤。瀏覽器原生 title 會延遲出現，且無法配合目前色段的
+   框選效果，因此改用事件委派：動態產生的刑度圖與靜態緩刑圖共用同一個浮動標籤。 */
+var anaBarTipsReady = false;
+function initAnaBarTips(){
+  if(anaBarTipsReady || !document.body) return;
+  anaBarTipsReady = true;
+  var tip = document.createElement('div'), active = null;
+  tip.id = 'db-ana-bar-tip';
+  tip.className = 'db-ana-tip';
+  tip.setAttribute('role', 'tooltip');
+  tip.hidden = true;
+  document.body.appendChild(tip);
+  function segment(node){
+    return node && node.closest ? node.closest('.db-ana-bar span[data-tip]') : null;
+  }
+  function place(clientX, clientY){
+    if(!active || tip.hidden) return;
+    var ar = active.getBoundingClientRect();
+    var px = typeof clientX === 'number' ? clientX : ar.left + ar.width / 2;
+    var py = typeof clientY === 'number' ? clientY : ar.top;
+    var tr = tip.getBoundingClientRect(), gap = 12;
+    var left = Math.max(8, Math.min((window.innerWidth || 0) - tr.width - 8, px + gap));
+    var top = py - tr.height - gap;
+    if(top < 8) top = Math.min((window.innerHeight || 0) - tr.height - 8, py + gap);
+    tip.style.left = Math.round(left) + 'px';
+    tip.style.top = Math.round(Math.max(8, top)) + 'px';
+  }
+  function show(seg, e){
+    if(!seg) return;
+    active = seg;
+    tip.textContent = seg.getAttribute('data-tip') || '';
+    tip.hidden = false;
+    seg.setAttribute('aria-describedby', tip.id);
+    place(e && e.clientX, e && e.clientY);
+  }
+  function hide(seg){
+    if(seg && seg !== active) return;
+    if(active) active.removeAttribute('aria-describedby');
+    active = null;
+    tip.hidden = true;
+  }
+  document.addEventListener('pointerover', function(e){
+    var seg = segment(e.target);
+    if(seg && seg !== active) show(seg, e);
+  });
+  document.addEventListener('pointermove', function(e){ if(active) place(e.clientX, e.clientY); });
+  document.addEventListener('pointerout', function(e){
+    var seg = segment(e.target);
+    if(seg && (!e.relatedTarget || !seg.contains(e.relatedTarget))) hide(seg);
+  });
+  document.addEventListener('focusin', function(e){ var seg = segment(e.target); if(seg) show(seg); });
+  document.addEventListener('focusout', function(e){ var seg = segment(e.target); if(seg) hide(seg); });
+  window.addEventListener('scroll', function(){ hide(); }, {passive:true});
 }
 function anaEnhance(art){
   var body = art.querySelector('.db-ana-body');
@@ -8533,10 +8627,11 @@ function anaEnhance(art){
   if(f2) safeRun('專題分析圖二', function(){ anaFig2(f2); });
   var fb = art.querySelector('#ana-fig-bands'), fy = art.querySelector('#ana-fig-year');
   if(fb) safeRun('專題分析刑度組成圖', function(){ anaFigBands(fb); });
-  if(fy) safeRun('專題分析年度圖', function(){ anaFigYear(fy); });
+  if(fy) safeRun('專題分析年度圖', function(){ anaFigYear(fy, asof); });
 }
 
 function initAnalysis(){
+  initAnaBarTips();
   var bar = el('stats-subtabs');
   if(bar) bar.addEventListener('click', function(e){
     var b = e.target.closest ? e.target.closest('.db-subtab[data-ssub]') : null;

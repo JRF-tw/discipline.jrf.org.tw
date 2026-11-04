@@ -1519,11 +1519,24 @@ span.db-tag-flow[role="button"]:focus-visible{outline:2px solid var(--focus);out
 @media (max-width:640px){ .db-ana-cmp-cols{grid-template-columns:minmax(0,1fr);gap:4px} }
 /* 文章內的簡易圖表：橫條（刑度組成、緩刑對照）、方塊（28 件分類）、覆審三格 */
 .db-ana-bars{margin:2px 0 4px}
+.db-ana-barhead{display:grid;grid-template-columns:150px minmax(0,1fr) 76px;gap:10px;margin:0 0 5px;font-size:12px;font-weight:700;color:var(--ink-soft)}
+.db-ana-barhead span:last-child{text-align:right;white-space:nowrap}
 .db-ana-barrow{display:grid;grid-template-columns:150px minmax(0,1fr) 76px;gap:10px;align-items:center;margin:0 0 8px;font-size:14px}
 .db-ana-barlbl{color:var(--ink);line-height:1.35}
 .db-ana-barlbl small{display:block;font-size:12px;color:var(--ink-soft)}
 .db-ana-bar{display:flex;height:24px;border-radius:4px;overflow:hidden;background:var(--line-soft)}
-.db-ana-bar span{display:block;height:100%}
+.db-ana-bar span{display:block;height:100%;cursor:help;transition:opacity .12s ease,filter .12s ease,box-shadow .12s ease}
+.db-ana-bar:hover span:not(:hover),.db-ana-bar:focus-within span:not(:focus){opacity:.5}
+.db-ana-bar span:hover,.db-ana-bar span:focus-visible{position:relative;z-index:1;filter:saturate(1.18) brightness(.94);box-shadow:inset 0 0 0 2px rgba(24,35,52,.72)}
+.db-ana-bar span:focus-visible{outline:0}
+.db-ana-tip{
+  position:fixed;z-index:10020;pointer-events:none;max-width:min(240px,calc(100vw - 16px));
+  padding:7px 10px;border:1px solid rgba(255,255,255,.24);border-radius:6px;
+  background:#25282D;color:#fff;box-shadow:0 5px 18px rgba(0,0,0,.22);
+  font:700 13px/1.45 "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  white-space:nowrap
+}
+.db-ana-tip[hidden]{display:none}
 .db-ana-barpct{font-size:13px;color:var(--ink-soft);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .db-ana-barsep{border-top:1px dashed var(--line);margin:10px 0 10px 160px}
 .db-ana-cats{display:flex;flex-wrap:wrap;gap:16px 34px;justify-content:center;padding:6px 0 2px}
@@ -1541,6 +1554,7 @@ span.db-tag-flow[role="button"]:focus-visible{outline:2px solid var(--focus);out
 .db-ana-rev-c.is-up{background:#F7ECEE;color:#8E1F33}
 .db-ana-rev-c.is-down{background:var(--accent-tint);color:var(--accent-deep)}
 @media (max-width:640px){
+  .db-ana-barhead{grid-template-columns:96px minmax(0,1fr) 58px;gap:6px}
   .db-ana-barrow{grid-template-columns:96px minmax(0,1fr) 58px;gap:6px;font-size:13px}
   .db-ana-barsep{margin-left:102px}
 }
@@ -2397,13 +2411,14 @@ button.db-full-tag.db-ft-open:hover{background:var(--accent,#8f2b34);transform:t
 }
 .db-home-stat-sub b{font-size:16px;line-height:1;font-variant-numeric:tabular-nums;margin-left:auto}
 .db-hs-dot{width:8px;height:8px;border-radius:2px;display:block;flex:none;transform:translateY(1px)}
-/* 成立＝主色藍、不成立＝金、其他（律聲字暫停職聲請）＝中性灰，
+/* 成立＝主色藍、不成立＝中性灰、暫時停職（律聲字暫停職聲請）＝土黃，
    三者同時用於圓點、數字與比例條，改色只需改這三條。 */
 .db-hs-y{background:var(--accent)}
-.db-hs-n{background:var(--gold)}
-.db-hs-o{background:#C9C6C2}
+.db-hs-n{background:#A9A6A1}
+.db-hs-t{background:#B08A4A}
 .db-hs-ny{color:var(--accent-deep)}
-.db-hs-nn{color:var(--annot-ink)}
+.db-hs-nn{color:#77736F}
+.db-hs-nt{color:var(--annot-ink)}
 /* 堆疊比例條：寬度於 initHome 依實際件數設定，HTML 不寫死任何百分比 */
 .db-home-stat-bar{display:flex;height:5px;border-radius:3px;overflow:hidden;background:var(--line-soft)}
 .db-home-stat-bar i{display:block;height:100%}
