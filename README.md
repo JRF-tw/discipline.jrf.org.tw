@@ -24,7 +24,7 @@
 │   │   └── apple-touch-icon.png 加入手機主畫面時的圖示
 │   └── js/
 │       ├── load-data.js   先下載 data/ 三份 JSON，再載入主程式
-│       └── app.js         主程式：資料整理、各頁籤畫面、檢索、統計、網址錨點路由
+│       └── app.js         主程式：資料整理、各頁籤畫面、檢索、統計、網址路由
 └── data/
     ├── cases.json         主資料：懲戒案件（含決議書全文）、違失態樣、法規條文
     ├── pattern-meta.json  違失態樣的分類與說明
@@ -118,7 +118,9 @@ python3 -m http.server 8000
 - 社群分享圖片是 `assets/img/og-image.png`。換圖時保持 1200×630，檔名不變；Facebook 會快取舊圖，換圖後可到 [Facebook 分享偵錯工具](https://developers.facebook.com/tools/debug/) 重新抓取。
 - 首頁、資料庫說明、改革主張、申訴救濟、專題分析文章等文字內容直接寫在 `index.html`，不依賴 JSON 載入。其中非首頁的頁籤在 HTML 中預設為隱藏（`hidden`），搜尋引擎仍會索引，但權重可能較低。
 - 案件清單、統計圖表由 JavaScript 產生；Google 會執行 JavaScript 後再建立索引。
-- 站內各頁籤使用網址錨點（例如 `#list/q=…`、`#stats`），對搜尋引擎而言整站是同一個網址，因此 `sitemap.xml` 只列首頁。
+- 站內各頁籤使用一般網址路徑（例如 `/list`、`/stats`）；篩選條件使用 query string（例如 `/list?q=關鍵字`），頁內項目使用子路徑（例如 `/pattern/P004`）。
+- GitHub Pages 找不到實體檔案時會先載入 `404.html`；已知的站內路徑會立即回到首頁程式並恢復原網址，因此直接開啟或重新整理 `/stats` 等網址仍可正常使用。
+- `sitemap.xml` 列出所有主要頁面；新增一級頁面時須同步加入 sitemap 與 `404.html` 的路由白名單。
 
 ## 資料授權
 

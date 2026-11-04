@@ -2,6 +2,19 @@
 <html lang="zh-Hant-TW">
 <head>
 <meta charset="utf-8">
+<base href="/">
+<script>
+(function(){
+  document.documentElement.classList.add('db-custom-scrollbar');
+  try{
+    var route = sessionStorage.getItem('jrf-discipline-route');
+    if(route){
+      sessionStorage.removeItem('jrf-discipline-route');
+      history.replaceState(null, '', route);
+    }
+  }catch(e){}
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>臺灣律師懲戒案件資料庫｜查詢律師懲戒紀錄與決議書全文</title>
 <meta name="description" content="民間司法改革基金會彙整歷年律師懲戒案件，逐案標註違失條文、懲戒結果與法規依據，並提供決議書全文、違失態樣分類、懲戒法規對照、統計分析與申訴管道說明。">
@@ -76,22 +89,14 @@
 }
 </script>
 
-<link rel="preload" href="data/content-meta.json" as="fetch" crossorigin="anonymous">
-<link rel="preload" href="data/pattern-meta.json" as="fetch" crossorigin="anonymous">
-<link rel="preload" href="data/cases.json" as="fetch" crossorigin="anonymous">
 <link rel="stylesheet" href="assets/css/main.css">
 <script src="assets/js/load-data.js" defer></script>
 </head>
 <body>
 <noscript><p style="margin:0;padding:12px 16px;background:#FFF8E6;color:#5A4200;text-align:center">本資料庫的案件檢索、統計與決議書全文需要啟用 JavaScript 才能使用。</p></noscript>
+<div aria-label="頁面捲軸" aria-orientation="vertical" aria-valuemax="0" aria-valuemin="0" aria-valuenow="0" class="db-page-scrollbar" id="page-scrollbar" role="scrollbar" tabindex="0"><span class="db-page-scrollbar-thumb" id="page-scrollbar-thumb"></span></div>
 <!-- [HTML-ROOT] 資料庫可見 DOM -->
-<div class="db-wrap"><!-- 捲動哨兵兼緩衝區：緊貼在懸浮頁首（.db-sticky）之前。
-     height 即頁首上方的緩衝空間，覺得太多或太少可直接調整此數值。
-     點擊頁籤時捲動至本元素「下緣」（＝頁首上緣），
-     緩衝區恰好整段捲出視窗外，深藍色頁首切齊視窗最上緣、上方不留白。
-     即使嵌入環境的佈景使 sticky 失效，頁首本身仍會落在視窗頂端。 -->
-<div aria-hidden="true" id="db-scroll-top" style="height:75px;margin:0;padding:0;border:0">&nbsp;</div>
-
+<div class="db-wrap">
 <div class="db-sticky">
 <header class="db-head">
 <div class="db-head-main">
@@ -109,7 +114,7 @@
 
 <div class="db-modal-body" id="modal-body">&nbsp;</div>
 </div>
-<!-- [HTML-HOME] 首頁（進站著陸頁）：位於七個頁籤之前，無錨點時預設顯示。
+<!-- [HTML-HOME] 首頁（進站著陸頁）：位於七個頁籤之前，根路徑預設顯示。
      本頁不自有任何資料：看板數字於載入時由 db-data／db-fulltext 推導（見 initHome），
      檢索框沿用案件清單的 gotoCaseSearch()，導覽卡片一律轉呼叫既有的 tabbtn-* 點擊流程。 -->
 
@@ -138,35 +143,35 @@
 <!-- 二、關鍵數字看板（數值由 initHome 於載入時推導，不寫死） -->
 
 <div class="db-home-stats" id="home-stats">
-<div class="db-home-stat-label"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list">案件總數</a></div>
+<div class="db-home-stat-label"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="/list">案件總數</a></div>
 
 <div class="db-home-stat-split">
-<div class="db-home-stat-val"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list"><b id="home-n-person">&mdash;</b> <span>人次</span></a></div>
+<div class="db-home-stat-val"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="/list"><b id="home-n-person">&mdash;</b> <span>人次</span></a></div>
 
 <div aria-hidden="true" class="db-home-stat-rule">&nbsp;</div>
 
 <div class="db-home-stat-sub">
-<div><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list"><i aria-hidden="true" class="db-hs-dot db-hs-y"></i><span>成立</span><b class="db-hs-ny" id="home-n-yes">&mdash;</b></a></div>
+<div><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="/list"><i aria-hidden="true" class="db-hs-dot db-hs-y"></i><span>成立</span><b class="db-hs-ny" id="home-n-yes">&mdash;</b></a></div>
 
-<div><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list"><i aria-hidden="true" class="db-hs-dot db-hs-n"></i><span>不成立</span><b class="db-hs-nn" id="home-n-no">&mdash;</b></a></div>
+<div><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="/list"><i aria-hidden="true" class="db-hs-dot db-hs-n"></i><span>不成立</span><b class="db-hs-nn" id="home-n-no">&mdash;</b></a></div>
 </div>
 </div>
 
-<div aria-hidden="true" class="db-home-stat-bar" id="home-stat-bar"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list"><i class="db-hs-y" id="home-bar-y"></i><i class="db-hs-n" id="home-bar-n"></i><i class="db-hs-o" id="home-bar-o"></i></a></div>
+<div aria-hidden="true" class="db-home-stat-bar" id="home-stat-bar"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="/list"><i class="db-hs-y" id="home-bar-y"></i><i class="db-hs-n" id="home-bar-n"></i><i class="db-hs-o" id="home-bar-o"></i></a></div>
 
-<div class="db-home-stat-note" id="home-n-person-note"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="#list">同一人同一事件，跨審級僅計一次</a></div>
+<div class="db-home-stat-note" id="home-n-person-note"><a aria-label="前往案件清單" class="db-home-stat db-home-stat-wide" data-homego="list" href="/list">同一人同一事件，跨審級僅計一次</a></div>
 
-<div class="db-home-stat-label"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="#stats/data">資料涵蓋</a></div>
+<div class="db-home-stat-label"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="/stats/data">資料涵蓋</a></div>
 
-<div class="db-home-stat-val"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="#stats/data"><b id="home-n-years">&mdash;</b> <span>年</span></a></div>
+<div class="db-home-stat-val"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="/stats/data"><b id="home-n-years">&mdash;</b> <span>年</span></a></div>
 
-<div class="db-home-stat-note" id="home-n-range"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="#stats/data">依決議日期最早與最新推算</a></div>
+<div class="db-home-stat-note" id="home-n-range"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="/stats/data">依決議日期最早與最新推算</a></div>
 
-<div class="db-home-stat-label"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="#pattern">違失態樣</a></div>
+<div class="db-home-stat-label"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="/pattern">違失態樣</a></div>
 
-<div class="db-home-stat-val"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="#pattern"><b id="home-n-pat">&mdash;</b> <span>類</span></a></div>
+<div class="db-home-stat-val"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="/pattern"><b id="home-n-pat">&mdash;</b> <span>類</span></a></div>
 
-<div class="db-home-stat-note"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="#pattern">依懲戒法規分類</a></div>
+<div class="db-home-stat-note"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="/pattern">依懲戒法規分類</a></div>
 </div>
 <!-- 三、資料速覽：左為法務部年度統計之處分結果（近年），右為本資料庫的處分輕重分布。
      兩者母體不同（統計為確定案件之人數，資料庫為逐案收錄），故各自標明來源與期間。
@@ -176,7 +181,7 @@
 <section aria-labelledby="home-kind-h" class="db-home-chart-card">
 <div class="db-home-chart-h">
 <h3 id="home-kind-h">近 5 年懲戒結果分布</h3>
-<a data-homego="stats" href="#stats/data">前往統計 &rarr;</a></div>
+<a data-homego="stats" href="/stats/data">前往統計 &rarr;</a></div>
 
 <div class="db-home-chart-sub" id="home-kind-sub">&nbsp;</div>
 
@@ -194,7 +199,7 @@
 <section aria-labelledby="home-sev-h" class="db-home-chart-card">
 <div class="db-home-chart-h">
 <h3 id="home-sev-h">懲戒結果量處統計</h3>
-<a data-homego="list" href="#list">前往案件清單 &rarr;</a></div>
+<a data-homego="list" href="/list">前往案件清單 &rarr;</a></div>
 
 <div class="db-home-chart-sub" id="home-sev-sub">&nbsp;</div>
 
@@ -217,7 +222,7 @@
 
 <p class="db-home-complaint-lead">民眾遇到律師有違倫理風紀的情形，一般可<b>向該律師所屬的地方律師公會申訴</b>。</p>
 
-<div class="db-home-complaint-side"><a aria-label="前往申訴救濟管道" class="db-home-btn-gold" data-homego="complaint" href="#complaint">查看申訴流程</a></div>
+<div class="db-home-complaint-side"><a aria-label="前往申訴救濟管道" class="db-home-btn-gold" data-homego="complaint" href="/complaint">查看申訴流程</a></div>
 </div>
 
 <div class="db-home-complaint-bd">
@@ -251,9 +256,9 @@
 <!-- 五、五個入口，一律轉呼叫既有頁籤按鈕-->
 
 <div>
-<div class="db-home-grid"><a aria-label="前往案件清單" class="db-home-card db-home-card-main" data-homego="list" href="#list"><span class="db-home-head"><span class="db-home-ico"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"><path d="M5.5 3.5h9L18.5 7v13.5h-13z"></path><path d="M8.5 10h7M8.5 13.5h7M8.5 17h4.5"></path></g></svg></span><span><span class="db-home-card-t">案件清單</span><span class="db-home-kicker">主要檢索介面</span></span></span> <span class="db-home-p">全部案件列表。可依姓名、案號、日期、移送機關、懲戒結果輕重、各法條、違失態樣或全文檢索，或依各欄位資料排序。</span> <span class="db-home-chips"><span class="db-home-chip">姓名／案號</span><span class="db-home-chip">依懲戒結果輕重排序</span><span class="db-home-chip">法條查詢／切換為違失態樣</span><span class="db-home-chip">決議書全文</span></span> <span class="db-home-cta">進入案件清單 <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></span></a> <a aria-label="前往違失態樣" class="db-home-card db-home-card-pattern" data-homego="pattern" href="#pattern"><span class="db-home-ico"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"><rect height="6.6" rx="1.4" width="6.6" x="3.6" y="3.6"></rect><rect height="6.6" rx="1.4" width="6.6" x="13.8" y="3.6"></rect><rect height="6.6" rx="1.4" width="6.6" x="3.6" y="13.8"></rect><path d="M14.2 17.1h6M17.2 14.1v6"></path></g></svg></span> <span class="db-home-card-t">違失態樣</span> <span class="db-home-p">將案件依不同的行為類型分類，並有說明與案例。</span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a> <a aria-label="前往懲戒法規" class="db-home-card" data-homego="laws" href="#laws"><span class="db-home-ico"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"><path d="M5 5.2A1.5 1.5 0 016.5 3.7H19v16.6H6.5A1.5 1.5 0 005 21.8z"></path><path d="M5 18.6h14M9 8h6"></path></g></svg></span> <span class="db-home-card-t">懲戒法規 <span aria-hidden="true" class="db-home-dots"><i style="background:var(--c-j)"></i><i style="background:var(--c-k)"></i><i style="background:var(--c-l)"></i><i style="background:var(--c-m)"></i><i style="background:var(--c-n)"></i><i style="background:var(--c-o)"></i></span></span> <span class="db-home-p">新舊《律師法》、《律師倫理規範》與《法律扶助法》條文對照。</span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a></div>
+<div class="db-home-grid"><a aria-label="前往案件清單" class="db-home-card db-home-card-main" data-homego="list" href="/list"><span class="db-home-head"><span class="db-home-ico"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"><path d="M5.5 3.5h9L18.5 7v13.5h-13z"></path><path d="M8.5 10h7M8.5 13.5h7M8.5 17h4.5"></path></g></svg></span><span><span class="db-home-card-t">案件清單</span><span class="db-home-kicker">主要檢索介面</span></span></span> <span class="db-home-p">全部案件列表。可依姓名、案號、日期、移送機關、懲戒結果輕重、各法條、違失態樣或全文檢索，或依各欄位資料排序。</span> <span class="db-home-chips"><span class="db-home-chip">姓名／案號</span><span class="db-home-chip">依懲戒結果輕重排序</span><span class="db-home-chip">法條查詢／切換為違失態樣</span><span class="db-home-chip">決議書全文</span></span> <span class="db-home-cta">進入案件清單 <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></span></a> <a aria-label="前往違失態樣" class="db-home-card db-home-card-pattern" data-homego="pattern" href="/pattern"><span class="db-home-ico"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"><rect height="6.6" rx="1.4" width="6.6" x="3.6" y="3.6"></rect><rect height="6.6" rx="1.4" width="6.6" x="13.8" y="3.6"></rect><rect height="6.6" rx="1.4" width="6.6" x="3.6" y="13.8"></rect><path d="M14.2 17.1h6M17.2 14.1v6"></path></g></svg></span> <span class="db-home-card-t">違失態樣</span> <span class="db-home-p">將案件依不同的行為類型分類，並有說明與案例。</span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a> <a aria-label="前往懲戒法規" class="db-home-card" data-homego="laws" href="/laws"><span class="db-home-ico"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"><path d="M5 5.2A1.5 1.5 0 016.5 3.7H19v16.6H6.5A1.5 1.5 0 005 21.8z"></path><path d="M5 18.6h14M9 8h6"></path></g></svg></span> <span class="db-home-card-t">懲戒法規 <span aria-hidden="true" class="db-home-dots"><i style="background:var(--c-j)"></i><i style="background:var(--c-k)"></i><i style="background:var(--c-l)"></i><i style="background:var(--c-m)"></i><i style="background:var(--c-n)"></i><i style="background:var(--c-o)"></i></span></span> <span class="db-home-p">新舊《律師法》、《律師倫理規範》與《法律扶助法》條文對照。</span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a></div>
 
-<div class="db-home-grid"><a aria-label="前往統計" class="db-home-card db-home-card-row" data-homego="stats" href="#stats/data"><span aria-hidden="true" class="db-home-bars"><i style="height:16px;opacity:.4"></i><i style="height:28px;opacity:.7"></i><i style="height:21px;opacity:.55"></i><i style="height:34px"></i></span> <span class="db-home-body"><span class="db-home-card-t">統計</span> <span class="db-home-p">懲戒件數與種類的年度趨勢，並可察看本國律師人數、入會執業人數等資訊。</span> </span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a> <a aria-label="前往改革主張" class="db-home-card db-home-card-row db-home-card-reform" data-homego="reform" href="#reform"><span aria-hidden="true" class="db-home-star">★</span> <span class="db-home-body"><span class="db-home-card-t">改革主張</span> <span class="db-home-p">民間司法改革基金會對律師懲戒制度的具體改革主張。</span> </span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a></div>
+<div class="db-home-grid"><a aria-label="前往統計" class="db-home-card db-home-card-row" data-homego="stats" href="/stats/data"><span aria-hidden="true" class="db-home-bars"><i style="height:16px;opacity:.4"></i><i style="height:28px;opacity:.7"></i><i style="height:21px;opacity:.55"></i><i style="height:34px"></i></span> <span class="db-home-body"><span class="db-home-card-t">統計</span> <span class="db-home-p">懲戒件數與種類的年度趨勢，並可察看本國律師人數、入會執業人數等資訊。</span> </span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a> <a aria-label="前往改革主張" class="db-home-card db-home-card-row db-home-card-reform" data-homego="reform" href="/reform"><span aria-hidden="true" class="db-home-star">★</span> <span class="db-home-body"><span class="db-home-card-t">改革主張</span> <span class="db-home-p">民間司法改革基金會對律師懲戒制度的具體改革主張。</span> </span> <span class="db-home-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a></div>
 </div>
 <!-- 六、關於資料庫 -->
 
@@ -265,7 +270,7 @@
 <p>民眾委任律師時，有時需要瞭解律師的說法與做法是否合理。然而，因為在法律專業知識、訴訟實務經驗有所落差，時常有難以判斷的情形。雖然法務部建有律師懲戒決議書查詢系統，但除了有資料分布在不同網站、較不易檢索的缺點外，民眾也很難透過決議書全文獲知必要資訊。除此之外，相關的權益資訊也處於散落於各網站的狀態</p>
 
 <p>為了促進資訊的流通，改善民眾委任律師的資訊落差，我們建立了這個資料庫，並提出我們對於強化律師懲戒制度的改革想法。</p>
-<a aria-label="前往資料庫說明" class="db-home-btn-primary" data-homego="about" href="#about">閱讀資料庫說明</a></div>
+<a aria-label="前往資料庫說明" class="db-home-btn-primary" data-homego="about" href="/about">閱讀資料庫說明</a></div>
 
 <div class="db-home-notes">
 <div class="db-home-notes-h">資料來源與維護</div>
@@ -326,10 +331,7 @@
 <div class="db-pattern-list" id="pattern-list">&nbsp;</div>
 
 <div class="db-pl-toggle"><button id="pl-toggle-btn" type="button"></button></div>
-<!-- 違失態樣定位錨點：高度等於懸浮頁首（--sticky-h，由腳本量測）。
-     點選態樣後直接捲到本元素「上緣」，懸浮頁首正好覆蓋這段緩衝高度，
-     態樣標題便緊接於頁首下緣。定位只依據本元素自身位置，
-     不需推算任何遮蔽高度，故嵌入官網後仍然精準。 -->
+<!-- 違失態樣定位錨點：預留懸浮頁首高度，讓態樣標題緊接於頁首下緣。 -->
 
 <div aria-hidden="true" id="pattern-anchor">&nbsp;</div>
 
@@ -352,7 +354,7 @@
 <div id="law-body">&nbsp;</div>
 </section>
 <!-- [HTML-ETHIC-HISTORY] 懲戒法規子頁：舊倫理規範歷史版本
-     入口在「懲戒法規 →（律師倫理規範新舊對照）」頁上方的按鈕，或網址錨點 #8。
+     入口在「懲戒法規 →（律師倫理規範新舊對照）」頁上方的按鈕，或網址 `/ethichist`。
      tabbtn-ethichist 為隱藏的切換鈕，只為沿用既有 tabs 陣列的切換機制而存在，
      不加 .db-tab-btn class，故不會被頁首列與頁籤動畫模組掃到。 -->
 
@@ -380,7 +382,7 @@
 
 <div class="db-ana-sub" id="stats-sub-analysis">
 <ul class="db-ana-list" id="ana-list">
-<li><a class="db-ana-item" data-ana-open="disbar" href="#stats/a=disbar"><span class="db-ana-item-t">律師犯罪後的懲戒與除名標準</span> <time class="db-ana-item-d" datetime="2026-10-29">2026年10月29日</time> <span class="db-ana-item-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a></li>
+<li><a class="db-ana-item" data-ana-open="disbar" href="/stats/articles/disbar"><span class="db-ana-item-t">律師犯罪後的懲戒與除名標準</span> <time class="db-ana-item-d" datetime="2026-10-29">2026年10月29日</time> <span class="db-ana-item-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a></li>
 </ul>
 
 <article class="db-ana-art" data-ana-asof="2026-09-10" data-ana-id="disbar" hidden="" id="ana-art-disbar"><button class="db-ana-back" type="button">&larr; 專題分析列表</button>
@@ -1236,19 +1238,18 @@
 <!-- [HTML-COMPLAINT] 頁籤 7：申訴救濟管道 -->
 
 <section aria-labelledby="tabbtn-complaint" hidden="" id="tab-complaint" role="tabpanel">
-<div class="db-complaint"><!-- 頁內目錄：連結指向 #complaint/1-1 這類複合錨點，捲動由 [JS-ROUTE] 負責
-     （元素 id 仍是 cp-1-1，與錨點刻意不同名，才不會被瀏覽器搶先捲動）。 -->
+<div class="db-complaint"><!-- 頁內目錄使用 /complaint/1-1 這類子路徑，捲動由 [JS-ROUTE] 負責。 -->
 <nav aria-label="本頁導覽" class="db-cp-toc">
 <div class="db-cp-toc-h">導覽</div>
 
 <div class="db-cp-toc-grid">
 <div>
 <div class="db-cp-toc-grp">壹、申訴之前</div>
-<a class="db-cp-toc-a" href="#complaint/1-1">一、什麼樣的情形可以申訴？</a> <a class="db-cp-toc-a" href="#complaint/1-2">二、我想要的結果是什麼？</a> <a class="db-cp-toc-a" href="#complaint/1-3">三、我該向誰申訴？</a> <a class="db-cp-toc-a" href="#complaint/1-4">四、常見疑慮</a></div>
+<a class="db-cp-toc-a" href="/complaint/1-1">一、什麼樣的情形可以申訴？</a> <a class="db-cp-toc-a" href="/complaint/1-2">二、我想要的結果是什麼？</a> <a class="db-cp-toc-a" href="/complaint/1-3">三、我該向誰申訴？</a> <a class="db-cp-toc-a" href="/complaint/1-4">四、常見疑慮</a></div>
 
 <div>
 <div class="db-cp-toc-grp">貳、實際提出申訴</div>
-<a class="db-cp-toc-a" href="#complaint/2-1">一、申訴流程</a> <a class="db-cp-toc-a" href="#complaint/2-2">二、我要準備什麼？</a> <a class="db-cp-toc-a" href="#complaint/2-3">三、送出去之後會發生什麼？</a> <a class="db-cp-toc-a" href="#complaint/2-4">四、各公會的申訴辦法、費用與聯繫方式</a></div>
+<a class="db-cp-toc-a" href="/complaint/2-1">一、申訴流程</a> <a class="db-cp-toc-a" href="/complaint/2-2">二、我要準備什麼？</a> <a class="db-cp-toc-a" href="/complaint/2-3">三、送出去之後會發生什麼？</a> <a class="db-cp-toc-a" href="/complaint/2-4">四、各公會的申訴辦法、費用與聯繫方式</a></div>
 </div>
 </nav>
 

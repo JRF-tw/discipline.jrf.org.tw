@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>找不到頁面｜臺灣律師懲戒案件資料庫</title>
 <meta name="robots" content="noindex">
+<script>
+(function(){
+  var page = String(location.pathname || '/').split('/').filter(Boolean)[0] || '';
+  var routes = {list:1,pattern:1,laws:1,stats:1,about:1,reform:1,complaint:1,ethichist:1};
+  if(!routes[page]) return;
+  try{
+    sessionStorage.setItem('jrf-discipline-route', location.pathname + location.search + location.hash);
+    location.replace('/');
+  }catch(e){}
+})();
+</script>
 <style>
 body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:16px;
   font-family:system-ui,-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;

@@ -57,7 +57,30 @@
   --e-soft:cubic-bezier(.4,0,.2,1);
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
+html{
+  margin:0;padding:0;overflow-y:auto
+}
+html.db-custom-scrollbar,
+html.db-custom-scrollbar body{scrollbar-width:none;-ms-overflow-style:none}
+html.db-custom-scrollbar::-webkit-scrollbar,
+html.db-custom-scrollbar body::-webkit-scrollbar{width:0;height:0}
+body{margin:0;padding:0}
+
+/* 不佔版面寬度的頁面捲軸；只有頁面可捲動時才由腳本顯示。 */
+.db-page-scrollbar{
+  position:fixed;top:3px;right:2px;bottom:3px;width:6px;z-index:1000;
+  opacity:0;pointer-events:none;transition:opacity .18s;
+  touch-action:none;outline:none
+}
+.db-page-scrollbar.db-scrollable{opacity:.42;pointer-events:auto}
+.db-page-scrollbar.db-scrolling,
+.db-page-scrollbar:hover,
+.db-page-scrollbar:focus-visible{opacity:.82}
+.db-page-scrollbar:focus-visible{box-shadow:0 0 0 2px rgba(44,74,115,.35);border-radius:99px}
+.db-page-scrollbar-thumb{
+  position:absolute;left:1px;top:0;width:4px;min-height:24px;border-radius:99px;
+  background:var(--accent);box-shadow:0 0 0 1px rgba(255,255,255,.7)
+}
 
 /* ===== 動畫關鍵影格 ===================================================
    全部動畫皆包在 @media (prefers-reduced-motion:no-preference) 之外
@@ -79,9 +102,9 @@ html,body{margin:0;padding:0}
 @keyframes db-slice{from{opacity:0;transform:scale(.72) rotate(-7deg)}to{opacity:1;transform:none}}
 @keyframes db-drift{0%{transform:translate3d(0,0,0) rotate(0)}50%{transform:translate3d(-14px,10px,0) rotate(2deg)}100%{transform:translate3d(0,0,0) rotate(0)}}
 
-/* 字型與字級只套用在資料庫容器內，不影響官網頁首／頁尾 */
+/* 全站內容容器 */
 .db-wrap{
-  max-width:1600px;margin:0 auto;padding:20px 16px 48px;position:relative;
+  max-width:1600px;margin:0 auto;padding:0 16px 48px;position:relative;
   font-family:Noto Sans TC,PingFang TC,Microsoft JhengHei,system-ui,sans-serif;
   color:var(--ink); background:var(--bg); font-size:16px; line-height:1.7;
 }
@@ -94,13 +117,8 @@ html,body{margin:0;padding:0}
    置頂前後外觀完全相同，故不需狀態切換腳本。
    配色：深藍漸層底（緩慢流動）× 香檳金鑲邊 × 象牙白文字，
    並疊一道由左向右緩慢掠過的高光（.db-sticky::after）。 */
-/* transition 只給左右的外距與內距：兩者等量反向，內容位置不動，
-   看到的是底色向兩側展開／收回，而非整條頁首位移。
-   減少動態偏好下由全域規則以 !important 關閉（見 prefers-reduced-motion 區塊）。 */
 .db-sticky{
-  position:sticky;top:0;z-index:80;margin-bottom:16px;overflow:hidden;
-  transition:margin-left .26s var(--e-soft),margin-right .26s var(--e-soft),
-             padding-left .26s var(--e-soft),padding-right .26s var(--e-soft);
+  position:sticky;top:0;z-index:80;margin:0 -16px 16px;overflow:hidden;
   background:#0F2038;
   border-bottom:1px solid var(--gold);
   box-shadow:0 4px 18px rgba(15,32,56,.30);
@@ -128,16 +146,6 @@ html,body{margin:0;padding:0}
 /* 選單展開時頁首變高，這道流光就成了一條掃過整個選單的垂直光帶，非常干擾。
    展開期間整個移除（content:none 連偽元素本身都不生成），收合後自動恢復。 */
 .db-sticky.db-nav-open::after{content:none}
-/* 貼頂時底色左右滿版：以負外距把左右邊界推到視窗兩側，再以等量內距把內容推回
-   原位，故文字與按鈕的水平位置完全不變，不會在貼頂瞬間左右跳動。
-   --bleed-l／--bleed-r 由腳本量測哨兵（#db-scroll-top）與視窗兩側的距離後寫入，
-   量測對象刻意選未滿版的哨兵，才不會量到自己滿版後的結果而愈算愈寬；
-   兩者預設 0，故腳本未執行時只是不滿版，不會破版。
-   不使用 100vw：桌機的垂直捲軸不計入 vw，會多出捲軸寬度而產生水平捲動。 */
-.db-sticky.db-is-stuck{
-  margin-left:calc(-1 * var(--bleed-l,0px));margin-right:calc(-1 * var(--bleed-r,0px));
-  padding-left:var(--bleed-l,0px);padding-right:var(--bleed-r,0px)
-}
 /* 頁首固定為「單列」：標題置左、頁籤置右，同一列排列。
    放不下時的兩段退讓由 initHeadFit() 量測後切換 class 決定，見該函式之註解：
    　.db-head-compact＝隱藏標題文字、保留全部頁籤；
@@ -355,46 +363,6 @@ html,body{margin:0;padding:0}
 .db-searchbox-lg input:focus-visible{outline:none}
 .db-searchbox-lg .db-btn{font-size:13.5px;padding:6px 13px;border:none;border-left:1px solid var(--line);border-radius:0;background:var(--accent);color:#fff}
 .db-searchbox-lg .db-btn:hover{background:var(--accent-deep);color:#fff;transform:none;box-shadow:none}
-/* [CMS] 頁首的流光（.db-sticky::after）會平移到元素右緣之外，全靠容器的 overflow:hidden
-   裁掉；官網佈景若把 overflow 改成 visible，流光就會週期性地從右緣探出幾像素再縮回，
-   看起來像邊界在抖動。此處把裁切釘死。 */
-.db-wrap .db-sticky{overflow:hidden!important}
-
-/* ---- [CMS] 檢索框在官網環境的重設 ----------------------------------------
-   宿主佈景可能對原生 button 設定尺寸、內距、圓角與最小寬度，且其選擇器
-   權重高於本檔（或帶 !important），貼上後檢索鈕被撐大、問號鈕被擠出圓角框外。
-   此處把兩顆按鈕的尺寸相關屬性以 !important 釘死，範圍限定在 .db-wrap 的檢索框內，
-   不影響頁面其他按鈕。
-   另外不再單靠容器的 overflow:hidden 去裁切右側圓角——佈景若把 overflow 改掉，
-   問號鈕就會露出方角；改為由問號鈕自己帶右側圓角，兩層保險。 */
-.db-wrap .db-searchbox-lg{flex-wrap:nowrap!important;overflow:hidden!important}
-.db-wrap .db-searchbox-lg input,
-.db-wrap .db-searchbox-lg .db-btn,
-.db-wrap .db-searchbox-lg .db-q-help{
-  font-family:inherit!important;line-height:1.4!important;height:auto!important;
-  min-height:0!important;max-height:none!important;box-shadow:none!important;
-  text-transform:none!important;letter-spacing:normal!important;
-  align-self:stretch!important;margin:0!important;border-radius:0!important
-}
-.db-wrap .db-searchbox-lg .db-btn{
-  flex:0 0 auto!important;width:auto!important;min-width:0!important;
-  font-size:13.5px!important;padding:6px 13px!important;
-  border:none!important;border-left:1px solid var(--line)!important;
-  background:var(--accent)!important;color:#fff!important
-}
-.db-wrap .db-searchbox-lg .db-q-help{
-  flex:0 0 auto!important;width:34px!important;min-width:0!important;padding:0!important;
-  font-size:15px!important;border:none!important;
-  border-left:1px solid rgba(255,255,255,.45)!important;
-  border-radius:0 6px 6px 0!important;
-  background:var(--accent)!important;color:#fff!important
-}
-.db-wrap .db-searchbox-lg .db-q-help:hover{background:var(--accent-deep)!important}
-.db-wrap .db-searchbox-lg input{
-  flex:1 1 0!important;width:100%!important;min-width:0!important;
-  font-size:15.5px!important;padding:8px 11px 8px 36px!important;
-  border:none!important;background:#fff!important
-}
 /* 檢索規則說明鈕：位於檢索框內、緊接檢索鈕之後，與檢索鈕共用同一塊深藍區塊，
    使整個檢索框看起來是一件；兩者之間以一道半透明白色分隔線區隔，加上各自獨立的
    hover 反白，讓使用者一眼看出是兩顆可分別點選的按鈕。
@@ -1914,13 +1882,8 @@ div.db-about-note.db-an-src p.db-src-num{padding-left:calc(5em + 4px);text-inden
     margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);
     padding-left:10px;padding-right:10px
   }
-  /* 懸浮頁首（.db-sticky）左右不留白：以負邊界抵銷 .db-wrap 的 10px 內距，
-     使深藍頁首橫向切齊螢幕兩側；頁首內部的左右內距（.db-head）仍保留，
-     標題與「≡」按鈕不會貼齊邊緣。 */
+  /* 抵銷內容容器的 10px 內距，頁首在手機同樣切齊螢幕兩側。 */
   .db-sticky{margin-left:-10px;margin-right:-10px}
-  /* 此寬度下版面本身已滿版（.db-wrap 為 100vw），頁首以 -10px 負邊界即切齊螢幕，
-     故貼頂時不再套用 --bleed-*，避免內容平白右移 10px */
-  .db-sticky.db-is-stuck{margin-left:-10px;margin-right:-10px;padding-left:0;padding-right:0}
   .db-wrap{font-size:15px}
   .db-result-count{margin-left:0}
   /* 法規選單改單欄，避免長標題在手機被擠壓換行 */
@@ -2912,31 +2875,3 @@ button.db-full-tag.db-ft-open:hover{background:var(--accent,#8f2b34);transform:t
 @media (prefers-reduced-motion:reduce){
   .db-wrap a.db-cp-btn:hover{transform:none}
 }
-
-/* ===== [CSS-CMS-GUARD] 版面容器的 CMS 防禦 ==============================
-   jrf CMS 的編輯器會把區塊之間的空行轉成 <p>&nbsp;</p>。落在一般文章流裡看不出來，
-   但落在 grid／flex 容器裡就會成為一個「看不見卻佔一格」的項目——首頁的關鍵數字
-   看板即因此第一格被佔住，三張卡片被擠到第 2、3 格，第三張再掉到下一行。
-   對策有二，兩者並用：
-     ① 首頁與申訴頁的原始碼在這些容器內不留空行（CMS 沒有空行可轉）；
-     ② 以下規則把這些容器「直接子層」的 <p> 與 <br> 一律隱藏。
-   只列直接子層本來就不該出現 <p> 的容器；.db-home-hero-main、.db-home-about-main、
-   .db-home-step、.db-cp-entry-main、.db-complaint 等本來就有正當的 <p> 子層，
-   刻意不列入，勿順手補上。
-   同理，版面寬度一律改用百分比，不用 calc()——CMS 的樣式處理曾整條丟棄含 calc()
-   的宣告，導致看板失去寬度限制而滿版。 */
-.db-home-grid>:not(.db-home-card),
-.db-home-steps>:not(.db-home-step),
-.db-home-tips>:not(.db-home-tip),
-.db-cp-two>:not(.db-cp-card),
-.db-cp-toc-grid>:not(div){display:none!important}
-.db-home>p,.db-home-hero>p,.db-home-stats>p,.db-home-grid>p,
-.db-home-steps>p,.db-home-tips>p,.db-home-about>p,.db-home-notes>p,
-.db-home-tags>p,.db-home-chips>p,.db-home-search>p,
-.db-cp-toc-grid>p,.db-cp-two>p,.db-cp-faq>p,.db-cp-check>p,
-.db-cp-entry>p,.db-cp-tw>p{display:none!important}
-.db-home>br,.db-home-hero>br,.db-home-stats>br,.db-home-grid>br,
-.db-home-steps>br,.db-home-tips>br,.db-home-about>br,.db-home-notes>br,
-.db-home-tags>br,.db-home-chips>br,.db-home-search>br,
-.db-cp-toc-grid>br,.db-cp-two>br,.db-cp-faq>br,.db-cp-check>br,
-.db-cp-entry>br,.db-cp-tw>br{display:none!important}

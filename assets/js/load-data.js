@@ -1,7 +1,5 @@
 /* 資料載入器
-   主程式（app.js）原本設計為從頁面內的 <script type="application/json"> 節點讀取資料
-   （#db、#db-content-meta、#db-pattern-meta）。資料拆成 data/*.json 獨立檔後，
-   由本檔先下載三份 JSON、放回同 id 的節點，再載入 app.js，主程式因此不必修改。 */
+   先下載三份 JSON，建立主程式使用的資料節點，再載入 app.js。 */
 (function(){
   var FILES = [
     ['db-content-meta', 'data/content-meta.json'],

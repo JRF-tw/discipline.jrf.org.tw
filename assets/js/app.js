@@ -1,97 +1,40 @@
+/* 主程式只在獨立網站的完整 DOM 載入資料後執行一次。 */
 (function(){
-/* [JS-BOOT-GUARD] 同一 DOM root 防重複執行；新 root 可重新初始化。 */
-/* CMS 可能重複執行同一文章 script，也可能在同一 Window 內以新 DOM 重新插入文章。
-   guard 綁定「本次文章的 .db-wrap DOM 節點」而非永久 boolean：同一節點重複執行會略過，
-   新節點則可重新初始化。 */
-var __DB_SCRIPT_NODE = document.currentScript;
-var __DB_ROOT = __DB_SCRIPT_NODE ? __DB_SCRIPT_NODE.previousElementSibling : null;
-if(!__DB_ROOT || !__DB_ROOT.classList || !__DB_ROOT.classList.contains('db-wrap')) __DB_ROOT = document.querySelector('.db-wrap');
-if(window.__JRF_DB_SCRIPT_ROOT__ === __DB_ROOT) return;
-window.__JRF_DB_SCRIPT_ROOT__ = __DB_ROOT;
-window.__JRF_DB_STATUS = {state:'waiting', missing:[], featureErrors:[], lastError:null};
-/* 早期 hash 定位與主 App 共用；必須定義在 DBHASH 之前，不能放進 __boot() 內層。 */
-/* 程式性定位一律可選擇「立即完成」，不受 CMS / 宿主頁面的 scroll-behavior:smooth 影響。
-   只暫時覆寫根元素的 inline scroll-behavior，呼叫後立即還原原值與 priority。 */
+var DB_STATUS = {featureErrors:[]};
 function scrollToInstant(x, y){
-  var de = document.documentElement;
-  if(!de){ window.scrollTo(x, y); return; }
-  var prev = de.style.getPropertyValue('scroll-behavior');
-  var priority = de.style.getPropertyPriority('scroll-behavior');
-  de.style.setProperty('scroll-behavior','auto','important');
   window.scrollTo(x, y);
-  if(prev) de.style.setProperty('scroll-behavior', prev, priority);
-  else de.style.removeProperty('scroll-behavior');
 }
-/* [JS-HASH-EARLY] 早期網址錨點定位 */
-/* ===== 網址錨點：早期定位模組 =====================================
-   本段於「主程式標籤被解析當下」立即執行，早於檔案末端數十萬字的 JSON 資料，
-   也早於 DOMContentLoaded，因此能在畫面幾乎尚未定型前就完成定位，
-   大幅減少「先看到頁面頂端才跳過來」的閃爍。
-
-   設計原則：
-   * 不新增任何 HTML 元素、不改動既有結構 —— 避免與嵌入環境（CMS 編輯器）衝突。
-   * 只有偏離目標超過門檻才移動：外部圖片、字型陸續載入而版面下沉時，
-     是逐格「持續貼齊」，而非事後一次大跳。
-   * 使用者一旦主動捲動（滾輪／觸控／按鍵／點擊），立即放手，不與使用者搶捲軸。
-   =================================================================== */
-var DBHASH = (function(){
-  /* ── 錨點語法 ─────────────────────────────────────────────────────
-     形式：#<頁籤>[/<段>][/<段>…][/full=<案號>[/<姓名>]]
-     　　　分層用 /，給值用 =，多值用 ,。三者在 fragment 中皆不必百分比編碼；
-     　　　案號、姓名等中文由瀏覽器自行編碼，貼回網址列仍可用。
-     頁籤鍵一律沿用程式內部既有的那一套（tabbtn-<鍵>／panel id），
-     不另立第二套字彙——多一套對照表就多一個會失步的地方。
-     不支援 #1～#8 這類數字錨點與中文別名（維護者確認不需相容）。
-     #0／#db／#top／#資料庫 維持原意：只捲動到資料庫，不切頁籤。
-     本模組只做「語法」解析，不認得任何頁籤內部的參數意義——
-     那些一律由主程式的 [JS-ROUTE] 依當下資料判讀。 */
+/* 獨立網站路由：頁籤使用網址路徑，篩選狀態使用 query string。 */
+var DBROUTE = (function(){
   var TABS = {home:1, list:1, pattern:1, laws:1, stats:1, about:1, reform:1, complaint:1, ethichist:1};
-  var SCROLL_ONLY = {'0':1, 'db':1, 'top':1, '資料庫':1};
-  var TOLERANCE = 2;      /* 偏離超過此像素數才校正，避免無謂的微幅抖動 */
-  var HOLD_MS   = 2000;   /* 載入階段持續貼齊的時間，涵蓋外部圖片與字型載入 */
-  var holdUntil = 0, holding = false, released = false;
-
-  /* 重新整理時不沿用瀏覽器記住的捲動位置，以免與本模組互相拉扯 */
-  try{ if('scrollRestoration' in history) history.scrollRestoration = 'manual'; }catch(e){}
-
-  function now(){ return (window.performance && performance.now) ? performance.now() : Date.now(); }
-  /* 不轉小寫：態樣 ID（P004）、案號與姓名都區分大小寫或含中文，
-     需要不分大小寫比對的只有頁籤鍵與參數名，由各自比對處自行 toLowerCase()。 */
-  function readHash(){
+  function decodePart(s){ try{ return decodeURIComponent(s); }catch(e){ return s; } }
+  function legacyRoute(){
     var h = String(location.hash || '').replace(/^#/, '');
-    if(!h) return '';
-    try{ h = decodeURIComponent(h); }catch(e){}
-    return h.trim();
-  }
-  /* 解析結果：
-     　{scrollOnly:true}                     → 只捲動、不切頁籤
-     　{tab:'list', parts:[…], full:{no,name}} → 一般路由
-     　null                                   → 空錨點或不認得（主程式退回首頁）
-     full 一律排在最後：案號與姓名之間也用 /，故自 full= 起的所有段落都歸它。 */
-  function route(){
-    var h = readHash();
     if(!h) return null;
-    var segs = h.split('/');
-    var head = String(segs[0] || '').toLowerCase();
-    if(SCROLL_ONLY[head]) return {scrollOnly:true, tab:null, parts:[], full:null};
+    var segs = decodePart(h).split('/'), head = String(segs.shift() || '').toLowerCase();
     if(!TABS[head]) return null;
     var parts = [], full = null;
-    for(var i = 1; i < segs.length; i++){
-      if(/^full=/i.test(segs[i])){
-        full = {no: segs[i].slice(5), name: segs[i+1] || ''};
-        break;
-      }
-      if(segs[i] !== '') parts.push(segs[i]);
+    for(var i = 0; i < segs.length; i++){
+      if(/^full=/i.test(segs[i])){ full = {no:segs[i].slice(5), name:segs[i + 1] || ''}; break; }
+      if(segs[i]) parts.push(segs[i]);
     }
-    return {scrollOnly:false, tab:head, parts:parts, full:full};
+    return {tab:head, parts:parts, full:full, legacy:true};
+  }
+  function route(){
+    var old = legacyRoute();
+    if(old) return old;
+    var segs = String(location.pathname || '/').split('/').filter(Boolean).map(decodePart);
+    var head = String(segs.shift() || 'home').toLowerCase();
+    if(!TABS[head]) return null;
+    var parts = segs.slice(), params = new URLSearchParams(location.search || '');
+    params.forEach(function(v, k){ if(k !== 'full' && k !== 'name') parts.push(k.toLowerCase() + '=' + v); });
+    var fullNo = params.get('full');
+    return {tab:head, parts:parts, full:fullNo ? {no:fullNo, name:params.get('name') || ''} : null};
   }
   function active(){ return !!route(); }
   function key(){ var r = route(); return r ? r.tab : null; }
 
-  /* 目標位置：預設為緩衝區（#db-scroll-top）下緣＝資料庫頁首上緣，與點擊頁籤時一致。
-     錨點指向頁內某一節（例如 #complaint/2-2）時，由主程式以 target() 換成該節的
-     定位錨點——如此「逐格持續貼齊」這套機制就一併適用於頁內定位：
-     申訴頁的地圖與流程圖是進站後才建立的，版面會繼續長高，單次捲動必然失準。 */
+  /* 預設定位到獨立網站的資料庫頁首；頁內目標由主程式提供。 */
   var targetFn = null;
   function target(fn){ targetFn = fn || null; }
   function targetY(){
@@ -99,56 +42,22 @@ var DBHASH = (function(){
       var y = targetFn();
       return (y === null || y === undefined || isNaN(y)) ? null : Math.max(0, Math.round(y));
     }
-    var probe = document.getElementById('db-scroll-top');
-    if(!probe) return null;
-    return Math.max(0, Math.round(probe.getBoundingClientRect().bottom + window.pageYOffset));
+    return 0;
   }
   function snap(){
     var y = targetY();
     if(y === null) return;
-    if(Math.abs(window.pageYOffset - y) <= TOLERANCE) return;
-    /* 強制瞬間定位，避免宿主頁面的 smooth-scroll 把錨點校正變成第二段垂直動畫。 */
     scrollToInstant(0, y);
   }
-  function release(){ released = true; holdUntil = 0; }
-  function resume(){ released = false; }
-  function hold(ms){
-    if(released) return;
-    holdUntil = Math.max(holdUntil, now() + ms);
-    if(holding) return;
-    holding = true;
-    (function step(){
-      if(released){ holding = false; return; }
-      snap();
-      if(now() < holdUntil){ requestAnimationFrame(step); }
-      else{ holding = false; }
-    })();
-  }
-
-  ['wheel','touchstart','keydown','pointerdown','mousedown'].forEach(function(ev){
-    window.addEventListener(ev, release, {passive:true});
-  });
-
-  if(active()){
-    snap();                 /* 立即定位（此時文件尚短，可能捲不到位，交由下方逐格貼齊補完） */
-    hold(HOLD_MS);
-    window.addEventListener('load', function(){ hold(400); });
-  }
-  /* release 對外公開：錨點指向頁內某個段落或條文時，主程式要停掉「持續貼齊頁首」，
-     否則兩邊會互相搶捲軸。 */
-  return {active:active, key:key, route:route, snap:snap, hold:hold, resume:resume, release:release, target:target};
+  return {active:active, key:key, route:route, snap:snap, hold:snap,
+    resume:function(){}, release:function(){}, target:target};
 })();
-
-/* 主程式由下方 __bootAttempt() 啟動，不再以 document.readyState 推測 CMS 的插入時序。
-   完整 HTML、file:// 重新整理、以及 DOM 已 ready 後才插入文章的 CMS，都必須等三個 JSON
-   與主要頁籤 DOM 真正存在後才進入 __boot()。 */
 
 /* [JS-BOOT] 主 App 啟動函式：以下所有資料模型、renderer、feature module 都在此作用域。 */
 function __boot(){
 var DB_SCHEMA_VERSION = 3;
 var PAT_META_SCHEMA_VERSION = 2;
 var CONTENT_META_SCHEMA_VERSION = 1;
-var DB_STATUS = window.__JRF_DB_STATUS;
 function safeRun(label, fn){
   try{ return fn(); }
   catch(err){
@@ -241,6 +150,89 @@ function onDbResize(fn){
   RESIZE_TASKS.push(fn);
 }
 window.addEventListener('resize', runResizeTasks, {passive:true});
+
+/* [JS-PAGE-SCROLLBAR] 不佔版面寬度的極窄頁面捲軸。 */
+function initPageScrollbar(){
+  var bar = el('page-scrollbar'), thumb = el('page-scrollbar-thumb');
+  if(!bar || !thumb) return;
+  var root = document.scrollingElement || document.documentElement;
+  var dragging = false, dragOffset = 0, fadeTimer = 0;
+
+  function metrics(){
+    var viewport = window.innerHeight || document.documentElement.clientHeight || 0;
+    var total = Math.max(root.scrollHeight, document.body ? document.body.scrollHeight : 0);
+    var max = Math.max(0, total - viewport);
+    var track = bar.clientHeight;
+    var height = max ? Math.max(24, Math.round(track * viewport / total)) : track;
+    return {max:max, track:track, height:Math.min(track, height)};
+  }
+  function update(){
+    var m = metrics(), canScroll = m.max > 1;
+    bar.classList.toggle('db-scrollable', canScroll);
+    bar.tabIndex = canScroll ? 0 : -1;
+    bar.setAttribute('aria-valuemax', String(Math.round(m.max)));
+    bar.setAttribute('aria-valuenow', String(Math.round(root.scrollTop || window.pageYOffset || 0)));
+    thumb.style.height = m.height + 'px';
+    var room = Math.max(0, m.track - m.height);
+    var top = m.max ? room * (root.scrollTop || window.pageYOffset || 0) / m.max : 0;
+    thumb.style.transform = 'translateY(' + Math.round(top) + 'px)';
+  }
+  function showWhileScrolling(){
+    update();
+    bar.classList.add('db-scrolling');
+    clearTimeout(fadeTimer);
+    fadeTimer = setTimeout(function(){ bar.classList.remove('db-scrolling'); }, 450);
+  }
+  function scrollFromPointer(clientY, offset){
+    var m = metrics(), rect = bar.getBoundingClientRect();
+    var room = Math.max(0, m.track - m.height);
+    if(!m.max || !room) return;
+    var thumbTop = Math.max(0, Math.min(room, clientY - rect.top - offset));
+    window.scrollTo(0, Math.round(m.max * thumbTop / room));
+  }
+
+  thumb.addEventListener('pointerdown', function(e){
+    if(e.button !== undefined && e.button !== 0) return;
+    dragging = true;
+    dragOffset = e.clientY - thumb.getBoundingClientRect().top;
+    bar.classList.add('db-scrolling');
+    if(thumb.setPointerCapture) thumb.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  window.addEventListener('pointermove', function(e){
+    if(!dragging) return;
+    scrollFromPointer(e.clientY, dragOffset);
+    e.preventDefault();
+  });
+  window.addEventListener('pointerup', function(){
+    if(!dragging) return;
+    dragging = false;
+    showWhileScrolling();
+  });
+  bar.addEventListener('pointerdown', function(e){
+    if(e.target === thumb) return;
+    var m = metrics();
+    scrollFromPointer(e.clientY, m.height / 2);
+    e.preventDefault();
+  });
+  bar.addEventListener('keydown', function(e){
+    var viewport = window.innerHeight || document.documentElement.clientHeight || 0;
+    var y = root.scrollTop || window.pageYOffset || 0, handled = true;
+    if(e.key === 'ArrowUp') y -= 40;
+    else if(e.key === 'ArrowDown') y += 40;
+    else if(e.key === 'PageUp') y -= viewport * .9;
+    else if(e.key === 'PageDown') y += viewport * .9;
+    else if(e.key === 'Home') y = 0;
+    else if(e.key === 'End') y = metrics().max;
+    else handled = false;
+    if(handled){ e.preventDefault(); window.scrollTo(0, Math.max(0, y)); }
+  });
+
+  window.addEventListener('scroll', showWhileScrolling, {passive:true});
+  onDbResize(update);
+  if(window.ResizeObserver && document.body) new ResizeObserver(update).observe(document.body);
+  update();
+}
 
 /* [JS-DATA] 資料正規化／衍生索引／audit */
 /* ======================================================================
@@ -3371,7 +3363,7 @@ var FX = (function(){
 
 /* [JS-TABS] 頁籤切換／鍵盤導覽 */
 /* ---------- 頁籤切換 ---------- */
-/* 由網址錨點觸發頁籤切換時設為 true：此時位置已由錨點模組掌控，
+/* 由網址路由觸發頁籤切換時設為 true：此時位置已由路由模組掌控，
    略過本處的捲動，以免產生二次跳動 */
 var SUPPRESS_TAB_SCROLL = false;
 var tabs = [
@@ -3432,25 +3424,7 @@ tabs.forEach(function(t){
       FX.settleTab(t.panel);
       FX.tabRise(t.panel);
     }
-    /* 切換後捲動至緩衝區（#db-scroll-top）的下緣＝頁首上緣：
-       此處正是 sticky 頁首開始貼頂的臨界點，
-       捲到這裡深藍色頁首即切齊視窗最上緣、上方不留白，
-       頁籤內容則自然接續於頁首下緣 */
-    var probe = document.getElementById('db-scroll-top');
-    if (probe && !SUPPRESS_TAB_SCROLL) {
-      var y = probe.getBoundingClientRect().bottom + window.pageYOffset;
-      scrollToInstant(0, Math.max(0, y));
-    }
-    /* 切換頁籤會改變頁面總高，捲動位置可能被瀏覽器夾住（短頁籤捲不到定位點）。
-       等版面安定後再判定一次貼頂狀態，否則會出現「頁首已貼頂、左右卻沒滿版」。
-       捲動本身也會觸發同一支函式，此處只是補上「捲不動」的情形。 */
-    if(window.__dbSyncStuck){
-      if(window.requestAnimationFrame){
-        window.requestAnimationFrame(function(){ window.requestAnimationFrame(window.__dbSyncStuck); });
-      }else{
-        setTimeout(window.__dbSyncStuck, 32);
-      }
-    }
+    if(!SUPPRESS_TAB_SCROLL) scrollToInstant(0, 0);
     /* 換頁籤＝一次導覽，寫入一筆歷史（applyRoute 期間由 ROUTE_APPLYING 擋住）。 */
     routePush();
   });
@@ -6641,12 +6615,8 @@ function gotoCaseSearch(q){
   });
   renderList();
   routePush();
-  /* 與頁籤點擊一致：捲至緩衝區下緣（＝頁首上緣），
-     使深藍色頁首切齊視窗頂端，清單開頭不被懸浮頁首遮住 */
-  var probe = document.getElementById('db-scroll-top');
-  if (probe) {
-    window.scrollTo(0, Math.max(0, probe.getBoundingClientRect().bottom + window.pageYOffset));
-  }
+  /* 與頁籤點擊一致：回到獨立網站頂端。 */
+  window.scrollTo(0, 0);
 }
 /* 事件委派：聯繫資訊卡片內容會動態重建，改於固定容器上監聽按鈕點擊 */
 el('bar-info').addEventListener('click', function(e){
@@ -6676,7 +6646,7 @@ function buildMap(){
   }
   /* 地圖區塊與左上兩顆 chip 的選取集中在這一支：原本兩處各清各的 db-cur、
      各自呼叫 renderBarCard，錨點路由要再寫第三份就必然分歧。
-     另外掛到模組層的 selectBarKey，供 [JS-ROUTE] 套用 #complaint/…/bar=X。 */
+     另外掛到模組層的 selectBarKey，供 [JS-ROUTE] 套用 /complaint/…?bar=X。 */
   function pick(key){
     svg.querySelectorAll('.db-region').forEach(function(n){ n.classList.remove('db-cur'); });
     document.querySelectorAll('.db-twba-chip').forEach(function(c){ c.classList.remove('db-cur'); });
@@ -7052,7 +7022,7 @@ function initComplaint(){
   complaintReady = true;
 }
 
-/* [JS-HEADER] sticky 頁首量測、滿版、頁首型態（單列／隱藏標題／收進選單）與選單。
+/* [JS-HEADER] sticky 頁首量測、頁首型態（單列／隱藏標題／收進選單）與選單。
    所有 listener 於 initHeaderBehavior() 啟動。 */
 function syncStickyH(){
   var sb = document.querySelector('.db-sticky');
@@ -7072,28 +7042,6 @@ function initHeaderBehavior(){
     var sbResize = document.querySelector('.db-sticky');
     if(sbResize) new ResizeObserver(syncStickyH).observe(sbResize);
   }
-
-  /* 貼頂狀態與左右滿版：直接量測哨兵，不依賴 IntersectionObserver。 */
-  (function initStickyState(){
-    var sb = document.querySelector('.db-sticky');
-    var probe = document.getElementById('db-scroll-top');
-    if(!sb || !probe) return;
-    function measure(){
-      var r = probe.getBoundingClientRect();
-      var vw = document.documentElement.clientWidth;
-      sb.style.setProperty('--bleed-l', Math.max(0, Math.round(r.left)) + 'px');
-      sb.style.setProperty('--bleed-r', Math.max(0, Math.round(vw - r.right)) + 'px');
-    }
-    function syncStuck(){
-      sb.classList.toggle('db-is-stuck', probe.getBoundingClientRect().bottom <= 1);
-    }
-    function sync(){ measure(); syncStuck(); }
-    window.__dbSyncStuck = sync;
-    sync();
-    var schedule = rafThrottle(sync);
-    onDbResize(schedule);
-    window.addEventListener('scroll', schedule, {passive:true});
-  })();
 
   /* 選單開關：捕獲階段先收合，再由頁籤 handler 捲動，避免 scroll anchoring 把位置拉回頂端。
      收合的呼叫端不只這裡（頁首型態改變時也要收），故把 setOpen 留給 initHeadFit 使用。 */
@@ -7182,9 +7130,9 @@ function initHeaderBehavior(){
   })();
 }
 
-/* [JS-ROUTE] 網址錨點：頁面狀態 ⇄ 網址，並以瀏覽器上一頁／下一頁來回切換。
+/* [JS-ROUTE] 網址路徑：頁面狀態 ⇄ URL，並以瀏覽器上一頁／下一頁來回切換。
    ── 設計要點（改動前務必先讀）─────────────────────────────────────
-   1. 語法解析在 DBHASH.route()（檔案上方，早於資料），意義判讀全在本區。
+   1. 語法解析在 DBROUTE.route()（檔案上方，早於資料），意義判讀全在本區。
    2. 寫入分兩種：
         push    ＝「改變看到哪些內容」的動作（切頁籤、檢索、篩選、選態樣、
                    選條文、換頁、開全文）→ 新增一筆歷史，上一頁可回到前一步。
@@ -7198,9 +7146,9 @@ function initHeaderBehavior(){
       applyRoute 內部會觸發頁籤 click 與各種 render，那些呼叫端本身也會寫網址，
       不擋住就會在回上一頁時反過來覆寫掉歷史。
    ------------------------------------------------------------------ */
-var hashRoutingReady = false;
+var pathRoutingReady = false;
 var ROUTE_APPLYING = false;
-var ROUTE_LAST = null;          /* 最後一次由本程式寫入或套用的錨點（已解碼） */
+var ROUTE_LAST = null;          /* 最後一次由本程式寫入或套用的網址 */
 /* 全文彈窗目前開啟的對象；由 initFulltextDialog() 維護，供組字串時取用。 */
 var FT_ROUTE = null;
 /* 全文彈窗的開啟函式（依案號／姓名），同由 initFulltextDialog() 掛上。 */
@@ -7220,6 +7168,17 @@ var ROUTE_TARGET = null;
 
 var LAW_TAB_KEY = {F:'act', E:'ethics', X:'others'};
 var LAW_TAB_OF_KEY = {act:'F', ethics:'E', others:'X'};
+var ROUTE_TITLES = {
+  home:'臺灣律師懲戒案件資料庫｜查詢律師懲戒紀錄與決議書全文',
+  list:'案件清單｜臺灣律師懲戒案件資料庫',
+  pattern:'違失態樣｜臺灣律師懲戒案件資料庫',
+  laws:'懲戒法規｜臺灣律師懲戒案件資料庫',
+  stats:'統計與分析｜臺灣律師懲戒案件資料庫',
+  about:'資料庫說明｜臺灣律師懲戒案件資料庫',
+  reform:'改革主張｜臺灣律師懲戒案件資料庫',
+  complaint:'申訴救濟管道｜臺灣律師懲戒案件資料庫',
+  ethichist:'律師倫理規範歷史版本｜臺灣律師懲戒案件資料庫'
+};
 
 function currentTabKey(){
   for(var i = 0; i < tabs.length; i++){
@@ -7231,81 +7190,92 @@ function currentTabKey(){
   }
   return 'home';
 }
+function syncRouteMeta(){
+  var tab = currentTabKey(), path = routeString().split('?')[0];
+  var absolute = location.origin + path;
+  document.title = ROUTE_TITLES[tab] || ROUTE_TITLES.home;
+  var canonical = document.querySelector('link[rel="canonical"]');
+  if(canonical) canonical.href = absolute;
+  var ogUrl = document.querySelector('meta[property="og:url"]');
+  if(ogUrl) ogUrl.content = absolute;
+}
 
-/* ---------- 狀態 → 錨點字串 ---------- */
+/* ---------- 狀態 → 網址 ---------- */
 /* 只寫出「與預設不同」的參數，網址才不會每一頁都拖著一長串預設值。 */
 function routeString(){
   var tab = currentTabKey();
-  var segs = [tab];
+  var path = tab === 'home' ? '/' : '/' + encodeURIComponent(tab);
+  var query = new URLSearchParams();
   if(tab === 'list'){
-    if(st.kind === 'prov') segs.push('kind=prov');
-    if(st.q) segs.push('q=' + st.q);
+    if(st.kind === 'prov') query.set('kind', 'prov');
+    if(st.q) query.set('q', st.q);
     if(st.src && st.artIdx >= 0){
       var a = DATA.articleIndex[st.src][st.artIdx];
-      if(a) segs.push(st.src.toLowerCase() + '=' + a.no);
+      if(a) query.set(st.src.toLowerCase(), a.no);
     }
-    if(st.other) segs.push('other=' + st.other);
-    if(st.grp) segs.push('group=' + st.grp);
-    if(st.page > 1) segs.push('page=' + st.page);
+    if(st.other) query.set('other', st.other);
+    if(st.grp) query.set('group', st.grp);
+    if(st.page > 1) query.set('page', st.page);
     /* 排序只在「與該檢視的預設不同」時寫出。一案多人／一人多案有各自的預設排序
        （setGroup 設定），若一律寫出，光是按下分組圖示網址就會多一段贅字。 */
     var defSort = st.grp ? ((st.grp === 'case' ? 'grpCase' : 'grpName') + '|asc') : 'no|desc';
     if(st.sort + '|' + (st.asc ? 'asc' : 'desc') !== defSort){
-      segs.push('sort=' + st.sort + (st.asc ? '-asc' : '-desc'));
+      query.set('sort', st.sort + (st.asc ? '-asc' : '-desc'));
     }
-    if(revShown.list) segs.push('rev=1');
+    if(revShown.list) query.set('rev', '1');
   }else if(tab === 'pattern'){
     var p = (pst.idx >= 0) ? DATA.patterns[pst.idx] : null;
     if(p){
-      segs.push(p.id);
+      path += '/' + encodeURIComponent(p.id);
       var subs = patSubcatSel(p.id);
-      if(subs.length) segs.push('sub=' + subs.join(','));
-      if(ONLYPAT_SEL[p.id]) segs.push('only=1');
-      if(pst.page > 1) segs.push('page=' + pst.page);
-      if(!(pst.sort === 'h' && pst.asc === true)) segs.push('sort=' + pst.sort + (pst.asc ? '-asc' : '-desc'));
-      if(!revShown.pattern) segs.push('rev=0');
+      if(subs.length) query.set('sub', subs.join(','));
+      if(ONLYPAT_SEL[p.id]) query.set('only', '1');
+      if(pst.page > 1) query.set('page', pst.page);
+      if(!(pst.sort === 'h' && pst.asc === true)) query.set('sort', pst.sort + (pst.asc ? '-asc' : '-desc'));
+      if(!revShown.pattern) query.set('rev', '0');
     }
   }else if(tab === 'laws'){
     var lt = LAW_TAB_KEY[lawState.key];
     if(lt){
-      segs.push(lt);
+      path += '/' + encodeURIComponent(lt);
       /* 條文／其它規範只在仍停留於同一個法規分頁時才寫出 */
-      if(LAW_TARGET && LAW_TARGET.tab === lt) segs.push(LAW_TARGET.token);
+      if(LAW_TARGET && LAW_TARGET.tab === lt) path += '/' + encodeURIComponent(LAW_TARGET.token);
     }
-    if(lawState.usedOnly) segs.push('used=1');
+    if(lawState.usedOnly) query.set('used', '1');
   }else if(tab === 'stats'){
-    if(ANA.sub === 'data') segs.push('data');
-    else if(ANA.art) segs.push('a=' + ANA.art);
+    if(ANA.sub === 'data') path += '/data';
+    else if(ANA.art) path += '/articles/' + encodeURIComponent(ANA.art);
   }else if(tab === 'complaint'){
-    if(CP_SEC) segs.push(CP_SEC);
-    if(CP_BAR) segs.push('bar=' + CP_BAR);
+    if(CP_SEC) path += '/' + encodeURIComponent(CP_SEC);
+    if(CP_BAR) query.set('bar', CP_BAR);
   }
   if(FT_ROUTE && FT_ROUTE.no){
-    segs.push('full=' + FT_ROUTE.no);
-    if(FT_ROUTE.name) segs.push(FT_ROUTE.name);
+    query.set('full', FT_ROUTE.no);
+    if(FT_ROUTE.name) query.set('name', FT_ROUTE.name);
   }
-  return '#' + segs.join('/');
+  var qs = query.toString();
+  return path + (qs ? '?' + qs : '');
 }
-function currentHashDecoded(){
-  var h = String(location.hash || '');
-  try{ h = decodeURIComponent(h); }catch(e){}
-  return h;
+function currentLocationKey(){
+  var path = String(location.pathname || '/').replace(/\/+$/, '') || '/';
+  return path + String(location.search || '');
 }
 function routeWrite(mode){
-  if(ROUTE_APPLYING || !hashRoutingReady) return;
-  var h = routeString();
-  if(h === currentHashDecoded()) return;
-  ROUTE_LAST = h;
+  if(ROUTE_APPLYING || !pathRoutingReady) return;
+  var url = routeString();
+  if(url === currentLocationKey()) return;
+  ROUTE_LAST = url;
   try{
-    if(mode === 'push' && history.pushState) history.pushState(null, '', h);
-    else if(history.replaceState) history.replaceState(null, '', h);
-    else location.hash = h;                       /* 極舊瀏覽器：至少網址會變 */
+    if(mode === 'push' && history.pushState) history.pushState(null, '', url);
+    else if(history.replaceState) history.replaceState(null, '', url);
+    else location.assign(url);
   }catch(e){}
+  syncRouteMeta();
 }
 function routePush(){ routeWrite('push'); }
 function routeReplace(){ routeWrite('replace'); }
 
-/* ---------- 錨點字串 → 狀態 ---------- */
+/* ---------- 網址 → 狀態 ---------- */
 function routeParams(parts){
   /* 回傳 {named:{k:v}, bare:[…]}；參數名不分大小寫，值原樣保留。 */
   var named = {}, bare = [];
@@ -7420,7 +7390,7 @@ function applyComplaintRoute(P){
   if(!node) return false;
   var an = node.querySelector ? node.querySelector('.db-cp-anchor') : null;
   /* 定位流程同 gotoLawArticle（見 CSS 的「捲動定位錨點：全檔通則」）。
-     差別是實際捲動交給 applyRoute 末端的 DBHASH.target()＋hold() 持續校正：
+     差別是實際捲動交給 applyRoute 末端的 DBROUTE.target()＋hold() 持續校正：
      本頁的地圖與流程圖是進站後才建立的，單次捲動會落空（通則第 ③ 點）。 */
   syncStickyH();
   /* 正常情形以節標題內的零淨高度錨點定位（與法規頁條文同一套配方）。
@@ -7442,42 +7412,27 @@ function applyComplaintRoute(P){
   return true;
 }
 
-/* [JS-CP-TOC] 申訴救濟頁導覽列：自行接手點擊，不倚賴瀏覽器的原生錨點導覽。
-   這八個連結是全檔唯一「純靠 <a href="#…"> 觸發頁內定位」的地方——其餘頁內
-   跳轉都是按鈕＋JS，首頁的 <a href="#list"> 一類也另有 data-homego 的委派作保險。
-   單獨開啟本檔正常、放到 jrf.org.tw 上卻不會捲動，徵狀即指向宿主佈景攔截了
-   a[href^="#"] 的點擊（平滑捲動外掛、SPA 路由之類的委派處理器），使 hash 沒變、
-   hashchange 沒發生，本程式的路由完全沒被喚起。
-   故改為在「捕獲階段」搶先接下點擊：擋掉原生導覽與宿主的處理器，自行寫入歷史
-   並直接呼叫 applyRoute()。不論宿主如何處理錨點，捲動都照常發生；網址列內容與
-   上一頁／下一頁的行為，則與原本的原生導覽完全一致。 */
+/* [JS-CP-TOC] 申訴救濟頁導覽列：站內連結以 History API 切換，不重新下載頁面。 */
 function initComplaintToc(){
   document.addEventListener('click', function(e){
-    var a = (e.target && e.target.closest) ? e.target.closest('.db-cp-toc-a[href^="#"]') : null;
+    var a = (e.target && e.target.closest) ? e.target.closest('.db-cp-toc-a[href^="/complaint/"]') : null;
     if(!a) return;
-    var h = a.getAttribute('href');
-    if(!h || h.length < 2) return;
+    var url = a.getAttribute('href');
+    if(!url) return;
     e.preventDefault();
-    e.stopPropagation();
     /* 同一個目標再點一次仍要重新捲動（使用者可能已自行捲離），故只跳過寫歷史。 */
-    if(currentHashDecoded() !== h){
-      ROUTE_LAST = h;
-      try{
-        if(history.pushState) history.pushState(null, '', h);
-        else location.hash = h.slice(1);
-      }catch(err){
-        try{ location.hash = h.slice(1); }catch(err2){}
-      }
+    if(currentLocationKey() !== url){
+      ROUTE_LAST = url;
+      if(history.pushState) history.pushState(null, '', url);
+      else{ location.assign(url); return; }
     }
-    /* 點擊本身會先觸發 pointerdown／mousedown，那是 DBHASH 的「使用者自行捲動」
-       放手訊號；此處必須 resume()，否則接下來的持續貼齊會整個不動作。 */
-    DBHASH.resume();
+    DBROUTE.resume();
     applyRoute(false);
-  }, true);
+  });
 }
 
 function applyRoute(fromLoad){
-  var r = DBHASH.route();
+  var r = DBROUTE.route();
   /* 只是關閉全文彈窗（自行關閉後的 history.back()、或按瀏覽器的上一頁）：
      網址扣掉 full= 之後，與目前畫面狀態組出的錨點完全相同，代表清單、頁次、捲動位置都
      沒有理由變動——只關彈窗，其餘一概不碰。否則會依網址把案件清單整個重畫、並把捲動位置
@@ -7487,12 +7442,12 @@ function applyRoute(fromLoad){
   if((wasClosing || FT_ROUTE) && r && !(r.full && r.full.no) && FT_CLOSE){
     var keptFt = FT_ROUTE;
     FT_ROUTE = null;                       /* routeString() 會把 FT_ROUTE 寫成 full=，先暫時拿掉再比 */
-    var sameState = (routeString() === currentHashDecoded());
+    var sameState = (routeString() === currentLocationKey());
     FT_ROUTE = keptFt;
     if(sameState){
       ROUTE_APPLYING = true;
       try{ FT_CLOSE(true); }catch(e0){}
-      finally{ ROUTE_APPLYING = false; ROUTE_LAST = currentHashDecoded(); }
+      finally{ ROUTE_APPLYING = false; ROUTE_LAST = currentLocationKey(); }
       return;
     }
   }
@@ -7502,11 +7457,11 @@ function applyRoute(fromLoad){
   try{
     if(r && r.scrollOnly){
       /* #0／#db／#top／#資料庫：只捲動，頁籤與各頁狀態一概不動 */
-      ROUTE_LAST = currentHashDecoded();
-      DBHASH.snap(); DBHASH.hold(fromLoad ? 1200 : 400);
+      ROUTE_LAST = currentLocationKey();
+      DBROUTE.snap(); DBROUTE.hold(fromLoad ? 1200 : 400);
       return;
     }
-    /* 空錨點或不認得的錨點一律退回首頁：否則按上一頁回到無錨點的網址時，
+    /* 空路徑或不認得的路徑一律退回首頁：否則按上一頁回到根網址時，
        網址已變、畫面卻停在原頁。 */
     var tab = (r && r.tab) ? r.tab : 'home';
     showTabByKey(tab);
@@ -7524,53 +7479,47 @@ function applyRoute(fromLoad){
       FT_CLOSE(true);
     }
   }catch(err){
-    if(window.console && console.warn) console.warn('[律師懲戒案件資料庫] 錨點套用失敗：', err);
+    if(window.console && console.warn) console.warn('[律師懲戒案件資料庫] 網址套用失敗：', err);
   }finally{
     ROUTE_APPLYING = false;
-    ROUTE_LAST = currentHashDecoded();
+    ROUTE_LAST = currentLocationKey();
+    syncRouteMeta();
   }
   if(located && ROUTE_TARGET){
     /* 錨點指向頁內某一節：把「持續貼齊」的目標換成該節，沿用同一套逐格校正，
        版面在其後繼續長高（圖表、字型、外部圖片）也會被追上。
-       使用者一旦自行捲動即放手，這點由 DBHASH 內部的 release 處理。 */
-    DBHASH.target(ROUTE_TARGET);
-    DBHASH.snap();
-    DBHASH.hold(fromLoad ? 1600 : 700);
+       使用者一旦自行捲動即放手，這點由 DBROUTE 內部的 release 處理。 */
+    DBROUTE.target(ROUTE_TARGET);
+    DBROUTE.snap();
+    DBROUTE.hold(fromLoad ? 1600 : 700);
   }else if(located){
     /* 已自行定位（法規頁的條文跳轉自帶金框與捲動）：停掉貼齊，免得互搶捲軸 */
-    DBHASH.target(null);
-    DBHASH.release();
+    DBROUTE.target(null);
+    DBROUTE.release();
   }else{
-    DBHASH.target(null);
-    DBHASH.snap();
-    DBHASH.hold(fromLoad ? 1200 : 400);
+    DBROUTE.target(null);
+    DBROUTE.snap();
+    DBROUTE.hold(fromLoad ? 1200 : 400);
   }
   ROUTE_TARGET = null;
 }
 
-function initHashRouting(){
-  if(hashRoutingReady) return;
-  hashRoutingReady = true;
-  /* popstate 與 hashchange 都要聽：pushState 造成的前進／後退會發 popstate，
-     使用者手改網址或點頁內連結則發 hashchange；以 ROUTE_LAST 去重，
-     兩者同時觸發時只套用一次。 */
+function initPathRouting(){
+  if(pathRoutingReady) return;
+  pathRoutingReady = true;
+  /* 瀏覽器上一頁／下一頁以 popstate 還原完整畫面狀態。 */
   function onNav(){
-    var h = currentHashDecoded();
+    var h = currentLocationKey();
     if(h === ROUTE_LAST) return;
     ROUTE_LAST = h;
-    DBHASH.resume();
+    DBROUTE.resume();
     applyRoute(false);
   }
   window.addEventListener('popstate', onNav);
-  window.addEventListener('hashchange', onNav);
   applyRoute(true);
-  /* 進站網址若無錨點、或是不認得的形式，此處補寫成正規形式，
-     使「目前這一筆歷史」與畫面一致。
-     #0／#db／#top／#資料庫 例外：那是「只捲動、不切頁籤」的既有語意，
-     改寫成 #home 等於把它降級成一般頁籤錨點，故一律保留原樣。 */
+  /* 正規化尾斜線、query 參數順序，並將舊 hash 網址轉成新路徑。 */
   ROUTE_APPLYING = false;
-  var r0 = DBHASH.route();
-  if(!(r0 && r0.scrollOnly)) routeReplace();
+  routeReplace();
 }
 
 /* [JS-FULLTEXT] 決議書全文 dialog；建立與事件綁定延後至 [JS-INIT]。 */
@@ -7590,7 +7539,7 @@ function initFulltextDialog(){
 
   var body = el('ft-body'), lastFocus = null;
   /* ftPushed：目前這個彈窗是不是由本程式推進歷史的（決定關閉時能否 history.back()）。
-     ftFromRoute：本次開啟是否來自錨點套用（來自錨點時不可再寫一次歷史）。 */
+     ftFromRoute：本次開啟是否來自網址套用（來自錨點時不可再寫一次歷史）。 */
   var ftPushed = false, ftFromRoute = false;
 
   /* 關鍵字反白：以檢索列當下的條件，於內文的文字節點上標示命中處。只處理文字節點，不碰標籤，因此不會破壞原檔的排版與連結。 */
@@ -8042,11 +7991,8 @@ function initFullTagTip(){
    1. 看板四個數字一律在此由 DATA／FT 推導，HTML 內不寫死；
    2. 快速檢索框與「常見查法」標籤一律轉呼叫既有的 gotoCaseSearch()，
       使首頁與案件清單共用同一套檢索狀態，不另立第二套邏輯；
-   3. 導覽卡片與兩個按鈕本身是 <a href="#list">～<a href="#complaint">，
-      因此即使本函式或錨點路由失效，仍可藉既有 hashchange 路由切換頁籤；
-      此處另補一層「直接點擊 tabbtn-*」的委派作為保險。
-   注意：首頁 DOM 若不存在（例如被宿主編輯器移除），initAppModules 會退回以
-   案件清單為預設頁，不得讓所有 panel 同時 hidden。 */
+   3. 導覽卡片與按鈕使用一般站內網址；JavaScript 啟用時由 History API 無刷新切換，
+      未啟用時仍可由瀏覽器直接前往該網址。 */
 var homeReady = false;
 /* 處分輕重分布的六個級距：由 HC_OF(h) 的 1–8 合併而來（申誡、警告的「併研習」
    與否在首頁不細分，要細分仍看案件清單的懲戒決定欄）。
@@ -8257,11 +8203,16 @@ function initHome(){
     if(tag){ runHomeSearch(tag.getAttribute('data-homeq')); return; }
     var go = t.closest('[data-homego]');
     if(go){
-      /* 不呼叫 preventDefault：href 本身就是一次錨點導覽，瀏覽器會推入一筆歷史，
-         後續由 [JS-ROUTE] 的 hashchange 接手切換頁籤。
-         此處的 click 只是「錨點路由尚未啟動」時的保險；路由已就緒時若也 click，
-         同一次導覽會被推兩筆歷史，上一頁要按兩次才會動。 */
-      if(hashRoutingReady) return;
+      if(pathRoutingReady){
+        var url = go.getAttribute('href');
+        e.preventDefault();
+        if(url && currentLocationKey() !== url){
+          ROUTE_LAST = url;
+          history.pushState(null, '', url);
+        }
+        applyRoute(false);
+        return;
+      }
       var btn = el('tabbtn-' + go.getAttribute('data-homego'));
       if(btn && btn.getAttribute('aria-selected') !== 'true') btn.click();
     }
@@ -8271,7 +8222,7 @@ function initHome(){
 /* [JS-ANALYSIS] 統計與分析：分頁切換、專題分析列表與文章 */
 /* ---------- 統計與分析 -------------------------------------------------
    頁籤「統計與分析」下分兩個分頁：專題分析（預設）與統計。
-   網址：#stats＝專題分析列表；#stats/a=文章代號＝開啟該篇；#stats/data＝統計分頁。
+   網址：/stats＝專題分析列表；/stats/articles/文章代號＝開啟該篇；/stats/data＝統計分頁。
    統計圖表沿用原本的延遲初始化（initStats），改為「統計分頁第一次顯示時」才執行：
    預設停在專題分析時統計分頁是隱藏的，不必先畫。
 
@@ -8287,9 +8238,8 @@ function anaArticles(){
   return out;
 }
 function anaScrollTop(){
-  if(ROUTE_APPLYING) return;               /* 由網址套用時，捲動交給錨點模組 */
-  var probe = document.getElementById('db-scroll-top');
-  if(probe) scrollToInstant(0, Math.max(0, probe.getBoundingClientRect().bottom + window.pageYOffset));
+  if(ROUTE_APPLYING) return;               /* 由網址套用時，捲動交給路由模組 */
+  scrollToInstant(0, 0);
 }
 function setStatsSub(sub){
   ANA.sub = (sub === 'data') ? 'data' : 'analysis';
@@ -8321,7 +8271,10 @@ function anaShowArticle(id){
 /* 套用網址：一律由預設值重建（見 [JS-ROUTE] 設計要點 3） */
 function applyStatsRoute(P){
   var data = P.bare.indexOf('data') >= 0;
-  anaShowArticle(data ? '' : (P.named.a || ''));
+  var article = P.named.a || '';
+  var ai = P.bare.indexOf('articles');
+  if(ai >= 0 && P.bare[ai + 1]) article = P.bare[ai + 1];
+  anaShowArticle(data ? '' : article);
   setStatsSub(data ? 'data' : 'analysis');
 }
 
@@ -8600,6 +8553,7 @@ function initAnalysis(){
 
 /* [JS-INIT] 所有主要 module 定義完成後，統一在此啟動副作用與首次 render。 */
 function initAppModules(){
+  safeRun('頁面捲軸', initPageScrollbar);
   initHeaderBehavior();
   initComplaintResponsive();
   FX.initParallax();
@@ -8626,51 +8580,16 @@ function initAppModules(){
   });
   safeRun('申訴頁導覽列', initComplaintToc);
   safeRun('統計與分析', initAnalysis);
-  safeRun('網址錨點', initHashRouting);
+  safeRun('網址路由', initPathRouting);
 }
 
 initAppModules();
 })();
 }
-/* [JS-BOOTSTRAP] CMS／重新整理穩健啟動器 */
-/* ---------- 穩健啟動器 -------------------------------------------------
-   不以 readyState 當成「文章內容已經插入完成」的替代指標。jrf 等 CMS 可能在整份
-   document 已完成後才執行文章片段；此時本 script 先於片段尾端 JSON 執行亦屬合法。
-   因此每次只檢查實際 prerequisite；未齊時讓出 event loop 後再試。正常完整 HTML
-   只會進入一次 setTimeout(0)，不增加長期 observer 或輪詢成本。 */
-var __bootTries = 0;
-function __bootMissing(){
-  var ids = ['db','db-content-meta','db-pattern-meta','db-nav',
-             'tabbtn-list','tabbtn-pattern','tabbtn-laws','tabbtn-stats','tabbtn-about','tabbtn-complaint','tabbtn-reform',
-             'tab-list','tab-pattern','tab-laws','tab-stats','tab-about','tab-complaint','tab-reform'];
-  return ids.filter(function(id){ return !document.getElementById(id); });
+/* 所有資料節點由 load-data.js 建立後才載入本檔，因此可直接啟動。 */
+try{ __boot(); }
+catch(err){
+  DB_STATUS.lastError = String(err && err.stack ? err.stack : err);
+  if(window.console && console.error) console.error('[律師懲戒案件資料庫] 主程式啟動失敗：', err);
 }
-function __bootAttempt(){
-  var status = window.__JRF_DB_STATUS;
-  if(status.state === 'ready' || status.state === 'running') return;
-  var missing = __bootMissing();
-  if(missing.length){
-    status.state = 'waiting'; status.missing = missing;
-    if(++__bootTries <= 200){ setTimeout(__bootAttempt, 25); }
-    else{
-      status.state = 'error';
-      status.lastError = '等待必要 DOM／資料逾時：' + missing.join(', ');
-      if(window.console && console.error) console.error('[律師懲戒案件資料庫] '+status.lastError);
-    }
-    return;
-  }
-  status.state = 'running'; status.missing = [];
-  try{
-    __boot();
-    status.state = 'ready'; status.readyAt = Date.now();
-  }catch(err){
-    status.state = 'error';
-    status.lastError = String(err && err.stack ? err.stack : err);
-    if(window.console && console.error) console.error('[律師懲戒案件資料庫] 主程式啟動失敗：', err);
-  }
-}
-/* __JRF_DB_STATUS 已於本次 root guard 建立；此處不沿用舊文章節點的狀態。 */
-/* 即使 DOMContentLoaded 已經發生，setTimeout 仍會等目前 CMS 插入工作完成後才檢查。 */
-setTimeout(__bootAttempt, 0);
-if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', __bootAttempt, {once:true});
 })();
