@@ -143,35 +143,41 @@
 <!-- 二、關鍵數字看板（數值由 initHome 於載入時推導，不寫死） -->
 
 <div class="db-home-stats" id="home-stats">
-<div class="db-home-stat-label"><a aria-label="前往專題分析" class="db-home-stat db-home-stat-wide" data-homego="stats" href="/stats">案件總數</a></div>
+<a aria-label="前往專題分析" class="db-home-stat db-home-stat-wide" data-homego="stats" href="/stats">
+<div class="db-home-stat-label">案件總數</div>
 
 <div class="db-home-stat-split">
-<div class="db-home-stat-val"><a aria-label="前往專題分析" class="db-home-stat db-home-stat-wide" data-homego="stats" href="/stats"><b id="home-n-person">&mdash;</b> <span>人次</span></a></div>
+<div class="db-home-stat-val"><b id="home-n-person">&mdash;</b> <span>人次</span></div>
 
 <div aria-hidden="true" class="db-home-stat-rule">&nbsp;</div>
 
 <div class="db-home-stat-sub">
-<div><a aria-label="前往專題分析" class="db-home-stat db-home-stat-wide" data-homego="stats" href="/stats"><i aria-hidden="true" class="db-hs-dot db-hs-y"></i><span>成立</span><b class="db-hs-ny" id="home-n-yes">&mdash;</b></a></div>
+<div><i aria-hidden="true" class="db-hs-dot db-hs-y"></i><span>成立</span><b class="db-hs-ny" id="home-n-yes">&mdash;</b></div>
 
-<div><a aria-label="前往專題分析" class="db-home-stat db-home-stat-wide" data-homego="stats" href="/stats"><i aria-hidden="true" class="db-hs-dot db-hs-n"></i><span>不成立</span><b class="db-hs-nn" id="home-n-no">&mdash;</b></a></div>
+<div><i aria-hidden="true" class="db-hs-dot db-hs-n"></i><span>不成立</span><b class="db-hs-nn" id="home-n-no">&mdash;</b></div>
 </div>
 </div>
 
-<div aria-hidden="true" class="db-home-stat-bar" id="home-stat-bar"><a aria-label="前往專題分析" class="db-home-stat db-home-stat-wide" data-homego="stats" href="/stats"><i class="db-hs-y" id="home-bar-y"></i><i class="db-hs-n" id="home-bar-n"></i><i class="db-hs-o" id="home-bar-o"></i></a></div>
+<div aria-hidden="true" class="db-home-stat-bar" id="home-stat-bar"><i class="db-hs-y" id="home-bar-y"></i><i class="db-hs-n" id="home-bar-n"></i><i class="db-hs-o" id="home-bar-o"></i></div>
 
-<div class="db-home-stat-note" id="home-n-person-note"><a aria-label="前往專題分析" class="db-home-stat db-home-stat-wide" data-homego="stats" href="/stats">同一人同一事件，跨審級僅計一次</a></div>
+<div class="db-home-stat-note" id="home-n-person-note">同一人同一事件，跨審級僅計一次</div>
+</a>
 
-<div class="db-home-stat-label"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="/stats/data">資料涵蓋</a></div>
+<a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="/stats/data">
+<div class="db-home-stat-label">資料涵蓋</div>
 
-<div class="db-home-stat-val"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="/stats/data"><b id="home-n-years">&mdash;</b> <span>年</span></a></div>
+<div class="db-home-stat-val"><b id="home-n-years">&mdash;</b> <span>年</span></div>
 
-<div class="db-home-stat-note" id="home-n-range"><a aria-label="前往統計" class="db-home-stat" data-homego="stats" href="/stats/data">依決議日期最早與最新推算</a></div>
+<div class="db-home-stat-note" id="home-n-range">依決議日期最早與最新推算</div>
+</a>
 
-<div class="db-home-stat-label"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="/pattern">違失態樣</a></div>
+<a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="/pattern">
+<div class="db-home-stat-label">違失態樣</div>
 
-<div class="db-home-stat-val"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="/pattern"><b id="home-n-pat">&mdash;</b> <span>類</span></a></div>
+<div class="db-home-stat-val"><b id="home-n-pat">&mdash;</b> <span>類</span></div>
 
-<div class="db-home-stat-note"><a aria-label="前往違失態樣" class="db-home-stat" data-homego="pattern" href="/pattern">依懲戒法規分類</a></div>
+<div class="db-home-stat-note">依懲戒法規分類</div>
+</a>
 </div>
 <!-- 三、資料速覽：左為法務部年度統計之處分結果（近年），右為本資料庫的處分輕重分布。
      兩者母體不同（統計為確定案件之人數，資料庫為逐案收錄），故各自標明來源與期間。
@@ -199,7 +205,7 @@
 <section aria-labelledby="home-sev-h" class="db-home-chart-card">
 <div class="db-home-chart-h">
 <h3 id="home-sev-h">懲戒結果量處統計</h3>
-<a data-homego="list" href="/list">前往案件清單 &rarr;</a></div>
+<a data-homego="stats" href="/stats">前往專題分析 &rarr;</a></div>
 
 <div class="db-home-chart-sub" id="home-sev-sub">&nbsp;</div>
 
@@ -211,7 +217,7 @@
 <div class="db-home-pie-lg" id="home-sev-legend">&nbsp;</div>
 </div>
 
-<p class="db-home-chart-note">圖示為相對比例；併命研習者併入該處分計算。</p>
+<p class="db-home-chart-note">資料來源：本資料庫；併命研習者併入該處分計算。</p>
 </section>
 </div>
 <!-- 四、我要申訴律師（內容取自申訴救濟管道頁籤，首頁只放三步驟與兩則提醒） -->
@@ -1526,32 +1532,32 @@
 		</tr>
 		<tr>
 			<td class="db-bar">台北</td>
-			<td><a aria-label="公告連結" href="https://tba-revtel2-com-prod.s3.ap-northeast-1.amazonaws.com/%E5%8C%97%E5%BE%8B%E5%80%AB%E7%B4%80%E6%A1%88%E4%BB%B6%E7%94%B3%E8%A8%B4%E6%9B%B811501%E7%89%88-1150109%E7%90%86%E7%9B%A3%E4%BA%8B%E6%9C%83%E9%80%9A%E9%81%8E-%EF%BC%88%E5%8A%A0%E4%B8%8A%E5%8C%AF%E6%AC%BE%E8%B3%87%E8%A8%8A%EF%BC%89_%E5%AE%9A%E7%A8%BF0115-1768446442.docx" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
-			<td><a aria-label="公告連結" href="https://www.tba.org.tw/about/?group=regulation&amp;category=practicing" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="開啟台北律師公會申訴表" href="https://tba-revtel2-com-prod.s3.ap-northeast-1.amazonaws.com/%E5%8C%97%E5%BE%8B%E5%80%AB%E7%B4%80%E6%A1%88%E4%BB%B6%E7%94%B3%E8%A8%B4%E6%9B%B811501%E7%89%88-1150109%E7%90%86%E7%9B%A3%E4%BA%8B%E6%9C%83%E9%80%9A%E9%81%8E-%EF%BC%88%E5%8A%A0%E4%B8%8A%E5%8C%AF%E6%AC%BE%E8%B3%87%E8%A8%8A%EF%BC%89_%E5%AE%9A%E7%A8%BF0115-1768446442.docx" rel="noopener" target="_blank" title="台北律師公會申訴表">🔗</a></td>
+			<td><a aria-label="開啟台北律師公會申訴辦法" href="https://www.tba.org.tw/about/?group=regulation&amp;category=practicing" rel="noopener" target="_blank" title="台北律師公會申訴辦法">🔗</a></td>
 			<td>3,000 元</td>
 		</tr>
 		<tr>
 			<td class="db-bar">桃園</td>
-			<td><a aria-label="公告連結" href="https://www.tybar.org.tw/Download" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="開啟桃園律師公會申訴表" href="https://www.tybar.org.tw/Download" rel="noopener" target="_blank" title="桃園律師公會申訴表">🔗</a></td>
 			<td class="db-na">未公告</td>
 			<td class="db-na">不詳</td>
 		</tr>
 		<tr>
 			<td class="db-bar">新竹</td>
 			<td class="db-na">未公告</td>
-			<td><a aria-label="公告連結" href="https://hcbara.org.tw/about/index/27" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="開啟新竹律師公會申訴辦法" href="https://hcbara.org.tw/about/index/27" rel="noopener" target="_blank" title="新竹律師公會申訴辦法">🔗</a></td>
 			<td>3,000 元</td>
 		</tr>
 		<tr>
 			<td class="db-bar">苗栗</td>
-			<td><a aria-label="公告連結" href="https://mlba.org.tw/%e8%8b%97%e6%a0%97%e5%be%8b%e5%b8%ab%e5%85%ac%e6%9c%83%e5%be%8b%e5%b8%ab%e7%94%b3%e8%a8%b4%e6%9b%b81150608-2/" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
-			<td><a aria-label="公告連結" href="https://mlba.org.tw/%e8%8b%97%e6%a0%97%e5%be%8b%e5%b8%ab%e5%85%ac%e6%9c%83%e5%be%8b%e5%b8%ab%e5%80%ab%e7%90%86%e9%a2%a8%e7%b4%80%e5%a7%94%e5%93%a1%e6%9c%83%e8%99%95%e7%90%86%e4%ba%8b%e5%8b%99%e8%be%a6%e6%b3%95-2/" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="開啟苗栗律師公會申訴表" href="https://mlba.org.tw/%e8%8b%97%e6%a0%97%e5%be%8b%e5%b8%ab%e5%85%ac%e6%9c%83%e5%be%8b%e5%b8%ab%e7%94%b3%e8%a8%b4%e6%9b%b81150608-2/" rel="noopener" target="_blank" title="苗栗律師公會申訴表">🔗</a></td>
+			<td><a aria-label="開啟苗栗律師公會申訴辦法" href="https://mlba.org.tw/%e8%8b%97%e6%a0%97%e5%be%8b%e5%b8%ab%e5%85%ac%e6%9c%83%e5%be%8b%e5%b8%ab%e5%80%ab%e7%90%86%e9%a2%a8%e7%b4%80%e5%a7%94%e5%93%a1%e6%9c%83%e8%99%95%e7%90%86%e4%ba%8b%e5%8b%99%e8%be%a6%e6%b3%95-2/" rel="noopener" target="_blank" title="苗栗律師公會申訴辦法">🔗</a></td>
 			<td>6,000 元</td>
 		</tr>
 		<tr>
 			<td class="db-bar">台中</td>
-			<td><a aria-label="公告連結" href="https://www.tcbar.org.tw/download/view?download_category_id=2&amp;download_id=26" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
-			<td><a aria-label="公告連結" href="https://www.tcbar.org.tw/about/view?about_category_id=16&amp;about_id=94" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="開啟台中律師公會申訴表" href="https://www.tcbar.org.tw/download/view?download_category_id=2&amp;download_id=26" rel="noopener" target="_blank" title="台中律師公會申訴表">🔗</a></td>
+			<td><a aria-label="開啟台中律師公會申訴辦法" href="https://www.tcbar.org.tw/about/view?about_category_id=16&amp;about_id=94" rel="noopener" target="_blank" title="台中律師公會申訴辦法">🔗</a></td>
 			<td>5,000 元</td>
 		</tr>
 		<tr>
@@ -1580,8 +1586,8 @@
 		</tr>
 		<tr>
 			<td class="db-bar">台南</td>
-			<td><a aria-label="公告連結" href="https://tnnbar.org.tw/%e8%a1%a8%e5%96%ae%e4%b8%8b%e8%bc%89/" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
-			<td><a aria-label="公告連結" href="https://tnnbar.org.tw/%e3%80%90-%e5%85%ac%e6%9c%83%e8%a6%8f%e7%ab%a0-%e3%80%91/" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="開啟台南律師公會申訴表" href="https://tnnbar.org.tw/%e8%a1%a8%e5%96%ae%e4%b8%8b%e8%bc%89/" rel="noopener" target="_blank" title="台南律師公會申訴表">🔗</a></td>
+			<td><a aria-label="開啟台南律師公會申訴辦法" href="https://tnnbar.org.tw/%e3%80%90-%e5%85%ac%e6%9c%83%e8%a6%8f%e7%ab%a0-%e3%80%91/" rel="noopener" target="_blank" title="台南律師公會申訴辦法">🔗</a></td>
 			<td>2,800 元</td>
 		</tr>
 		<tr>
@@ -1604,8 +1610,8 @@
 		</tr>
 		<tr>
 			<td class="db-bar">花蓮</td>
-			<td><a aria-label="公告連結" href="https://hualienbar-association.org.tw/contact-all-comcontact-views/%E6%9C%83%E5%93%A1%E5%80%AB%E7%90%86%E9%A2%A8%E7%B4%80%E8%99%95%E7%90%86%E7%A8%8B%E5%BA%8F.html" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
-			<td><a aria-label="公告連結" href="https://hualienbar-association.org.tw/contact-all-comcontact-views/%E6%9C%83%E5%93%A1%E5%80%AB%E7%90%86%E9%A2%A8%E7%B4%80%E8%99%95%E7%90%86%E7%A8%8B%E5%BA%8F.html" rel="noopener" target="_blank" title="公告連結">🔗</a></td>
+			<td><a aria-label="開啟花蓮律師公會申訴表" href="https://hualienbar-association.org.tw/contact-all-comcontact-views/%E6%9C%83%E5%93%A1%E5%80%AB%E7%90%86%E9%A2%A8%E7%B4%80%E8%99%95%E7%90%86%E7%A8%8B%E5%BA%8F.html" rel="noopener" target="_blank" title="花蓮律師公會申訴表">🔗</a></td>
+			<td><a aria-label="開啟花蓮律師公會申訴辦法" href="https://hualienbar-association.org.tw/contact-all-comcontact-views/%E6%9C%83%E5%93%A1%E5%80%AB%E7%90%86%E9%A2%A8%E7%B4%80%E8%99%95%E7%90%86%E7%A8%8B%E5%BA%8F.html" rel="noopener" target="_blank" title="花蓮律師公會申訴辦法">🔗</a></td>
 			<td>免費</td>
 		</tr>
 		<tr>
