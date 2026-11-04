@@ -6,6 +6,14 @@
 <script>
 (function(){
   document.documentElement.classList.add('db-custom-scrollbar');
+  /* F5／重新載入時不重播頁首動畫。Navigation Timing 2 為主，舊介面僅作
+     相容備援；判斷必須在樣式表載入前完成，才不會先畫出動畫的第一格。 */
+  try{
+    var navEntries = window.performance && performance.getEntriesByType ? performance.getEntriesByType('navigation') : [];
+    var isReload = navEntries.length ? navEntries[0].type === 'reload' :
+      !!(window.performance && performance.navigation && performance.navigation.type === 1);
+    if(isReload) document.documentElement.classList.add('db-page-reload');
+  }catch(e0){}
   try{
     var route = sessionStorage.getItem('jrf-discipline-route');
     if(route){
@@ -407,7 +415,7 @@
 <header class="db-ana-art-hd">
 <h2 class="db-ana-art-t">律師犯罪後的懲戒與除名標準</h2>
 
-<p class="db-ana-art-m">發布日期　<time datetime="2026-10-29">2026年10月29日</time></p>
+<p class="db-ana-art-m">發布日期：<time datetime="2026-10-29">2026年10月29日</time></p>
 </header>
 
 <div class="db-ana-body">

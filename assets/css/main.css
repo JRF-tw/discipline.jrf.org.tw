@@ -109,8 +109,10 @@ body{margin:0;padding:0}
   color:var(--ink); background:var(--bg); font-size:16px; line-height:1.7;
 }
 /* 非首頁網址重新整理時，在路由程式選定正確頁籤前隱藏面板，避免預設首頁閃現。
-   頁首仍保留，資料載入失敗時 load-data.js 會移除此狀態並顯示錯誤訊息。 */
+   頁尾也必須一起隱藏；否則面板暫時不佔高度時，頁尾會先跳到頁首下方，待正確
+   內容顯示後才被推回底部。頁首仍保留，資料載入失敗時 load-data.js 會移除此狀態。 */
 .db-route-pending .db-wrap section[role="tabpanel"]{display:none!important}
+.db-route-pending .db-foot{visibility:hidden!important;pointer-events:none!important}
 .db-wrap a{color:var(--accent)}
 .db-wrap a:hover{color:var(--accent-deep)}
 
@@ -146,6 +148,11 @@ body{margin:0;padding:0}
   background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.16),rgba(255,255,255,0));
   animation:db-sheen 9s var(--e-soft) infinite;
 }
+/* F5 時瀏覽器會重新建立動畫時間軸，頁首看來像再次進場。同步於 <head> 加上的
+   .db-page-reload 將頁首改為穩定靜態狀態；一般首次造訪仍完整播放。 */
+.db-page-reload .db-sticky::before{animation:none;background-position:50% 50%}
+.db-page-reload .db-sticky::after{animation:none;opacity:0}
+.db-page-reload .db-head h1{animation:none}
 /* 選單展開時頁首變高，這道流光就成了一條掃過整個選單的垂直光帶，非常干擾。
    展開期間整個移除（content:none 連偽元素本身都不生成），收合後自動恢復。 */
 .db-sticky.db-nav-open::after{content:none}
