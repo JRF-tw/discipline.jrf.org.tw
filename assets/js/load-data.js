@@ -9,6 +9,7 @@
 
   function fail(err){
     if(window.console && console.error) console.error('[律師懲戒案件資料庫] 資料載入失敗：', err);
+    document.documentElement.classList.remove('db-route-pending');
     var wrap = document.querySelector('.db-wrap');
     if(!wrap) return;
     var p = document.createElement('p');

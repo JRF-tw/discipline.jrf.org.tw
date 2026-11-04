@@ -13,6 +13,17 @@
       history.replaceState(null, '', route);
     }
   }catch(e){}
+  /* HTML 預設顯示首頁，但資料與路由程式是延遲載入；直接開啟子路徑時，若不在
+     第一次繪製前先遮住頁籤面板，就會短暫閃現首頁。只標記有效的非首頁路由，
+     未知網址仍讓主程式照既有規則退回首頁。舊 hash 網址亦一併處理。 */
+  var tabs = {list:1,pattern:1,laws:1,stats:1,about:1,reform:1,complaint:1,ethichist:1};
+  var seg = String(location.pathname || '/').split('/').filter(Boolean);
+  var head = String(seg[0] || '').toLowerCase();
+  if(!head){
+    var legacy = String(location.hash || '').replace(/^#/, '').split('/');
+    head = String(legacy[0] || '').toLowerCase();
+  }
+  if(tabs[head]) document.documentElement.classList.add('db-route-pending');
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -283,7 +294,7 @@
 <div class="db-home-notes">
 <div class="db-home-notes-h">資料來源與維護</div>
 
-<div class="db-home-note"><i aria-hidden="true"></i> <span>本資料庫懲戒資訊，皆來自於政府機關之公開資訊。</span></div>
+<div class="db-home-note"><i aria-hidden="true"></i> <span>本資料庫由財團法人民間司法改革基金會建置、維護。所載資訊皆來自於政府機關之公開資訊。</span></div>
 
 <div class="db-home-note"><i aria-hidden="true"></i> <span>違失態樣是依照懲戒法規的分類，供理解與檢索之便，引用上仍以各法規為主。</span></div>
 
@@ -386,12 +397,11 @@
 
 <section aria-labelledby="tabbtn-stats" hidden="" id="tab-stats" role="tabpanel">
 <div aria-label="統計與分析" class="db-subtabs" id="stats-subtabs" role="group"><button aria-pressed="true" class="db-subtab" data-ssub="analysis" type="button">專題分析</button><button aria-pressed="false" class="db-subtab" data-ssub="data" type="button">統計</button></div>
-<!-- [HTML-ANALYSIS] 統計與分析：專題分析（列表＋各篇文章；文章代號 data-ana-id 與列表 data-ana-open 一致） -->
+<!-- [HTML-ANALYSIS] 統計與分析：專題分析。列表由文章的 data-ana-id、標題、日期、
+     第一章以前的段落與第一張圖自動產生；新增專題只需加入 article。 -->
 
 <div class="db-ana-sub" id="stats-sub-analysis">
-<ul class="db-ana-list" id="ana-list">
-<li><a class="db-ana-item" data-ana-open="disbar" href="/stats/articles/disbar"><span class="db-ana-item-t">律師犯罪後的懲戒與除名標準</span> <time class="db-ana-item-d" datetime="2026-10-29">2026年10月29日</time> <span class="db-ana-item-go"><svg aria-hidden="true" focusable="false" viewbox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 12h14"></path><path d="M12.5 6.5l5.5 5.5-5.5 5.5"></path></g></svg></span></a></li>
-</ul>
+<ul class="db-ana-list" id="ana-list"></ul>
 
 <article class="db-ana-art" data-ana-asof="2026-09-10" data-ana-id="disbar" hidden="" id="ana-art-disbar"><button class="db-ana-back" type="button">&larr; 專題分析列表</button>
 <header class="db-ana-art-hd">
@@ -403,14 +413,15 @@
 <div class="db-ana-body">
 <p>律師犯罪後，法院的刑事判決決定了應受的刑罰；而律師懲戒制度則必須回答另一個問題：這名律師是否仍值得信賴，可以當事人權益為優先處理法律事務？</p>
 <p>「除名」是律師懲戒中唯一能讓律師永久退出執業的處分，判斷的關鍵在於律師是否「已喪失執行律師之信譽」。然而，法律並未明定這個判斷應採什麼標準。本文要追問的是：實務上，什麼樣的行為會讓懲戒機關作出除名？刑事判決的刑度、緩刑或事後和解，在這個判斷中扮演什麼角色？同樣嚴重破壞委任信賴或司法公信的行為，是否得到一致的評價？</p>
-<p>本文以資料庫收錄的懲戒決議為基礎，依序說明：第一部分整理除名的數量與歷年趨勢；第二部分逐案檢視 28 件除名案件的犯罪事實與刑度，指出除名在實務上全數與刑事犯罪有關；第三部分以 146 件因故意犯罪受懲戒的案件，分析刑種、刑度、緩刑與處分輕重的關係，比較相近刑度下除名與未除名的案件，並檢視決議理由與覆審的立場；最後一部分則討論，犯罪以外的嚴重失信行為，是否也可能達到除名的程度。本會認為，刑度可以作為參考，卻不能代替對「是否已喪失執行律師之信譽」的獨立、嚴格判斷。</p>
+<p>本文以資料庫收錄的懲戒決議為基礎，依序說明：第一部分整理除名的數量與歷年趨勢；第二部分逐案檢視 28 件除名案件的犯罪事實與刑度，指出除名在實務上全數與刑事犯罪有關；第三部分以 146 件因故意犯罪受懲戒的案件，分析刑種、刑度、緩刑與處分輕重的關係，比較相近刑度下除名與未除名的案件，並檢視決議理由與覆審的立場；最後一部分則討論，犯罪以外的嚴重失信行為，是否也可能達到除名的程度。</p>
 <h3 class="db-ana-h">一、除名罕見且占比呈下降趨勢</h3>
 <p>資料庫收錄的 664 筆資料，扣除 12 件暫時停止執行職務聲請後，共有 652 件終局懲戒決議，其中最終除名者為 28 件，占 4.3%。</p>
 <h4 class="db-ana-sh">民國 94 年以來的 652 件終局懲戒決議中　除名僅28件（4.3%）</h4>
-<div class="db-ana-fig-svg" id="ana-fig1">&nbsp;</div><p class="db-ana-fig-note">上圖以每點代表一件決議，以左上角開始從 2005 年延伸至 2026 年；紅點代表最終除名案件。除名案件較集中於前期，後期案件增加，除名件數卻未隨之增加。</p></figure>
+<div class="db-ana-fig-svg" id="ana-fig1">&nbsp;</div></figure>
+<p>上圖以每點代表一件決議，以左上角開始從 2005 年延伸至 2026 年；紅點代表最終除名案件。從上圖視覺化的呈現，可以看出除名案件的密度，隨著時間顯著下降。</p>
 <h4 class="db-ana-sh">按案號年度分組的除名情形</h4>
 <figure class="db-ana-fig" data-anafig="year"><figcaption class="db-ana-fig-t">各期案件數與除名率</figcaption><div class="db-ana-fig-svg" id="ana-fig-year">&nbsp;</div></figure>
-<p>若依時間順序分為4組觀察，最早一組有 126 件案件、12 件除名，最近一組則有 197 件案件、5 件除名，除名率由 9.5% 降至 2.5%。趨勢上，懲戒案件的除名占比持續下降，值得進一步檢視。</p>
+<p>若依決議確定的時間順序分為4組觀察，最早一組有 99 件案件、9 件除名，最近一組則有 259 件案件、7 件除名，除名率由 9.1% 降至 2.7%。趨勢上，懲戒案件的除名占比持續下降，值得進一步檢視。</p>
 <h3 class="db-ana-h">二、除名案件，全都涉及刑事犯罪</h3>
 <p>28 件除名案件中，27 件以犯罪經判刑確定為懲戒事由；唯一例外為 96年度律懲字第2號，但該案在懲戒時已有刑事有罪判決，只是尚未確定。<strong>換言之，過去 22 年的律師懲戒案件中，只有涉犯刑事犯罪才會被除名。</strong></p>
 <p>下表列出全部 28 件除名案件及其刑度、行為摘要。</p>
@@ -945,14 +956,14 @@
 <div>
 <dl>
 	<dt>時間範圍</dt>
-	<dd>民國 94 年 1 月 1 日～民國 115 年 7 月 2 日（民國 94 年以前部分案件，請參考上述《律師懲戒案例選輯》）</dd>
+	<dd>民國 94 年 1 月 1 日～<span id="about-date-end">&mdash;</span>（民國 94 年以前部分案件，請參考上述《律師懲戒案例選輯》）</dd>
 </dl>
 </div>
 
 <div>
 <dl>
 	<dt>資料筆數</dt>
-	<dd>共 642 人次（同一人對同一事件之救濟，於本資料庫計為 1 筆）</dd>
+	<dd>共 <span id="about-n-person">&mdash;</span> 人次（同一人對同一事件之救濟，於本資料庫計為 1 筆）</dd>
 </dl>
 </div>
 
@@ -1515,7 +1526,15 @@
 </div>
 </section>
 
-<footer class="db-foot" id="db-foot">&nbsp;</footer>
+<footer class="db-foot" id="db-foot">
+<div class="db-foot-org">
+<a class="db-foot-logo" href="https://www.jrf.org.tw/" aria-label="前往民間司法改革基金會網站" rel="noopener" target="_blank"><img alt="民間司法改革基金會" decoding="async" loading="lazy" referrerpolicy="no-referrer" src="https://taiwanrebels.org/uploads/organization/live_view_upload-1707971164-713413723947-2" /></a>
+
+<p>民間司法改革基金會成立於1995年11月。主要工作為法案推動、監督評鑑、個案追蹤與教育推廣。改革的力量必須由下而上，只有經由民間的推力，才能讓改革的夢想成為真實，最終建立人民信賴的司法。</p>
+</div>
+
+<p class="db-foot-updated">資料庫更新日期：<time datetime="" id="db-foot-date">&mdash;</time></p>
+</footer>
 </div>
 
 </body>

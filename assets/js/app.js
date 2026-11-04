@@ -7536,6 +7536,9 @@ function applyRoute(fromLoad){
     ROUTE_APPLYING = false;
     ROUTE_LAST = currentLocationKey();
     syncRouteMeta();
+    /* 必須在下方量測頁內錨點之前顯示正確面板；同一個 JS 工作尚未結束，瀏覽器
+       不會在解除 class 與完成 snap 之間插入繪製，因此不會再閃出錯誤位置。 */
+    document.documentElement.classList.remove('db-route-pending');
   }
   if(located && ROUTE_TARGET){
     /* 錨點指向頁內某一節：把「持續貼齊」的目標換成該節，沿用同一套逐格校正，
@@ -8070,6 +8073,13 @@ function dbUpdatedText(){
   function p2(n){ return (n.length < 2 ? '0' : '') + n; }
   return m[1] + '.' + p2(m[2]) + '.' + p2(m[3]);
 }
+/* 資料庫說明的時間範圍結束日與頁尾更新日期共用同一來源，只轉為民國格式。 */
+function dbUpdatedRocText(){
+  var foot = el('db-foot');
+  var m = /(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/.exec(foot ? foot.textContent : '');
+  if(!m) return '';
+  return '民國 ' + (parseInt(m[1], 10) - 1911) + ' 年 ' + parseInt(m[2], 10) + ' 月 ' + parseInt(m[3], 10) + ' 日';
+}
 
 function initHome(){
   if(homeReady) return;
@@ -8101,6 +8111,8 @@ function initHome(){
   function put(id, v){ var node = el(id); if(node) node.textContent = v; }
   put('home-n-case', numFmt(nCase));
   put('home-n-person', numFmt(DATA.cases.length));
+  put('about-n-person', numFmt(DATA.cases.length));
+  put('about-date-end', dbUpdatedRocText() || '\u2014');
   put('home-n-yes', numFmt(nYes));
   put('home-n-no', numFmt(nNo));
   put('home-n-temp', numFmt(nTemp));
@@ -8275,8 +8287,9 @@ function initHome(){
    統計圖表沿用原本的延遲初始化（initStats），改為「統計分頁第一次顯示時」才執行：
    預設停在專題分析時統計分頁是隱藏的，不必先畫。
 
-   文章本體是 HTML 中的 <article class="db-ana-art" data-ana-id>，列表項目以
-   data-ana-open 指向同一代號；新增文章只需在兩處各加一段，程式不必改。
+   文章本體是 HTML 中的 <article class="db-ana-art" data-ana-id>；列表項目由
+   buildAnaList() 讀取文章標題、日期、第一章以前的段落與第一張圖自動產生。
+   新增文章只需加一段 article，不必再同步維護另一份列表內容。
    文中案號與圖表不在 HTML 內寫死決議書位置：第一次開啟該篇時才由 FT_XREF_CASE
    把案號改寫為全文按鈕、由 DATA 繪製圖表（理由同覆轍清單第 1 點）。 */
 var ANA = {sub:'analysis', art:''};
@@ -8285,6 +8298,53 @@ function anaArticles(){
   var out = {}, nodes = document.querySelectorAll('#stats-sub-analysis .db-ana-art[data-ana-id]');
   for(var i = 0; i < nodes.length; i++) out[nodes[i].getAttribute('data-ana-id')] = nodes[i];
   return out;
+}
+function buildAnaList(){
+  var list = el('ana-list'), arts = anaArticles();
+  if(!list) return;
+  list.innerHTML = '';
+  Object.keys(arts).forEach(function(id){
+    var art = arts[id], body = art.querySelector('.db-ana-body');
+    if(!body) return;
+    /* 動態圖必須先完成繪製，列表才能複製第一張圖作主視覺。每篇只 enhance 一次。 */
+    if(!anaEnhanced[id]){
+      anaEnhanced[id] = true;
+      safeRun('專題分析文章', function(){ anaEnhance(art); });
+    }
+    var titleNode = art.querySelector('.db-ana-art-t');
+    var dateNode = art.querySelector('.db-ana-art-m time');
+    var intro = [], child = body.firstElementChild;
+    while(child){
+      if(child.matches && (child.matches('h2,h3,.db-ana-h') || /^一[、　\s]/.test((child.textContent || '').trim()))) break;
+      if(child.tagName === 'P' && (child.textContent || '').trim()) intro.push((child.textContent || '').replace(/\s+/g, ' ').trim());
+      child = child.nextElementSibling;
+    }
+    var visual = body.querySelector('.db-ana-fig-svg svg, figure img, figure svg, img');
+    var li = document.createElement('li'), a = document.createElement('a');
+    a.className = 'db-ana-item' + (visual ? '' : ' db-ana-item-no-visual');
+    a.setAttribute('data-ana-open', id);
+    a.href = '/stats/articles/' + encodeURIComponent(id);
+    if(visual){
+      var media = document.createElement('span'), clone = visual.cloneNode(true);
+      media.className = 'db-ana-item-visual';
+      clone.removeAttribute('id');
+      if(clone.querySelectorAll) clone.querySelectorAll('[id]').forEach(function(n){ n.removeAttribute('id'); });
+      clone.setAttribute('aria-hidden', 'true');
+      clone.setAttribute('focusable', 'false');
+      if(clone.tagName === 'IMG') clone.alt = '';
+      media.appendChild(clone);
+      a.appendChild(media);
+    }
+    var content = document.createElement('span');
+    content.className = 'db-ana-item-content';
+    content.innerHTML = '<span class="db-ana-item-head"><span class="db-ana-item-t">' + esc(titleNode ? titleNode.textContent.trim() : id) + '</span>' +
+      (dateNode ? '<time class="db-ana-item-d" datetime="' + esc(dateNode.getAttribute('datetime') || '') + '">' + esc(dateNode.textContent.trim()) + '</time>' : '') + '</span>' +
+      '<span class="db-ana-item-summary">' + intro.map(function(p){ return '<span>' + esc(p) + '</span>'; }).join('') + '</span>' +
+      '<span class="db-ana-item-more">閱讀專題 <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M4 12h14M12.5 6.5 18 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></span>';
+    a.appendChild(content);
+    li.appendChild(a);
+    list.appendChild(li);
+  });
 }
 function anaScrollTop(){
   if(ROUTE_APPLYING) return;               /* 由網址套用時，捲動交給路由模組 */
@@ -8404,11 +8464,12 @@ function anaFig1(box, asof){
     if(dis){
       nDis++;
       var fa = anaFtAttrs(String(c.caseNo).split(/[、，,]/)[0]);
-      dots.push('<g class="db-ana-pt' + fa.cls + '" aria-label="' + tip + '"' + fa.attrs + '>' +
-        '<title>' + tip + '</title><circle cx="' + x + '" cy="' + y + '" r="5" fill="none" stroke="' + ANA_DIS_COLOR + '" stroke-width=".8" opacity=".55"></circle>' +
+      dots.push('<g class="db-ana-pt' + fa.cls + '" data-tip="' + tip + '" aria-label="' + tip + '"' + fa.attrs + '>' +
+        '<circle cx="' + x + '" cy="' + y + '" r="5" fill="none" stroke="' + ANA_DIS_COLOR + '" stroke-width=".8" opacity=".55"></circle>' +
         '<circle cx="' + x + '" cy="' + y + '" r="3.1" fill="' + ANA_DIS_COLOR + '"></circle></g>');
     }else{
-      dots.push('<circle cx="' + x + '" cy="' + y + '" r="3.1" fill="' + ANA_DOT_GREY + '"><title>' + tip + '</title></circle>');
+      dots.push('<g class="db-ana-pt" data-tip="' + tip + '" aria-label="' + tip + '">' +
+        '<circle cx="' + x + '" cy="' + y + '" r="3.1" fill="' + ANA_DOT_GREY + '"></circle></g>');
     }
   });
   box.innerHTML = '<svg viewBox="0 0 ' + w.toFixed(1) + ' ' + h.toFixed(1) + '" role="img" aria-label="' +
@@ -8564,8 +8625,8 @@ function anaFigYear(box, asof){
     '<div class="db-ana-key"><span><i style="background:#DCE7F3;border-radius:2px"></i>案件數</span><span><i style="background:#DFA6AF;border-radius:2px"></i>除名件數</span><span><i style="background:' + ANA_DIS_COLOR + '"></i>除名率</span></div>';
 }
 
-/* 橫條圖色段的即時資料標籤。瀏覽器原生 title 會延遲出現，且無法配合目前色段的
-   框選效果，因此改用事件委派：動態產生的刑度圖與靜態緩刑圖共用同一個浮動標籤。 */
+/* 圖表的即時資料標籤。瀏覽器原生 title 會延遲出現，且無法配合目前圖形的
+   框選效果，因此改用事件委派；文章內點狀圖與橫條圖共用同一個浮動標籤。 */
 var anaBarTipsReady = false;
 function initAnaBarTips(){
   if(anaBarTipsReady || !document.body) return;
@@ -8577,7 +8638,8 @@ function initAnaBarTips(){
   tip.hidden = true;
   document.body.appendChild(tip);
   function segment(node){
-    return node && node.closest ? node.closest('.db-ana-bar span[data-tip]') : null;
+    /* 點狀圖的列表縮圖不在文章內，刻意不啟用互動浮標。 */
+    return node && node.closest ? node.closest('.db-ana-bar span[data-tip], .db-ana-art .db-ana-pt[data-tip]') : null;
   }
   function place(clientX, clientY){
     if(!active || tip.hidden) return;
@@ -8632,6 +8694,7 @@ function anaEnhance(art){
 
 function initAnalysis(){
   initAnaBarTips();
+  buildAnaList();
   var bar = el('stats-subtabs');
   if(bar) bar.addEventListener('click', function(e){
     var b = e.target.closest ? e.target.closest('.db-subtab[data-ssub]') : null;
@@ -8677,8 +8740,11 @@ function initAppModules(){
   initFulltextDialog();
   safeRun('全文標籤說明浮字', initFullTagTip);
 
-  var foot = el('db-foot');
-  if(foot) foot.textContent = '資料庫更新日期：2026年10月15日';
+  var footDate = el('db-foot-date');
+  if(footDate){
+    footDate.textContent = '2026年10月15日';
+    footDate.setAttribute('datetime', '2026-10-15');
+  }
 
   safeRun('違失態樣初始清單', renderPatternList);
   safeRun('案件清單', renderList);
@@ -8698,6 +8764,8 @@ function initAppModules(){
   safeRun('申訴頁導覽列', initComplaintToc);
   safeRun('統計與分析', initAnalysis);
   safeRun('網址路由', initPathRouting);
+  /* 若路由初始化在進入 applyRoute 前即發生非預期錯誤，仍不可讓內容永久隱藏。 */
+  document.documentElement.classList.remove('db-route-pending');
 }
 
 initAppModules();

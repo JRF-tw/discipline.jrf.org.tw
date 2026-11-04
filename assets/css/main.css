@@ -108,6 +108,9 @@ body{margin:0;padding:0}
   font-family:Noto Sans TC,PingFang TC,Microsoft JhengHei,system-ui,sans-serif;
   color:var(--ink); background:var(--bg); font-size:16px; line-height:1.7;
 }
+/* 非首頁網址重新整理時，在路由程式選定正確頁籤前隱藏面板，避免預設首頁閃現。
+   頁首仍保留，資料載入失敗時 load-data.js 會移除此狀態並顯示錯誤訊息。 */
+.db-route-pending .db-wrap section[role="tabpanel"]{display:none!important}
 .db-wrap a{color:var(--accent)}
 .db-wrap a:hover{color:var(--accent-deep)}
 
@@ -1109,7 +1112,18 @@ tr:has(.db-lk8:is(:hover,:focus-visible)) :is(td.db-t-norm,td.db-t-pat) .db-tag:
 .db-pat-desc .db-desc-case p{margin:0;text-align:justify}
 .db-pat-desc .db-desc-todo{color:var(--ink-soft);font-style:normal;letter-spacing:.05em}
 .db-hint{color:var(--ink);font-size:var(--fs-read);line-height:1.9;padding:2px 2px 8px}
-.db-foot{margin-top:24px;color:#A6A19C;font-size:14px;letter-spacing:.03em;text-align:right}
+.db-foot{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px 40px;align-items:end;
+  margin:38px -16px -48px;padding:26px 30px 22px;
+  border-top:3px solid var(--gold);background:linear-gradient(135deg,#10243F 0%,#0B1A2D 100%);
+  color:#fff;font-size:14px;letter-spacing:.02em
+}
+.db-foot-org{display:grid;grid-template-columns:126px minmax(0,680px);gap:22px;align-items:center;min-width:0}
+.db-wrap a.db-foot-logo{display:grid;place-items:center;width:112px;height:112px;padding:14px;color:inherit;text-decoration:none;border-radius:50%;background:#fff;box-shadow:0 5px 18px rgba(0,0,0,.24)}
+.db-foot-logo img{display:block;width:100%;max-width:88px;max-height:78px;object-fit:contain;object-position:center}
+.db-foot-org p{margin:0;line-height:1.85;color:rgba(255,255,255,.78);text-align:justify}
+.db-foot-updated{margin:0;color:rgba(255,255,255,.68);font-size:13px;white-space:nowrap;text-align:right}
+.db-foot-updated time{color:#F5DDAF;font-weight:700;font-variant-numeric:tabular-nums}
 
 /* 可點選之法條標籤 */
 button.db-tag{appearance:none;font:inherit;cursor:pointer;transition:filter .18s,transform .18s var(--e-out)}
@@ -1424,22 +1438,35 @@ span.db-tag-flow[role="button"]:focus-visible{outline:2px solid var(--focus);out
 /* [CSS-ANALYSIS] 統計與分析：專題分析（列表、文章、文章內圖表） */
 /* 分頁切換沿用案件清單的 .db-subtabs／.db-subtab（見 [CSS-COMMON-CONTROLS]）。 */
 .db-ana-sub[hidden]{display:none}
-/* 文章列表：一列一篇，標題在左、發布日期在右；窄螢幕改為上下排列 */
-.db-ana-list{list-style:none;margin:6px auto 0;padding:0;max-width:860px;border-top:2px solid var(--accent-deep)}
-.db-ana-list li{margin:0;padding:0;border-bottom:1px solid var(--line)}
+/* 文章列表：與文章同為 1040px 寬；由文章自動建立主視覺、標題、日期與摘要。 */
+.db-ana-list{list-style:none;margin:8px auto 0;padding:0;max-width:1040px}
+.db-ana-list li{margin:0 0 20px;padding:0}
 .db-wrap .db-ana-item{
-  display:flex;align-items:baseline;gap:18px;padding:18px 8px 18px 6px;
-  color:var(--ink);text-decoration:none;transition:background .18s
+  display:grid;grid-template-columns:minmax(240px,34%) minmax(0,1fr);gap:24px;padding:18px;
+  color:var(--ink);text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 5px 20px rgba(27,50,85,.07);transition:background .18s,border-color .18s,transform .22s var(--e-out),box-shadow .22s
 }
-.db-wrap .db-ana-item:hover{background:var(--accent-tint)}
+.db-wrap .db-ana-item:hover{background:#fff;border-color:var(--accent-line);transform:translateY(-2px);box-shadow:0 9px 28px rgba(27,50,85,.13)}
 .db-wrap .db-ana-item:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
-.db-ana-item-t{flex:1 1 auto;font-size:19px;font-weight:700;color:var(--accent-deep);line-height:1.5;letter-spacing:.03em}
-.db-ana-item-d{flex:none;font-size:14.5px;color:var(--ink-soft);font-variant-numeric:tabular-nums;white-space:nowrap}
-.db-ana-item-go{flex:none;width:18px;height:18px;color:var(--accent);align-self:center}
-.db-ana-item-go svg{width:100%;height:100%;display:block}
+.db-ana-item-visual{display:flex;align-items:center;justify-content:center;min-height:210px;padding:14px;border-radius:9px;background:var(--bg-soft);overflow:hidden}
+.db-ana-item-visual svg,.db-ana-item-visual img{display:block;width:100%;height:auto;max-height:230px;object-fit:contain}
+.db-ana-item-content{display:flex;flex-direction:column;min-width:0}
+.db-ana-item-head{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--line);padding:0 0 10px;margin:0 0 11px}
+.db-ana-item-t{flex:1 1 auto;font-size:21px;font-weight:700;color:var(--accent-deep);line-height:1.5;letter-spacing:.03em}
+.db-ana-item-d{flex:none;font-size:14px;color:var(--ink-soft);font-variant-numeric:tabular-nums;white-space:nowrap}
+.db-ana-item-summary{display:block;font-size:14.5px;line-height:1.8;color:var(--ink-soft)}
+.db-ana-item-summary>span{display:block;margin:0 0 7px}
+.db-ana-item-more{display:inline-flex;align-items:center;align-self:flex-end;gap:5px;margin-top:auto;padding-top:8px;color:var(--accent);font-size:14px;font-weight:700}
+.db-ana-item-more svg{width:17px;height:17px}
+.db-ana-item-no-visual{grid-template-columns:minmax(0,1fr)!important}
 @media (max-width:640px){
-  .db-wrap .db-ana-item{flex-wrap:wrap;gap:4px 12px}
-  .db-ana-item-t{flex-basis:100%;font-size:17.5px}
+  .db-wrap .db-ana-item{grid-template-columns:minmax(0,1fr);gap:15px;padding:13px}
+  .db-ana-item-visual{min-height:150px;padding:10px}
+  .db-ana-item-visual svg,.db-ana-item-visual img{max-height:190px}
+  .db-ana-item-head{display:block}
+  .db-ana-item-t{display:block;font-size:18px}
+  .db-ana-item-d{display:block;margin-top:4px;font-size:13px}
+  .db-ana-item-summary{font-size:14px}
 }
 /* 文章：正文限制行長，表格與圖可較寬 */
 .db-ana-art{max-width:1040px;margin:0 auto;font-size:var(--fs-read);line-height:1.9;color:var(--ink)}
@@ -1577,6 +1604,7 @@ span.db-tag-flow[role="button"]:focus-visible{outline:2px solid var(--focus);out
 .db-ana-key{display:flex;flex-wrap:wrap;gap:4px 18px;justify-content:center;margin:8px 0 0;font-size:13.5px;color:var(--ink-soft)}
 .db-ana-key span{display:inline-flex;align-items:center;gap:6px}
 .db-ana-key i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.db-ana-pt[data-tip]{cursor:help}
 .db-ana-pt.db-ft-open{cursor:pointer}
 .db-ana-pt:focus{outline:none}
 .db-ana-pt:hover circle,.db-ana-pt:focus-visible circle{stroke:var(--ink);stroke-width:1.5}
@@ -1899,6 +1927,12 @@ div.db-about-note.db-an-src p.db-src-num{padding-left:calc(5em + 4px);text-inden
   /* 抵銷內容容器的 10px 內距，頁首在手機同樣切齊螢幕兩側。 */
   .db-sticky{margin-left:-10px;margin-right:-10px}
   .db-wrap{font-size:15px}
+  .db-foot{grid-template-columns:minmax(0,1fr);gap:18px;margin-left:-10px;margin-right:-10px;padding:24px 20px 18px}
+  .db-foot-org{grid-template-columns:minmax(0,1fr);gap:14px}
+  .db-wrap a.db-foot-logo{width:96px;height:96px;padding:12px}
+  .db-foot-logo img{max-width:74px;max-height:68px}
+  .db-foot-org p{text-align:left}
+  .db-foot-updated{text-align:right}
   .db-result-count{margin-left:0}
   /* 法規選單改單欄，避免長標題在手機被擠壓換行 */
   .db-lawsel{grid-template-columns:1fr!important}
