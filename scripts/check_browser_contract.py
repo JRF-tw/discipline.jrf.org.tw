@@ -68,6 +68,7 @@ def main() -> int:
     require(app, "CASE_LIST_RENDERER", "case list renderer integration")
     require(app, "FULLTEXT_RENDERER", "fulltext renderer integration")
     require(app, "function ensureFulltext()", "fulltext loading entrypoint")
+    require(app, "initFulltextDeferredClick", "deferred fulltext click bridge")
     require(route, "global.DBROUTE", "route module export")
     require(context, "app.context", "shared context export")
     require(fulltext, "cases-fulltext.json", "fulltext endpoint")
