@@ -1897,63 +1897,6 @@ function buildFulltext(){
 }
 var FT = buildFulltext();
 var FULLTEXT_PROMISE = null;
-function ensureFulltext(){
-  if(FT) return Promise.resolve(FT);
-  if(FULLTEXT_PROMISE) return FULLTEXT_PROMISE;
-  var service = window.DisciplineApp && window.DisciplineApp.services && window.DisciplineApp.services.fulltext;
-  if(!service || typeof service.load !== 'function') return Promise.resolve(null);
-  FULLTEXT_PROMISE = service.load().then(function(payload){
-    if(!payload || payload.schemaVersion !== DB_SCHEMA_VERSION) throw new Error('全文資料格式版本不相容');
-    var main = payload.main || {}, rev = payload.rev || {};
-    DATA.cases.forEach(function(c){
-      if(!c.ft && c.caseNo && main[c.caseNo]) c.ft = main[c.caseNo];
-      if(!c.ftRev && c.revNo && rev[c.revNo]) c.ftRev = rev[c.revNo];
-    });
-    FT = buildFulltext();
-    FT_PLAIN = null;
-    initFulltextDialog();
-    safeRun('全文索引完成', function(){
-      renderList();
-      if(typeof pst !== 'undefined' && pst.expanded) renderPatternList();
-      if(typeof applyRoute === 'function' && DBROUTE.route().full) applyRoute(false);
-    });
-    return FT;
-  }).catch(function(err){
-    FULLTEXT_PROMISE = null;
-    if(window.console && console.error) console.error('[律師懲戒案件資料庫] 全文載入失敗：', err);
-    throw err;
-  });
-  return FULLTEXT_PROMISE;
-}
-/* 索引模式下全文資料尚未載入時，全文標籤仍會先顯示在案件列表中。
-   這個一次性委派器負責接住第一次點擊，載入全文後把同一個點擊重新交給
-   initFulltextDialog() 建立的正式事件處理器；避免啟動時因 FT 尚未存在而漏綁事件。 */
-var fulltextDeferredClickReady = false;
-function initFulltextDeferredClick(){
-  if(fulltextDeferredClickReady) return;
-  fulltextDeferredClickReady = true;
-  document.addEventListener('click', function(e){
-    if(FT) return;
-    var target = e.target;
-    var button = target && target.closest ? target.closest('.db-ft-open') : null;
-    if(!button) return;
-    e.preventDefault();
-    var slot = button.getAttribute('data-ft-slot');
-    var index = button.getAttribute('data-ft-i');
-    var hit = button.getAttribute('data-ft-hit');
-    ensureFulltext().then(function(){
-      /* ensureFulltext() 會重繪案件列表，原 button 可能已離開 DOM；重新取得
-         同一筆按鈕後再派送，事件才會沿 document 委派器正常冒泡。 */
-      var selector = '.db-ft-open[data-ft-slot="'+slot+'"][data-ft-i="'+index+'"]';
-      if(hit != null) selector += '[data-ft-hit="'+hit+'"]';
-      var current = document.querySelector(selector);
-      if(!current) return;
-      current.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true}));
-    }).catch(function(){
-      if(window.console && console.error) console.error('[律師懲戒案件資料庫] 無法開啟全文');
-    });
-  });
-}
 /* 案件之第 i 列在該 slot 對應的鍵（原決議＝案號、覆審＝覆審案號） */
 function ftKey(slot, i){
   var c = DATA.cases[i];
@@ -2105,6 +2048,63 @@ function ftDoc(slot, i){
 }
 (function(){
 "use strict";
+function ensureFulltext(){
+  if(FT) return Promise.resolve(FT);
+  if(FULLTEXT_PROMISE) return FULLTEXT_PROMISE;
+  var service = window.DisciplineApp && window.DisciplineApp.services && window.DisciplineApp.services.fulltext;
+  if(!service || typeof service.load !== 'function') return Promise.resolve(null);
+  FULLTEXT_PROMISE = service.load().then(function(payload){
+    if(!payload || payload.schemaVersion !== DB_SCHEMA_VERSION) throw new Error('全文資料格式版本不相容');
+    var main = payload.main || {}, rev = payload.rev || {};
+    DATA.cases.forEach(function(c){
+      if(!c.ft && c.caseNo && main[c.caseNo]) c.ft = main[c.caseNo];
+      if(!c.ftRev && c.revNo && rev[c.revNo]) c.ftRev = rev[c.revNo];
+    });
+    FT = buildFulltext();
+    FT_PLAIN = null;
+    initFulltextDialog();
+    safeRun('全文索引完成', function(){
+      renderList();
+      if(typeof pst !== 'undefined' && pst.expanded) renderPatternList();
+      if(typeof applyRoute === 'function' && DBROUTE.route().full) applyRoute(false);
+    });
+    return FT;
+  }).catch(function(err){
+    FULLTEXT_PROMISE = null;
+    if(window.console && console.error) console.error('[律師懲戒案件資料庫] 全文載入失敗：', err);
+    throw err;
+  });
+  return FULLTEXT_PROMISE;
+}
+/* 索引模式下全文資料尚未載入時，全文標籤仍會先顯示在案件列表中。
+   這個一次性委派器負責接住第一次點擊，載入全文後把同一個點擊重新交給
+   initFulltextDialog() 建立的正式事件處理器；避免啟動時因 FT 尚未存在而漏綁事件。 */
+var fulltextDeferredClickReady = false;
+function initFulltextDeferredClick(){
+  if(fulltextDeferredClickReady) return;
+  fulltextDeferredClickReady = true;
+  document.addEventListener('click', function(e){
+    if(FT) return;
+    var target = e.target;
+    var button = target && target.closest ? target.closest('.db-ft-open') : null;
+    if(!button) return;
+    e.preventDefault();
+    var slot = button.getAttribute('data-ft-slot');
+    var index = button.getAttribute('data-ft-i');
+    var hit = button.getAttribute('data-ft-hit');
+    ensureFulltext().then(function(){
+      /* ensureFulltext() 會重繪案件列表，原 button 可能已離開 DOM；重新取得
+         同一筆按鈕後再派送，事件才會沿 document 委派器正常冒泡。 */
+      var selector = '.db-ft-open[data-ft-slot="'+slot+'"][data-ft-i="'+index+'"]';
+      if(hit != null) selector += '[data-ft-hit="'+hit+'"]';
+      var current = document.querySelector(selector);
+      if(!current) return;
+      current.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true}));
+    }).catch(function(){
+      if(window.console && console.error) console.error('[律師懲戒案件資料庫] 無法開啟全文');
+    });
+  });
+}
 var PAGE_SIZE = 60;
 var srcByKey = {};
 /* 法律扶助法之下拉不顯示於篩選列（見下方 initExtraFilters），但條號索引、

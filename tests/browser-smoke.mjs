@@ -8,6 +8,9 @@ const port = 4173;
 const server = spawn('python3', ['-m', 'http.server', String(port), '--directory', '_site'], {
   stdio: ['ignore', 'pipe', 'pipe']
 });
+let browser;
+let page;
+server.stderr.on('data', (chunk) => process.stderr.write(chunk));
 
 try {
   await new Promise((resolve, reject) => {
@@ -28,10 +31,17 @@ try {
     check();
   });
 
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage();
+  browser = await chromium.launch({ headless: true });
+  page = await browser.newPage();
   const errors = [];
-  page.on('pageerror', (error) => errors.push(error));
+  page.on('pageerror', (error) => {
+    errors.push(error);
+    console.error('[browser pageerror]', error.stack || error.message);
+  });
+  page.on('console', (message) => {
+    if(message.type() === 'error') console.error('[browser console]', message.text());
+  });
+  page.on('requestfailed', (request) => console.error('[request failed]', request.url(), request.failure()));
   await page.goto(`http://127.0.0.1:${port}/`, { waitUntil: 'networkidle' });
   await page.locator('#tabbtn-list').click();
   await page.locator('#list-table table').waitFor();
@@ -39,6 +49,7 @@ try {
 
   const fulltextButton = page.locator('#list-table .db-ft-open').first();
   await fulltextButton.waitFor();
+  console.log('Opening fulltext:', await fulltextButton.evaluate((button) => ({slot:button.dataset.ftSlot, index:button.dataset.ftI})));
   await fulltextButton.click();
   await page.locator('#ft-dlg[open]').waitFor();
   assert.ok((await page.locator('#ft-body').innerText()).length > 0, '全文對話框沒有內容');
@@ -46,8 +57,17 @@ try {
   await page.waitForFunction(() => !document.querySelector('#ft-dlg')?.open);
   assert.equal(errors.length, 0, errors.map((error) => error.message).join('\n'));
   await browser.close();
+  browser = null;
   console.log('Browser smoke test passed');
+} catch (error) {
+  if(page) console.error('[failure state]', await page.evaluate(() => ({
+    url: location.href,
+    dialogExists: !!document.querySelector('#ft-dlg'),
+    dialogOpen: !!document.querySelector('#ft-dlg')?.open
+  })).catch(() => 'page unavailable'));
+  throw error;
 } finally {
+  if(browser) await browser.close();
   server.kill('SIGTERM');
   await once(server, 'close').catch(() => {});
 }
