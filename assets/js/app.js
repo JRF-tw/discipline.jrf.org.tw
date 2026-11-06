@@ -4,84 +4,6 @@ var DB_STATUS = {featureErrors:[]};
 function scrollToInstant(x, y){
   window.scrollTo(x, y);
 }
-/* 獨立網站路由：頁籤使用網址路徑，篩選狀態使用 query string。 */
-var DBROUTE = (function(){
-  var TABS = {home:1, list:1, pattern:1, laws:1, stats:1, about:1, reform:1, complaint:1, ethichist:1};
-  var TOLERANCE = 2;
-  var holdUntil = 0, holding = false, released = false;
-  function now(){ return (window.performance && performance.now) ? performance.now() : Date.now(); }
-  function decodePart(s){ try{ return decodeURIComponent(s); }catch(e){ return s; } }
-  function legacyRoute(){
-    var h = String(location.hash || '').replace(/^#/, '');
-    if(!h) return null;
-    var segs = decodePart(h).split('/'), head = String(segs.shift() || '').toLowerCase();
-    if(!TABS[head]) return null;
-    var parts = [], full = null;
-    for(var i = 0; i < segs.length; i++){
-      if(/^full=/i.test(segs[i])){ full = {no:segs[i].slice(5), name:segs[i + 1] || ''}; break; }
-      if(segs[i]) parts.push(segs[i]);
-    }
-    return {tab:head, parts:parts, full:full, legacy:true};
-  }
-  function route(){
-    var old = legacyRoute();
-    if(old) return old;
-    var segs = String(location.pathname || '/').split('/').filter(Boolean).map(decodePart);
-    var head = String(segs.shift() || 'home').toLowerCase();
-    if(!TABS[head]) return null;
-    var parts = segs.slice(), params = new URLSearchParams(location.search || '');
-    params.forEach(function(v, k){ if(k !== 'full' && k !== 'name') parts.push(k.toLowerCase() + '=' + v); });
-    var fullNo = params.get('full');
-    return {tab:head, parts:parts, full:fullNo ? {no:fullNo, name:params.get('name') || ''} : null};
-  }
-  function active(){ return !!route(); }
-  function key(){ var r = route(); return r ? r.tab : null; }
-
-  /* 預設定位到獨立網站的資料庫頁首；頁內目標由主程式提供。 */
-  var targetFn = null;
-  function target(fn){ targetFn = fn || null; }
-  function targetY(){
-    if(targetFn){
-      var y = targetFn();
-      return (y === null || y === undefined || isNaN(y)) ? null : Math.max(0, Math.round(y));
-    }
-    return 0;
-  }
-  function snap(){
-    var y = targetY();
-    if(y === null) return;
-    if(Math.abs(window.pageYOffset - y) <= TOLERANCE) return;
-    scrollToInstant(0, y);
-  }
-  function release(){
-    released = true;
-    holdUntil = 0;
-  }
-  function resume(){ released = false; }
-  function hold(ms){
-    if(released) return;
-    holdUntil = Math.max(holdUntil, now() + (ms || 0));
-    if(holding) return;
-    holding = true;
-    (function step(){
-      if(released){ holding = false; return; }
-      snap();
-      if(now() < holdUntil){
-        if(window.requestAnimationFrame) window.requestAnimationFrame(step);
-        else setTimeout(step, 16);
-      }else{
-        holding = false;
-      }
-    })();
-  }
-  /* 版面尚在建立時持續追蹤目標；使用者自行捲動後立即停止，避免搶捲軸。
-     頁內導覽的 click handler 會在套用新目標前呼叫 resume()。 */
-  ['wheel','touchstart','keydown','pointerdown','mousedown'].forEach(function(ev){
-    window.addEventListener(ev, release, {passive:true});
-  });
-  return {active:active, key:key, route:route, snap:snap, hold:hold,
-    resume:resume, release:release, target:target};
-})();
 
 /* [JS-BOOT] 主 App 啟動函式：以下所有資料模型、renderer、feature module 都在此作用域。 */
 function __boot(){
@@ -97,6 +19,11 @@ function safeRun(label, fn){
     return null;
   }
 }
+function safeFeature(label, fn){
+  var features = window.DisciplineApp && window.DisciplineApp.features;
+  if(!features || typeof features.init !== 'function') return safeRun(label, fn);
+  return safeRun(label, function(){ return features.init(label, fn); });
+}
 var dbNode = document.getElementById('db');
 var contentNode = document.getElementById('db-content-meta');
 var patternNode = document.getElementById('db-pattern-meta');
@@ -109,6 +36,8 @@ var CONTENT_META = JSON.parse(contentNode.textContent);
 if(CONTENT_META.schemaVersion !== CONTENT_META_SCHEMA_VERSION){
   throw new Error('內容資料格式版本不相容：預期 '+CONTENT_META_SCHEMA_VERSION+'，實際 '+CONTENT_META.schemaVersion);
 }
+var APP_CONTEXT = window.DisciplineApp && window.DisciplineApp.context;
+if(APP_CONTEXT){ APP_CONTEXT.data = DATA; APP_CONTEXT.content = CONTENT_META; }
 /* 純內容資料只在各自功能區建立短別名，避免把不同頁籤的資料與程式混在一起。 */
 function esc(s){
   return String(s==null?'':s).replace(/[&<>"']/g,function(c){
@@ -1971,8 +1900,9 @@ var FULLTEXT_PROMISE = null;
 function ensureFulltext(){
   if(FT) return Promise.resolve(FT);
   if(FULLTEXT_PROMISE) return FULLTEXT_PROMISE;
-  if(typeof window.__loadDisciplineFulltext !== 'function') return Promise.resolve(null);
-  FULLTEXT_PROMISE = window.__loadDisciplineFulltext().then(function(payload){
+  var service = window.DisciplineApp && window.DisciplineApp.services && window.DisciplineApp.services.fulltext;
+  if(!service || typeof service.load !== 'function') return Promise.resolve(null);
+  FULLTEXT_PROMISE = service.load().then(function(payload){
     if(!payload || payload.schemaVersion !== DB_SCHEMA_VERSION) throw new Error('全文資料格式版本不相容');
     var main = payload.main || {}, rev = payload.rev || {};
     DATA.cases.forEach(function(c){
@@ -2003,6 +1933,8 @@ function ftKey(slot, i){
 }
 /* 段落陣列 → 原字串。相容於直接存成單一字串的舊寫法 */
 function ftJoin(d){
+  var renderer = window.DisciplineApp && window.DisciplineApp.modules && window.DisciplineApp.modules.fulltextRenderer;
+  if(renderer && renderer.join) return renderer.join(d);
   if(!d) return null;
   return (typeof d === 'string') ? d : d.join('\n');
 }
@@ -2012,13 +1944,15 @@ function ftJoin(d){
 /* 全文來源網站：網域 → 顯示名稱。全庫只有下列三個來源（350／340／5 筆）。
    name 為紙本者另需頁次（見 srcPage），否則單一網址無從指出是書中哪幾頁。
    日後新增來源只要在此加一列；未列入者由載入檢核在主控台指出，不會靜默產生空標籤。 */
-var FT_SITE = {
+var FULLTEXT_RENDERER = window.DisciplineApp && window.DisciplineApp.modules && window.DisciplineApp.modules.fulltextRenderer;
+var FT_SITE = FULLTEXT_RENDERER && FULLTEXT_RENDERER.sites || {
   'lawyerbc.moj.gov.tw': {name:'法務部查詢系統'},
   'gazette.nat.gov.tw':  {name:'行政院公報資訊網'},
   'www.twba.org.tw':     {name:'律師懲戒案例選集', paper:true}
 };
 /* 網址 → 網域（不用 URL 物件，舊瀏覽器亦可） */
 function ftHost(u){
+  if(FULLTEXT_RENDERER && FULLTEXT_RENDERER.host) return FULLTEXT_RENDERER.host(u);
   var m = /^https?:\/\/([^\/?#]+)/i.exec(String(u || ''));
   return m ? m[1].toLowerCase() : '';
 }
@@ -2048,7 +1982,7 @@ function ftHydrate(doc, no, link, page){
    機關代碼：0＝臺灣律師懲戒委員會；1＝律師懲戒委員會；2＝律師懲戒覆審委員會。
    空姓名／空委員陣列統一渲染為 <span class="empty">（空）</span>。
    297 筆舊署名 HTML 均已逐筆驗證，可由此結構完整還原。 */
-var SIGN_AGENCY = ['臺灣律師懲戒委員會','律師懲戒委員會','律師懲戒覆審委員會'];
+var SIGN_AGENCY = FULLTEXT_RENDERER && FULLTEXT_RENDERER.agencies || ['臺灣律師懲戒委員會','律師懲戒委員會','律師懲戒覆審委員會'];
 function ftSignCell(v){
   return v ? esc(v) : '<span class="empty">（空）</span>';
 }
@@ -2074,6 +2008,7 @@ function ftSign(t, g){
    dOrig／revDOrig 欄位保留；它帶 class="hide"，畫面上不顯示，照原樣輸出。
    案號與被付懲戒人兩列由 fillMetaHead() 於開窗後自標題條補上（見下）。 */
 function ftRoc(iso){
+  if(FULLTEXT_RENDERER && FULLTEXT_RENDERER.roc) return FULLTEXT_RENDERER.roc(iso);
   var m = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(String(iso || ''));
   if(!m) return '';
   return '民國' + (+m[1] - 1911) + '年' + (+m[2]) + '月' + (+m[3]) + '日';
@@ -2084,6 +2019,7 @@ function ftMetaRow(label, value, hide){
   return '<dt' + h + '>' + esc(label) + '</dt><dd' + (hide ? ' class="hide"' : ' class="wide"') + '>' + v + '</dd>';
 }
 function ftCriminalDate(s){
+  if(FULLTEXT_RENDERER && FULLTEXT_RENDERER.criminalDate) return FULLTEXT_RENDERER.criminalDate(s);
   var m = /^(\d+)\.(\d+)\.(\d+)$/.exec(String(s || ''));
   if(!m) return '';
   return '民國' + (+m[1]) + '年' + (+m[2]) + '月' + (+m[3]) + '日';
@@ -2495,9 +2431,14 @@ try{
    「無全文」→深灰底白字。外部來源連結由全文彈窗內的來源按鈕提供。 */
 /* 全文欄實際顯示的字樣。fullTag() 與關鍵字檢索索引共用這一份判斷——
    兩者若各寫一套就會不一致：畫面顯示「詳覆審」的案件，卻能被「無全文」搜到。 */
+var CASE_LIST_VIEW = window.DisciplineApp && window.DisciplineApp.modules && window.DisciplineApp.modules.caseListView;
 function fullWord(v, revv, i, slot){
+  if(CASE_LIST_VIEW && CASE_LIST_VIEW.fullWord) return CASE_LIST_VIEW.fullWord(v, revv, i, slot, ftHas);
   var s = String(v==null?'':v).trim();
   if(ftHas(slot || 'main', i)) return '全文';          /* 已收錄全文 */
+  /* 索引檔會移除 ft，全文資料尚未按需載入時仍要依來源網址顯示可開啟的按鈕；
+     使用者點擊後由 fulltext dialog 觸發 ensureFulltext() 載入完整內容。 */
+  if(/^https?:\/\//i.test(s)) return '全文';
   var rs = String(revv==null?'':revv).trim();
   /* 本案無全文，但覆審有全文連結時，標示「詳覆審」 */
   if((s==='無全文'||s==='') && /^https?:\/\//i.test(rs)) return '詳覆審';
@@ -2505,6 +2446,7 @@ function fullWord(v, revv, i, slot){
   return '';
 }
 function fullTag(v, revv, i, slot){
+  if(CASE_LIST_VIEW && CASE_LIST_VIEW.fullTag) return CASE_LIST_VIEW.fullTag(v, revv, i, slot, ftHas, esc);
   var sl = slot || 'main', word = fullWord(v, revv, i, sl);
   if(word==='全文'){
     /* 不下 title：按鈕文字「全文」本身已說明用途，原生 tooltip 只是重複一次 */
@@ -3032,7 +2974,29 @@ onDbResize(fitTableScroll);
 /* curPatId（選用）：目前檢視之態樣 ID，只有「違失態樣」頁傳入。
    snip（選用）：{terms:[…]}，只有「案件清單」在有檢索字詞時傳入；有值才輸出檢索摘要列並
    反白欄位內的命中字（見上方「檢索摘要列」）。不傳則與過去完全相同。 */
+var CASE_LIST_RENDERER = window.DisciplineApp && window.DisciplineApp.modules && window.DisciplineApp.modules.caseListRenderer;
+var CASE_LIST_RENDER = CASE_LIST_RENDERER && CASE_LIST_RENDERER.create ? CASE_LIST_RENDERER.create({
+  columns: CASE_COLUMNS,
+  pageSize: PAGE_SIZE,
+  pager: window.DisciplineApp.modules.caseListPager,
+  groupIcons: GRP_ICON,
+  deps: function(){ return {
+    data: DATA,
+    setPattern: function(id){ CUR_PAT_ID = id || ''; },
+    snipRegex: snipRegex,
+    snipSpan: snipSpan,
+    snipRowHtml: snipRowHtml,
+    snipMarkCells: snipMarkCells,
+    fitTableScroll: fitTableScroll
+  }; }
+}) : null;
 function renderTable(idxList, tableBox, pagerBoxes, page, onPage, sortCfg, groupCfg, revVisible, curPatId, snip){
+  if(CASE_LIST_RENDER) return CASE_LIST_RENDER({idxList:idxList, tableBox:tableBox, pagerBoxes:pagerBoxes, page:page,
+    onPage:onPage, sortCfg:sortCfg, groupCfg:groupCfg, revVisible:revVisible, curPatId:curPatId, snip:snip});
+  return renderTableLegacy(idxList, tableBox, pagerBoxes, page, onPage, sortCfg, groupCfg, revVisible, curPatId, snip);
+}
+function renderTableLegacy(idxList, tableBox, pagerBoxes, page, onPage, sortCfg, groupCfg, revVisible, curPatId, snip){
+  var CASE_LIST_PAGER = window.DisciplineApp && window.DisciplineApp.modules && window.DisciplineApp.modules.caseListPager;
   if(!Array.isArray(pagerBoxes)) pagerBoxes = [pagerBoxes];
   var total = idxList.length;
   var pages = Math.max(1, Math.ceil(total/PAGE_SIZE));
@@ -3078,7 +3042,7 @@ function renderTable(idxList, tableBox, pagerBoxes, page, onPage, sortCfg, group
   var start = (page-1)*PAGE_SIZE;
   var slice = idxList.slice(start, start+PAGE_SIZE);
   /* 佔位分頁：頁數不足一頁時保留同高空間，避免表格位置跳動 */
-  var ghost = '<nav class="db-pager" style="visibility:hidden" aria-hidden="true"><button type="button" disabled>▲</button></nav>';
+  var ghost = CASE_LIST_PAGER ? CASE_LIST_PAGER.ghost() : '<nav class="db-pager" style="visibility:hidden" aria-hidden="true"><button type="button" disabled>▲</button></nav>';
   if(!total){
     tableBox.innerHTML = '<div class="db-table-scroll"><div class="db-no-result">查無符合條件之案件。</div></div>';
     tableBox.classList.toggle('db-rev-hidden', !revVisible);
@@ -3141,6 +3105,11 @@ function renderTable(idxList, tableBox, pagerBoxes, page, onPage, sortCfg, group
      　中段：            1 … p-1 p p+1 … 末
      　結尾段（末4頁內）：1 … 末-4 末-3 末-2 末-1 末
      如此任何頁次下槽位數與各槽寬度皆相同，上一頁／下一頁位置固定不動 */
+  if(CASE_LIST_PAGER){
+    var modulePager = CASE_LIST_PAGER.html(pages, page);
+    pagerBoxes.forEach(function(bx){ bx.innerHTML = modulePager; });
+    return;
+  }
   var slots = [];
   if(pages<=7){
     for(var p=1;p<=pages;p++) slots.push(p);
@@ -3489,8 +3458,14 @@ tabs.forEach(function(t){
     if(t.btn === el('tabbtn-home') && !homeReady) safeRun('首頁', initHome);
     if(t.btn === el('tabbtn-pattern')) safeRun('違失態樣', function(){ pst.expanded = true; renderPatternList(); });
     if(t.btn === el('tabbtn-laws') && !lawState.ready) safeRun('懲戒法規', initLaws);
-    if(t.btn === el('tabbtn-stats')) safeRun('統計與分析', anaOnTabShown);
-    if(t.btn === el('tabbtn-complaint') && !complaintReady) safeRun('申訴流程與地圖', initComplaint);
+    if(t.btn === el('tabbtn-stats')){
+      safeFeature('統計與分析', initAnalysis);
+      safeRun('統計圖表', anaOnTabShown);
+    }
+    if(t.btn === el('tabbtn-complaint')){
+      if(!complaintReady) safeFeature('申訴流程與地圖', initComplaint);
+      safeFeature('申訴頁導覽列', initComplaintToc);
+    }
     if(t.btn === el('tabbtn-ethichist') && !ehReady) safeRun('倫理規範歷史版本', initEthicHist);
     /* 各頁首次 init 完成後，先把既有子內容的垂直進場定格，再只讓整個 panel
        走一次 CSS 上滑淡入；動畫失敗也不影響已完成的頁籤狀態切換。 */
@@ -3510,7 +3485,10 @@ tabs.forEach(function(t){
 /* grp：'' 一般／'case' 一案多人／'name' 一人多案（僅「案件清單」頁籤可用） */
 /* kind：'disc' 懲戒處分（暫時處分以外的全部案件）／'prov' 暫時處分。兩個分頁是
    互斥的兩份清單，件數、排序、檢索與頁次都各自獨立。 */
-var st = {src:'', artIdx:-1, sort:'no', asc:false, page:1, q:'', other:'', grp:'', kind:'disc'};
+var CASE_LIST_STATE = window.DisciplineApp && window.DisciplineApp.modules && window.DisciplineApp.modules.caseList;
+var st = CASE_LIST_STATE && CASE_LIST_STATE.createState
+  ? CASE_LIST_STATE.createState()
+  : {src:'', artIdx:-1, sort:'no', asc:false, page:1, q:'', other:'', grp:'', kind:'disc'};
 
 /* 分頁切換。暫時處分不設法條篩選器——該分頁全部案件都只引新律師法第7條第1項，
    篩了沒有分辨力，篩選器又會隨分頁隱藏，留著就成了看不見卻生效的條件，故一併
@@ -3709,8 +3687,10 @@ function qParse(toks){
   return root;
 }
 /* 解析結果快取：同一段查詢字串於一次渲染中會被反覆取用 */
+var CASE_LIST_SEARCH = window.DisciplineApp && window.DisciplineApp.modules && window.DisciplineApp.modules.caseListSearch;
 var Q_CACHE = {s:null, ast:null};
 function queryAst(q){
+  if(CASE_LIST_SEARCH && CASE_LIST_SEARCH.ast) return CASE_LIST_SEARCH.ast(q);
   var s = searchNormalizeText(q);
   if(Q_CACHE.s === s) return Q_CACHE.ast;
   Q_CACHE.s = s;
@@ -3719,6 +3699,7 @@ function queryAst(q){
 }
 /* 反白用字詞：只取正向條件，「不含」右側者不取（未命中之字詞不該被標示） */
 function queryTerms(node, out){
+  if(CASE_LIST_SEARCH && CASE_LIST_SEARCH.terms) return CASE_LIST_SEARCH.terms(node, out);
   out = out || [];
   if(!node) return out;
   if(node.t === 'w'){ if(out.indexOf(node.v) < 0) out.push(node.v); return out; }
@@ -7542,6 +7523,7 @@ function applyComplaintRoute(P){
 
 /* [JS-CP-TOC] 申訴救濟頁導覽列：站內連結以 History API 切換，不重新下載頁面。 */
 function initComplaintToc(){
+  if(initComplaintToc.ready) return;
   document.addEventListener('click', function(e){
     var a = (e.target && e.target.closest) ? e.target.closest('.db-cp-toc-a[href^="/complaint/"]') : null;
     if(!a) return;
@@ -7557,6 +7539,7 @@ function initComplaintToc(){
     DBROUTE.resume();
     applyRoute(false);
   });
+  initComplaintToc.ready = true;
 }
 
 function applyRoute(fromLoad){
@@ -7665,16 +7648,18 @@ function initFulltextDialog(){
   if(fulltextDialogReady || !FT) return;
   fulltextDialogReady = true;
   if(!FT) return;                       /* 未附全文資料時完全不介入 */
-  var dlg = document.createElement('dialog');
-  dlg.id = 'ft-dlg';
-  dlg.setAttribute('aria-modal', 'true');
-  /* 不另設標題列：案號、姓名、出處、日期在彙編原檔的 h2 與 .meta 區塊中皆已具備，僅於右上角浮貼一個關閉鈕 */
-  dlg.innerHTML =
-    '<button type="button" id="ft-x" aria-label="關閉全文">\u00d7</button>' +
-    '<div id="ft-body" tabindex="-1"></div>';
-  document.body.appendChild(dlg);
+  var DIALOG_CONTROLLER = window.DisciplineApp && window.DisciplineApp.modules && window.DisciplineApp.modules.fulltextDialogController;
+  var shell = DIALOG_CONTROLLER && DIALOG_CONTROLLER.create ? DIALOG_CONTROLLER.create({id:'ft-dlg'}) : null;
+  var dlg = shell ? shell.dialog : document.createElement('dialog');
+  if(!shell){
+    dlg.id = 'ft-dlg';
+    dlg.setAttribute('aria-modal', 'true');
+    dlg.innerHTML = '<button type="button" id="ft-x" aria-label="關閉全文">\u00d7</button><div id="ft-body" tabindex="-1"></div>';
+    document.body.appendChild(dlg);
+  }
 
   var body = el('ft-body'), lastFocus = null;
+  var HIGHLIGHT = window.DisciplineApp && window.DisciplineApp.modules && window.DisciplineApp.modules.fulltextHighlight;
   /* ftPushed：目前這個彈窗是不是由本程式推進歷史的（決定關閉時能否 history.back()）。
      ftFromRoute：本次開啟是否來自網址套用（來自錨點時不可再寫一次歷史）。 */
   var ftPushed = false, ftFromRoute = false;
@@ -7688,6 +7673,7 @@ function initFulltextDialog(){
     return q.split(/\s+/).filter(Boolean);
   }
   function clearHilite(){
+    if(HIGHLIGHT && HIGHLIGHT_CONTROLLER) return HIGHLIGHT_CONTROLLER.clear();
     var ms = body.querySelectorAll('mark.ft-hit');
     for(var i = 0; i < ms.length; i++){
       var m = ms[i], p = m.parentNode;
@@ -7696,6 +7682,7 @@ function initFulltextDialog(){
     }
   }
   function applyHilite(){
+    if(HIGHLIGHT && HIGHLIGHT_CONTROLLER) return HIGHLIGHT_CONTROLLER.apply();
     clearHilite();
     var toks = hiliteTokens();
     if(!toks.length || !body.firstChild) return;
@@ -7729,6 +7716,7 @@ function initFulltextDialog(){
      附近也不報錯（超出範圍則取最後一個）。須在 showModal() 之後呼叫——彈窗開啟前
      #ft-body 沒有版面，量不到位置。 */
   function goHit(k){
+    if(HIGHLIGHT && HIGHLIGHT_CONTROLLER) return HIGHLIGHT_CONTROLLER.goHit(k);
     if(k == null || isNaN(k)) return;
     var ms = body.querySelectorAll('.sec mark.ft-hit');
     if(!ms.length) return;
@@ -7739,6 +7727,7 @@ function initFulltextDialog(){
     var top = m.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop;
     body.scrollTop = Math.max(0, top - body.clientHeight / 3);
   }
+  var HIGHLIGHT_CONTROLLER = HIGHLIGHT && HIGHLIGHT.create ? HIGHLIGHT.create(body, hiliteTokens) : null;
   /* 供檢索列於條件變動時呼叫；彈窗未開啟時不做事 */
   FT_HILITE = function(){ if(dlg.open) applyHilite(); };
 
@@ -7788,6 +7777,7 @@ function initFulltextDialog(){
   })();
 
   var XREF_FIELDS = {'原決議':1, '覆審':1, '歷審決議':1};
+  var FULLTEXT_META = window.DisciplineApp && window.DisciplineApp.modules && window.DisciplineApp.modules.fulltextMeta;
 
   /* 前導資訊區的顯示欄位與順序。彙編原檔預設只顯示「覆審／原決議／歷審決議」
      與「決議日期」，其餘標為 hide；此處改為依下列順序顯示前四項，
@@ -7797,6 +7787,7 @@ function initFulltextDialog(){
   /* 案號與被付懲戒人：全文字串內不存，一律由標題條的 .cn／.pname 取值後補回，
      故更正姓名只需改標題條一處。須在 reorderMeta() 之前呼叫，補上的欄位才會納入排序。 */
   function fillMetaHead(){
+    if(FULLTEXT_META_CONTROLLER) return FULLTEXT_META_CONTROLLER.fillMetaHead();
     var dl = body.querySelector('.meta'), h2 = body.querySelector('.doc h2');
     if(!dl || !h2) return;
     /* 由後往前插入，故先被付懲戒人、後案號，插完即為「案號、被付懲戒人」之序 */
@@ -7817,6 +7808,7 @@ function initFulltextDialog(){
     }
   }
   function reorderMeta(){
+    if(FULLTEXT_META_CONTROLLER) return FULLTEXT_META_CONTROLLER.reorderMeta();
     var dl = body.querySelector('.meta');
     if(!dl) return;
     var dts = dl.querySelectorAll('dt'), pairs = [], i, j;
@@ -7849,6 +7841,7 @@ function initFulltextDialog(){
 
   /* 把可跳轉的案號改寫為按鈕；沿用 .db-ft-open 類別，直接由既有的委派處理器接手 */
   function linkifyMeta(){
+    if(FULLTEXT_META_CONTROLLER) return FULLTEXT_META_CONTROLLER.linkifyMeta();
     var dts = body.querySelectorAll('.meta dt');
     for(var a = 0; a < dts.length; a++){
       var label = (dts[a].textContent || '').trim();
@@ -7867,6 +7860,7 @@ function initFulltextDialog(){
       if(changed) dd.innerHTML = html;
     }
   }
+  var FULLTEXT_META_CONTROLLER = FULLTEXT_META && FULLTEXT_META.create ? FULLTEXT_META.create(body, esc, function(value){ return XREF(value); }) : null;
 
   /* 開關彈窗時固定背景頁面的捲動位置。
      會造成背景跳動的來源有三：
@@ -7950,6 +7944,23 @@ function initFulltextDialog(){
   FT_CLOSE = close;
 
   /* 事件委派：表格每次重繪都不必重新掛載 */
+  var DIALOG_EVENTS = window.DisciplineApp && window.DisciplineApp.modules && window.DisciplineApp.modules.fulltextDialogEvents;
+  if(DIALOG_EVENTS && DIALOG_EVENTS.bind){
+    DIALOG_EVENTS.bind({
+      dialog: dlg,
+      open: open,
+      close: close,
+      getElement: el,
+      onNativeClose: function(){
+        body.innerHTML = '';
+        if(FT_ROUTE){
+          FT_ROUTE = null;
+          if(ftPushed && window.history && history.back){ ftPushed = false; FT_CLOSING = true; history.back(); }
+          else routeReplace();
+        }
+      }
+    });
+  }else{
   document.addEventListener('click', function(e){
     var t = e.target;
     var btn = t.closest ? t.closest('.db-ft-open') : null;
@@ -7970,6 +7981,7 @@ function initFulltextDialog(){
       else routeReplace();
     }
   });
+  }
 }
 
 /* ---------- 「詳覆審」「無全文」標籤的說明浮字 --------------------------
@@ -8781,6 +8793,7 @@ function anaEnhance(art){
 }
 
 function initAnalysis(){
+  if(initAnalysis.ready) return;
   initAnaBarTips();
   buildAnaList();
   var bar = el('stats-subtabs');
@@ -8817,6 +8830,7 @@ function initAnalysis(){
   }
   setStatsSub(ANA.sub);
   anaShowArticle(ANA.art);
+  initAnalysis.ready = true;
 }
 
 /* [JS-INIT] 所有主要 module 定義完成後，統一在此啟動副作用與首次 render。 */
@@ -8849,8 +8863,6 @@ function initAppModules(){
     FX.settleTab(defPanel);
     FX.tabRise(defPanel);
   });
-  safeRun('申訴頁導覽列', initComplaintToc);
-  safeRun('統計與分析', initAnalysis);
   safeRun('網址路由', initPathRouting);
   /* 若路由初始化在進入 applyRoute 前即發生非預期錯誤，仍不可讓內容永久隱藏。 */
   document.documentElement.classList.remove('db-route-pending');

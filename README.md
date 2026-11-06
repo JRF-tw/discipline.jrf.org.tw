@@ -20,15 +20,31 @@
 ├── scripts/
 │   ├── validate_data.py         部署前的資料關聯與格式檢查
 │   ├── build_site_data.py       產生瀏覽器使用的索引、全文與統計資料
-│   └── check_site_data.py       檢查產生後的網站資料是否完整
+│   ├── check_site_data.py       檢查產生後的網站資料是否完整
+│   └── check_browser_contract.py 檢查瀏覽器啟動順序與核心互動契約
 ├── assets/
 │   ├── css/main.css       全站樣式
 │   ├── img/
 │   │   ├── og-image.png         社群網站分享時顯示的圖片（1200×630）
 │   │   └── apple-touch-icon.png 加入手機主畫面時的圖示
 │   └── js/
-│       ├── load-data.js   先下載 data/ 三份 JSON，再載入主程式
+│       ├── modules/app-context.js       模組共享 Context
+│       ├── modules/route.js              路由與頁面定位模組
+│       ├── modules/fulltext-service.js  全文資料按需載入與快取
+│       ├── modules/fulltext-renderer.js 全文來源與日期呈現工具
+│       ├── modules/fulltext-dialog-events.js 全文 dialog 事件委派
+│       ├── modules/fulltext-dialog-controller.js 全文 dialog 外殼與生命週期
+│       ├── modules/fulltext-highlight.js 全文命中反白與摘要定位
+│       ├── modules/fulltext-meta.js      全文 meta 與案號互連
+│       ├── modules/feature-lifecycle.js 一次性功能初始化管理
+│       ├── modules/case-list-state.js   案件清單狀態模組
+│       ├── modules/case-list-search.js  案件清單搜尋語法模組
+│       ├── modules/case-list-view.js    案件清單全文標籤呈現模組
+│       ├── modules/case-list-pager.js   案件清單分頁呈現模組
+│       ├── modules/case-list-renderer.js 案件清單完整 renderer
+│       ├── load-data.js                  先下載 data/ 三份 JSON，再載入主程式
 │       └── app.js         主程式：資料整理、各頁籤畫面、檢索、統計、網址路由
+├── tests/browser-smoke.mjs   Chromium 冒煙測試：列表、全文開啟與關閉
 └── data/
     ├── cases.json         維護用主資料：懲戒案件（含決議書全文）、違失態樣、法規條文
     ├── pattern-meta.json  違失態樣的分類與說明
@@ -52,6 +68,8 @@ python3 -m http.server 8000
 
 - **只發布網站需要的檔案**：`index.html`、`404.html`、`favicon.svg`、`robots.txt`、`sitemap.xml`、`assets/`，以及由 workflow 產生的 `data/cases-index.json`、`data/cases-fulltext.json`、`data/content-meta.json`、`data/pattern-meta.json`。維護用的 `cases.json` 不會直接公開。
 - 發布前會檢查 JSON 格式、資料關聯、日期、法條鍵值、全文索引與 JavaScript 語法；檢查失敗就不會發布。
+- workflow 也會檢查所有 `assets/js/modules/*.js` 模組的 JavaScript 語法，以及網站啟動契約。
+- 建置完成後會安裝 Chromium 並執行 `tests/browser-smoke.mjs`，確認案件列表與全文閱讀按鈕可正常運作。
 - Repo 設定：Settings → Pages → Source 為 `GitHub Actions`，Custom domain 為 `discipline.jrf.org.tw`。
 - DNS：`discipline.jrf.org.tw` 以 CNAME 指向 `jrf-tw.github.io`，目前經 Cloudflare 代理。
 

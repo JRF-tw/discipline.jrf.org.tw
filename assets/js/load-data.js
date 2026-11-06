@@ -46,11 +46,4 @@
     document.body.appendChild(app);
   }).catch(fail);
 
-  window.__loadDisciplineFulltext = function(){
-    if(window.__disciplineFulltextPromise) return window.__disciplineFulltextPromise;
-    window.__disciplineFulltextPromise = fetchText('data/cases-fulltext.json').then(function(text){
-      return JSON.parse(text);
-    });
-    return window.__disciplineFulltextPromise;
-  };
 })();

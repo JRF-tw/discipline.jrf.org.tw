@@ -26,10 +26,12 @@ jobs:
 
       - name: 檢查 JSON 格式
         run: |
-          python3 -m py_compile scripts/validate_data.py scripts/build_site_data.py scripts/check_site_data.py
+          python3 -m py_compile scripts/validate_data.py scripts/build_site_data.py scripts/check_site_data.py scripts/check_browser_contract.py
           python3 scripts/validate_data.py
-          node --check assets/js/load-data.js
-          node --check assets/js/app.js
+          python3 scripts/check_browser_contract.py
+          for file in assets/js/modules/*.js assets/js/load-data.js assets/js/app.js; do
+            node --check "$file"
+          done
 
       - name: 複製要發布的檔案
         run: |
@@ -39,6 +41,12 @@ jobs:
           cp data/pattern-meta.json _site/data/
           python3 scripts/build_site_data.py --source data/cases.json --output _site/data
           python3 scripts/check_site_data.py _site/data
+
+      - name: 瀏覽器冒煙測試
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+          node tests/browser-smoke.mjs
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
