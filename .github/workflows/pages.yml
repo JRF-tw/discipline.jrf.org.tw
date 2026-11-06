@@ -17,7 +17,9 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    # Playwright 1.55 尚未支援 ubuntu-latest 目前解析到的 Ubuntu 26.04。
+    # 固定 runner，避免 GitHub 更新 latest 後讓瀏覽器測試突然失效。
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -45,7 +47,7 @@ jobs:
       - name: 瀏覽器冒煙測試
         run: |
           npm install --no-save playwright@1.55.0
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
           node tests/browser-smoke.mjs
 
       - uses: actions/configure-pages@v5
