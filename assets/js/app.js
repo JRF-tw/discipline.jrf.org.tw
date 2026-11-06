@@ -115,6 +115,17 @@ function esc(s){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
   });
 }
+/* 外部資料進入 href 前除了 HTML escaping，也必須限制協定，避免誤植成
+   javascript: 或 data: URL。回傳值已完成 HTML escaping，只能放進屬性值。 */
+function safeHref(value, allowMail){
+  var raw = String(value == null ? '' : value).trim();
+  if(!raw) return '';
+  try{
+    var u = new URL(raw, location.href);
+    var ok = u.protocol === 'https:' || u.protocol === 'http:' || (allowMail && u.protocol === 'mailto:');
+    return ok ? esc(raw) : '';
+  }catch(e){ return ''; }
+}
 
 /* [JS-CORE] 共用基礎設施 */
 /* ======================================================================
@@ -1938,7 +1949,7 @@ var CRIMINAL_CASE_ALLOWED = (function(){
   DATA.cases.forEach(function(c){ if(isIntentionalCriminalCase(c)) m[c.caseNo] = true; });
   return m;
 })();
-var FT = (function(){
+function buildFulltext(){
   var main = {}, rev = {}, n = 0;
   try{
     DATA.cases.forEach(function(c){
@@ -1954,7 +1965,36 @@ var FT = (function(){
     });
   }catch(e){ return null; }
   return n ? {main:main, rev:rev} : null;
-})();
+}
+var FT = buildFulltext();
+var FULLTEXT_PROMISE = null;
+function ensureFulltext(){
+  if(FT) return Promise.resolve(FT);
+  if(FULLTEXT_PROMISE) return FULLTEXT_PROMISE;
+  if(typeof window.__loadDisciplineFulltext !== 'function') return Promise.resolve(null);
+  FULLTEXT_PROMISE = window.__loadDisciplineFulltext().then(function(payload){
+    if(!payload || payload.schemaVersion !== DB_SCHEMA_VERSION) throw new Error('全文資料格式版本不相容');
+    var main = payload.main || {}, rev = payload.rev || {};
+    DATA.cases.forEach(function(c){
+      if(!c.ft && c.caseNo && main[c.caseNo]) c.ft = main[c.caseNo];
+      if(!c.ftRev && c.revNo && rev[c.revNo]) c.ftRev = rev[c.revNo];
+    });
+    FT = buildFulltext();
+    FT_PLAIN = null;
+    initFulltextDialog();
+    safeRun('全文索引完成', function(){
+      renderList();
+      if(typeof pst !== 'undefined' && pst.expanded) renderPatternList();
+      if(typeof applyRoute === 'function' && DBROUTE.route().full) applyRoute(false);
+    });
+    return FT;
+  }).catch(function(err){
+    FULLTEXT_PROMISE = null;
+    if(window.console && console.error) console.error('[律師懲戒案件資料庫] 全文載入失敗：', err);
+    throw err;
+  });
+  return FULLTEXT_PROMISE;
+}
 /* 案件之第 i 列在該 slot 對應的鍵（原決議＝案號、覆審＝覆審案號） */
 function ftKey(slot, i){
   var c = DATA.cases[i];
@@ -1995,7 +2035,9 @@ function ftHydrate(doc, no, link, page){
   var site = FT_SITE[ftHost(link)];
   if(site){
     var label = site.name + (site.paper && page ? '第' + page + '頁' : '');
-    head += '<a class="srcbtn" href="' + esc(link) + '" target="_blank" rel="noopener">'
+    var href = safeHref(link);
+    if(!href) return t;
+    head += '<a class="srcbtn" href="' + href + '" target="_blank" rel="noopener">'
           + '檢索原文（' + esc(label) + '）</a>';
   }
   /* 來源按鈕排在人名之後（CSS 以 margin-left:auto 靠右），故整段接在 <h2> 之後即可 */
@@ -2051,7 +2093,9 @@ function ftCriminalRow(items){
   var content = items.map(function(j){
     var title = String(j.title || '').replace(/\s+/g, '');
     if(!j.url) return esc(title) + '（無連結）';
-    return '<a href="' + esc(j.url) + '" target="_blank" rel="noopener">' + esc(title) + '</a>'
+    var href = safeHref(j.url);
+    if(!href) return esc(title) + '（無效連結）';
+    return '<a href="' + href + '" target="_blank" rel="noopener">' + esc(title) + '</a>'
       + '（' + esc(ftCriminalDate(j.date)) + '，案由：' + esc(j.cause) + '）';
   }).join('、');
   return '<dt>刑事確定判決</dt><dd class="wide">' + content + '</dd>';
@@ -4111,6 +4155,12 @@ function toggleGroup(kind){
 function applySearch(){
   st.q = el('flt-q').value.trim();
   st.page = 1; renderList();
+  if(st.q && !FT){
+    el('list-count').textContent = '正在載入全文索引…';
+    ensureFulltext().then(function(){ routePush(); if(FT_HILITE) FT_HILITE(); })
+      .catch(function(){ el('list-count').textContent = '全文載入失敗，請重新整理後再試。'; });
+    return;
+  }
   routePush();
   if(FT_HILITE) FT_HILITE();          /* 重新檢索：同步彈窗內的反白 */
 }
@@ -6034,8 +6084,8 @@ function gotoLawArticle(key, artNo){
    改連結只需改 LAW_OTHERS 一處。 */
 function otherSrcLink(o){
   var m = /href="([^"]+)"/.exec(o.src || '');
-  /* m[1] 取自原始 HTML，已為跳脫後之字串，勿再 esc 以免二次跳脫 */
-  return m ? '<a class="db-m-jump" href="' + m[1] + '" target="_blank" rel="noopener">閱讀全文 ↗</a>' : '';
+  var href = m ? safeHref(m[1].replace(/&amp;/g, '&')) : '';
+  return href ? '<a class="db-m-jump" href="' + href + '" target="_blank" rel="noopener">閱讀全文 ↗</a>' : '';
 }
 function openOther(k, anchor){
   var o = otherByKey(k), pop = el('law-pop');
@@ -6616,7 +6666,7 @@ function renderBarCard(key){
   if(!d){ el('bar-info').innerHTML = '<div class="db-bar-empty">請點選左側地圖上的律師公會，以檢視聯繫資訊。</div>'; return; }
   var rows = [];
   rows.push('<div class="db-bar-row"><span class="db-k">網站</span><span class="db-v">'+
-    (d.url ? '<a href="'+d.url+'" target="_blank" rel="noopener">'+esc(d.url)+'</a>' : '（無網站）')+'</span></div>');
+    (safeHref(d.url) ? '<a href="'+safeHref(d.url)+'" target="_blank" rel="noopener">'+esc(d.url)+'</a>' : '（無網站）')+'</span></div>');
   /* 聯繫方式（目前僅法律扶助基金會使用；內容為預先寫好之 HTML，含分會連結） */
   if(d.contact){
     rows.push('<div class="db-bar-row"><span class="db-k">聯繫方式</span><span class="db-v">'+d.contact+'</span></div>');
@@ -6666,7 +6716,12 @@ function gotoCaseSearch(q){
     o.panel.hidden = !cur;
   });
   renderList();
-  routePush();
+  if(q && !FT){
+    el('list-count').textContent = '正在載入全文索引…';
+    ensureFulltext().then(function(){ routePush(); }).catch(function(){
+      el('list-count').textContent = '全文載入失敗，請重新整理後再試。';
+    });
+  }else routePush();
   /* 與頁籤點擊一致：回到獨立網站頂端。 */
   window.scrollTo(0, 0);
 }
@@ -7231,6 +7286,17 @@ var ROUTE_TITLES = {
   complaint:'申訴救濟管道｜律懲資料庫',
   ethichist:'懲戒法規｜律懲資料庫'
 };
+var ROUTE_DESCRIPTIONS = {
+  home:'民間司法改革基金會彙整歷年律師懲戒案件，提供案件檢索、違失態樣、懲戒法規、統計分析與申訴救濟資訊。',
+  list:'查詢臺灣律師懲戒案件，可依姓名、案號、日期、法條、違失態樣與決議書全文檢索。',
+  pattern:'依違失行為分類瀏覽臺灣律師懲戒案例，查看分類說明、相關法規與實際案件。',
+  laws:'檢視臺灣律師懲戒相關法規、歷年新舊條文對照與引用案件。',
+  stats:'查看臺灣律師懲戒案件的年度件數、懲戒種類與專題分析。',
+  about:'臺灣律師懲戒案件資料庫的資料來源、整理方法、欄位說明與授權資訊。',
+  reform:'民間司法改革基金會對律師懲戒制度的改革主張。',
+  complaint:'說明律師懲戒申訴、救濟流程、應備資料與各地律師公會聯繫方式。',
+  ethichist:'檢視舊版律師倫理規範的條文沿革與歷史版本。'
+};
 
 function currentTabKey(){
   for(var i = 0; i < tabs.length; i++){
@@ -7246,10 +7312,20 @@ function syncRouteMeta(){
   var tab = currentTabKey(), path = routeString().split('?')[0];
   var absolute = location.origin + path;
   document.title = ROUTE_TITLES[tab] || ROUTE_TITLES.home;
+  var description = document.querySelector('meta[name="description"]');
+  if(description) description.content = ROUTE_DESCRIPTIONS[tab] || ROUTE_DESCRIPTIONS.home;
   var canonical = document.querySelector('link[rel="canonical"]');
   if(canonical) canonical.href = absolute;
   var ogUrl = document.querySelector('meta[property="og:url"]');
   if(ogUrl) ogUrl.content = absolute;
+  var ogTitle = document.querySelector('meta[property="og:title"]');
+  if(ogTitle) ogTitle.content = document.title;
+  var ogDescription = document.querySelector('meta[property="og:description"]');
+  if(ogDescription) ogDescription.content = description ? description.content : ROUTE_DESCRIPTIONS.home;
+  var twitterTitle = document.querySelector('meta[name="twitter:title"]');
+  if(twitterTitle) twitterTitle.content = document.title;
+  var twitterDescription = document.querySelector('meta[name="twitter:description"]');
+  if(twitterDescription) twitterDescription.content = description ? description.content : ROUTE_DESCRIPTIONS.home;
 }
 
 /* ---------- 狀態 → 網址 ---------- */
@@ -7572,6 +7648,12 @@ function initPathRouting(){
   }
   window.addEventListener('popstate', onNav);
   applyRoute(true);
+  var initialRoute = DBROUTE.route();
+  if(initialRoute && initialRoute.full && !FT){
+    ensureFulltext().catch(function(){
+      if(window.console && console.error) console.error('[律師懲戒案件資料庫] 無法載入網址指定的全文');
+    });
+  }
   /* 正規化尾斜線、query 參數順序，並將舊 hash 網址轉成新路徑。 */
   ROUTE_APPLYING = false;
   routeReplace();
@@ -7794,6 +7876,12 @@ function initFulltextDialog(){
      第 1 點以 preventScroll 處理，第 2、3 點須在當下與下一個繪製週期各校正一次。 */
 
   function open(slot, i, hitNo){
+    if(!FT){
+      ensureFulltext().then(function(){ open(slot, i, hitNo); }).catch(function(){
+        if(window.console && console.error) console.error('[律師懲戒案件資料庫] 無法開啟全文');
+      });
+      return;
+    }
     var doc = ftDoc(slot, i), c = DATA.cases[i];
     if(!doc || !c) return;
     if(!dlg.open) lastFocus = document.activeElement;   /* 彈窗內跳轉時不覆寫原焦點 */

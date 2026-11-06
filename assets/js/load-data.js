@@ -4,7 +4,7 @@
   var FILES = [
     ['db-content-meta', 'data/content-meta.json'],
     ['db-pattern-meta', 'data/pattern-meta.json'],
-    ['db',              'data/cases.json']
+    ['db',              'data/cases-index.json']
   ];
 
   function fail(err){
@@ -19,12 +19,20 @@
     wrap.insertBefore(p, wrap.firstChild);
   }
 
-  Promise.all(FILES.map(function(f){
-    return fetch(f[1]).then(function(res){
-      if(!res.ok) throw new Error(f[1] + ' HTTP ' + res.status);
+  function fetchText(path){
+    return fetch(path).then(function(res){
+      if(!res.ok) throw new Error(path + ' HTTP ' + res.status);
       return res.text();
     });
-  })).then(function(texts){
+  }
+
+  /* 本機直接預覽舊工作目錄時仍可使用原始 cases.json；正式部署由 workflow
+     產生較小的 cases-index.json 與按需載入的 cases-fulltext.json。 */
+  var dataFetch = fetchText(FILES[2][1]).catch(function(err){
+    if(err && /cases-index\.json/.test(String(err.message || err))) return fetchText('data/cases.json');
+    throw err;
+  });
+  Promise.all([fetchText(FILES[0][1]), fetchText(FILES[1][1]), dataFetch]).then(function(texts){
     texts.forEach(function(text, i){
       var node = document.createElement('script');
       node.type = 'application/json';
@@ -37,4 +45,12 @@
     app.onerror = function(){ fail(new Error('assets/js/app.js 載入失敗')); };
     document.body.appendChild(app);
   }).catch(fail);
+
+  window.__loadDisciplineFulltext = function(){
+    if(window.__disciplineFulltextPromise) return window.__disciplineFulltextPromise;
+    window.__disciplineFulltextPromise = fetchText('data/cases-fulltext.json').then(function(text){
+      return JSON.parse(text);
+    });
+    return window.__disciplineFulltextPromise;
+  };
 })();

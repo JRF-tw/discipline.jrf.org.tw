@@ -5,7 +5,7 @@
 - 網址：<https://discipline.jrf.org.tw/>
 - 聯絡：contact@jrf.org.tw
 
-本站是純靜態網站，沒有後端與資料庫伺服器，也沒有建置流程。案件檢索、篩選、統計圖表都由瀏覽器端的 JavaScript 讀取 `data/` 內的 JSON 後即時運算，以 GitHub Pages 部署。
+本站是純靜態網站，沒有後端與資料庫伺服器。案件檢索、篩選、統計圖表都由瀏覽器端的 JavaScript 即時運算，以 GitHub Pages 部署。部署流程會先執行 `scripts/validate_data.py`，再由 `scripts/build_site_data.py` 將案件索引與決議書全文拆成兩份公開資料；首頁只載入索引，使用者搜尋全文或開啟決議書時才載入全文資料。
 
 ## 目錄結構
 
@@ -17,6 +17,10 @@
 ├── robots.txt
 ├── sitemap.xml
 ├── .github/workflows/pages.yml  推上 main 後自動發布網站
+├── scripts/
+│   ├── validate_data.py         部署前的資料關聯與格式檢查
+│   ├── build_site_data.py       產生瀏覽器使用的索引、全文與統計資料
+│   └── check_site_data.py       檢查產生後的網站資料是否完整
 ├── assets/
 │   ├── css/main.css       全站樣式
 │   ├── img/
@@ -26,7 +30,7 @@
 │       ├── load-data.js   先下載 data/ 三份 JSON，再載入主程式
 │       └── app.js         主程式：資料整理、各頁籤畫面、檢索、統計、網址路由
 └── data/
-    ├── cases.json         主資料：懲戒案件（含決議書全文）、違失態樣、法規條文
+    ├── cases.json         維護用主資料：懲戒案件（含決議書全文）、違失態樣、法規條文
     ├── pattern-meta.json  違失態樣的分類與說明
     └── content-meta.json  倫理規範沿革、統計數字、各地律師公會申訴方式等內容資料
 ```
@@ -44,10 +48,10 @@ python3 -m http.server 8000
 
 ## 部署（GitHub Pages）
 
-推上 `main` 後，GitHub Actions（`.github/workflows/pages.yml`）會自動發布，約 1 分鐘生效。
+推上 `main` 後，GitHub Actions（`.github/workflows/pages.yml`）會先驗證資料與 JavaScript 語法，再產生網站所需的拆分資料並自動發布，約 1 分鐘生效。
 
-- **只發布白名單內的檔案**：`index.html`、`404.html`、`favicon.svg`、`robots.txt`、`sitemap.xml`、`assets/`、`data/`。README、`.github/` 等其他檔案不會出現在網站上。新增要上線的檔案時，要放進上述目錄，或把檔名加進 workflow 的複製清單。
-- 發布前會先檢查 `data/*.json` 格式，格式錯誤就不會發布。
+- **只發布網站需要的檔案**：`index.html`、`404.html`、`favicon.svg`、`robots.txt`、`sitemap.xml`、`assets/`，以及由 workflow 產生的 `data/cases-index.json`、`data/cases-fulltext.json`、`data/content-meta.json`、`data/pattern-meta.json`。維護用的 `cases.json` 不會直接公開。
+- 發布前會檢查 JSON 格式、資料關聯、日期、法條鍵值、全文索引與 JavaScript 語法；檢查失敗就不會發布。
 - Repo 設定：Settings → Pages → Source 為 `GitHub Actions`，Custom domain 為 `discipline.jrf.org.tw`。
 - DNS：`discipline.jrf.org.tw` 以 CNAME 指向 `jrf-tw.github.io`，目前經 Cloudflare 代理。
 
@@ -56,7 +60,7 @@ python3 -m http.server 8000
 - **新增或修正案件**：編輯 `data/cases.json`。
 - **違失態樣分類與說明**：編輯 `data/pattern-meta.json`。
 - **資料庫更新日期**：在 `assets/js/app.js` 搜尋 `資料庫更新日期`，手動修改。首頁的「資料更新於」會自動沿用這個日期。
-- 更新資料後，把 `sitemap.xml` 的 `<lastmod>` 改成當天日期。
+- 更新資料後，把 `sitemap.xml` 的 `<lastmod>` 改成當天日期。若新增一級路由，也要同步更新 `404.html` 與 sitemap。
 - 改完先依「本機預覽」開起來確認，再 commit、push。
 
 ### 編輯 JSON 的注意事項
