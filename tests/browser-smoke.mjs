@@ -33,6 +33,7 @@ try {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error));
   await page.goto(`http://127.0.0.1:${port}/`, { waitUntil: 'networkidle' });
+  await page.locator('#tabbtn-list').click();
   await page.locator('#list-table table').waitFor();
   assert.ok((await page.locator('#list-table tbody tr').count()) > 0, '案件列表沒有資料');
 
