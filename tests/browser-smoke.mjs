@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
+import { get } from 'node:http';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
@@ -11,16 +12,17 @@ const server = spawn('python3', ['-m', 'http.server', String(port), '--directory
 try {
   await new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('測試網站啟動逾時')), 10000);
-    const check = async () => {
-      try {
-        const response = await fetch(`http://127.0.0.1:${port}/`);
-        if (response.ok) {
+    const check = () => {
+      const request = get(`http://127.0.0.1:${port}/`, (response) => {
+        response.resume();
+        if (response.statusCode && response.statusCode < 400) {
           clearTimeout(timer);
           resolve();
           return;
         }
-      } catch {}
-      setTimeout(check, 100);
+        setTimeout(check, 100);
+      });
+      request.on('error', () => setTimeout(check, 100));
     };
     server.once('error', reject);
     check();
