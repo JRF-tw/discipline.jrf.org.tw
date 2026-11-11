@@ -69,7 +69,8 @@ try {
   const publicPatternIds = await page.locator('#pub-entry .db-pub-pat').evaluateAll(
     (buttons) => [...new Set(buttons.map((button) => button.dataset.patternId))].sort());
   await page.locator('#tabbtn-pattern').click();
-  assert.ok((await page.locator('#tab-pattern .db-hint').first().innerText()).includes('實務上民眾可能較常見的類型'));
+  const patternHint = page.locator('#tab-pattern .db-hint').filter({has:page.locator('.db-pat-common-key')});
+  assert.match(await patternHint.innerText(), /實務上民眾可能較常見.*類型/, '淡黃色標示應說明常見態樣的意義');
   async function checkPatternHighlights(){
     const cards = await page.locator('#pattern-list .db-pattern-item').evaluateAll((buttons) => buttons.map((button) => ({
       name:button.firstElementChild.textContent, common:button.classList.contains('db-pat-common'),
