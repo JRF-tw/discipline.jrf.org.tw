@@ -783,6 +783,8 @@ tr:has(.db-lk8:is(:hover,:focus-visible)) :is(td.db-t-norm,td.db-t-pat) .db-tag:
 }
 .db-pat-group-h .db-gtodo{flex:none;font-size:13px;color:#A24A4A;font-variant-numeric:tabular-nums}
 /* ===== [暫時] 以上為撰寫進度標示，全部寫完後刪除 ===================== */
+.db-pattern-item.db-pat-common{background:#FFF8DC;border-color:#DCC989}
+.db-pat-common-key{background:#FFF8DC;color:var(--ink);border:1px solid #DCC989;border-radius:4px;padding:1px 5px}
 .db-pattern-item:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 20px rgba(27,50,85,.12)}
 .db-pattern-item.db-cur{border-color:var(--accent);background:var(--accent);color:#fff;box-shadow:0 8px 22px rgba(27,50,85,.26)}
 .db-pattern-item.db-cur .db-cnt{background:#fff;color:var(--accent-deep)}
@@ -791,6 +793,56 @@ tr:has(.db-lk8:is(:hover,:focus-visible)) :is(td.db-t-norm,td.db-t-pat) .db-tag:
   background:var(--bg-soft);border-radius:99px;padding:2px 10px;color:var(--ink-soft);transition:background .22s,color .22s
 }
 .db-pattern-item:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+/* 總覽頁的子類標示；內頁卡片保留既有樣式。 */
+.db-pattern-overview a.db-pattern-item{color:var(--ink);text-decoration:none}
+.db-pattern-overview a.db-pattern-item.db-todo{color:#9C3B3B}
+.db-pattern-overview .db-pattern-item{
+  --pattern-color:#1F3A5C;
+  --pattern-color-text:var(--pattern-color);
+  --pattern-color-on:#FFFFFF
+}
+/* 淡黃底的常見態樣：標籤、件數與疊層沿用同一組深黃色。 */
+.db-pattern-overview .db-pattern-item.db-pat-common{
+  --pattern-color:#8A5700;
+  --pattern-color-text:#754900
+}
+.db-pattern-overview .db-pat-common:not(.db-zero) .db-cnt{background:#F4E3AD;color:#754900}
+.db-pattern-overview .db-pattern-item:focus-visible{outline:3px solid #B8892F;outline-offset:2px}
+.db-pattern-overview .db-pattern-item.db-zero,
+.db-pattern-overview .db-pattern-item.db-zero .db-cnt{color:#6B7079}
+.db-pattern-item.db-pattern-item--has-sub{
+  min-height:56px;margin:0 4px 4px 0;
+  border-color:color-mix(in srgb,var(--pattern-color) 50%,#FFFFFF);
+  box-shadow:4px 4px 0 -1px color-mix(in srgb,var(--pattern-color) 8%,#FFFFFF),
+    4px 4px 0 0 color-mix(in srgb,var(--pattern-color) 32%,#FFFFFF)
+}
+.db-pattern-item--has-sub .db-pattern-item__name{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:500}
+.db-pattern-item__sub{
+  flex:none;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;
+  border-radius:4px;font-size:13px;font-weight:500;line-height:1.4;white-space:nowrap;
+  background:color-mix(in srgb,var(--pattern-color) 12%,#FFFFFF);color:var(--pattern-color-text)
+}
+.db-pattern-item--has-sub .db-cnt{white-space:nowrap}
+.db-pattern-item.db-pattern-item--has-sub:hover{
+  border-color:var(--pattern-color);background:color-mix(in srgb,var(--pattern-color) 3%,#FFFFFF);
+  box-shadow:4px 4px 0 -1px color-mix(in srgb,var(--pattern-color) 14%,#FFFFFF),4px 4px 0 0 var(--pattern-color)
+}
+.db-pattern-item--has-sub:hover .db-pattern-item__name{color:var(--pattern-color-text)}
+.db-pattern-item--has-sub:hover .db-pattern-item__sub{background:var(--pattern-color);color:var(--pattern-color-on)}
+@supports not (color:color-mix(in srgb,red 50%,white)){
+  .db-pattern-item.db-pattern-item--has-sub{border-color:#8FA0B6;box-shadow:4px 4px 0 -1px #EEF2F7,4px 4px 0 0 #B9C3D0}
+  .db-pattern-item__sub{background:#E6ECF4}
+  .db-pattern-item.db-pattern-item--has-sub:hover{
+    border-color:var(--pattern-color);background:#F8F9FA;
+    box-shadow:4px 4px 0 -1px #E0E3E8,4px 4px 0 0 var(--pattern-color)
+  }
+  .db-pattern-item--has-sub.db-pat-common{border-color:#C5AB80;box-shadow:4px 4px 0 -1px #F6F2EB,4px 4px 0 0 #DACAAD}
+  .db-pat-common .db-pattern-item__sub{background:#F1EBE0}
+  .db-pattern-item.db-pattern-item--has-sub.db-pat-common:hover{
+    border-color:var(--pattern-color);background:#FBFAF7;
+    box-shadow:4px 4px 0 -1px #EFE7DB,4px 4px 0 0 var(--pattern-color)
+  }
+}
 .db-pl-toggle{display:flex;justify-content:center;margin-bottom:6px}
 .db-pl-toggle button{
   font:inherit;font-size:14.5px;color:var(--accent);background:var(--bg-soft);
@@ -2211,6 +2263,7 @@ button.db-full-tag.db-ft-open:hover{background:var(--accent,#8f2b34);transform:t
 /* ---- 前導資訊區（案號／被付懲戒人／決議日期／原決議或覆審） ---- */
 #ft-body .meta{display:grid;grid-template-columns:8.7em minmax(0,1fr);gap:5px 10px;align-items:baseline;font-size:16px;color:#333;background:#f4f6f9;border:1px solid #e3e8ef;border-radius:6px;padding:12px 15px;margin:0 0 14px}
 #ft-body .meta .hide{display:none}
+#ft-body:not([data-criminal-revealed]) .meta [data-criminal-judgment]{display:none}
 #ft-body .meta dt{color:#1d3b6e;font-weight:700;white-space:nowrap;letter-spacing:.02em;font-size:16px;line-height:1.9}
 #ft-body .meta dd{margin:0;min-width:0;overflow-wrap:anywhere;font-size:16px;line-height:1.9;font-weight:400}
 #ft-body .meta .empty{color:#b0b0b0}
@@ -2772,6 +2825,14 @@ button.db-full-tag.db-ft-open:hover{background:var(--accent,#8f2b34);transform:t
 .db-cp-no{border-top:3px solid var(--accent-line)}
 .db-cp-no .db-cp-card-h{color:var(--ink-soft)}
 .db-cp-dot{width:9px;height:9px;border-radius:2px;flex:0 0 auto;display:block}
+
+/* 完整案例改用段落閱讀，與下方提醒維持相同寬度。 */
+.db-cp-explanation,.db-cp-explanation + .db-cp-note{max-width:var(--cp-maxw)}
+.db-cp-explanation p{font-size:15px;line-height:1.9}
+.db-cp-explanation .db-cp-explanation-lead{font-size:16px;margin-bottom:18px}
+.db-cp-example{background:var(--bg-soft);border-left:3px solid var(--accent-line);border-radius:0 6px 6px 0;padding:16px 18px;margin:0 0 18px}
+.db-cp-example .db-cp-example-label{font-size:14px;font-weight:700;color:var(--accent-deep);margin-bottom:8px}
+.db-cp-example p:last-child,.db-cp-explanation .db-cp-explanation-caution{margin-bottom:0}
 
 /* ── 對照表（分流表、該找誰）───────────────────────────── */
 /* 本檔有一條通用規則 table{width:100%;min-width:1566px;table-layout:fixed}（為案件清單的

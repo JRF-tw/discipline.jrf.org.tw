@@ -2006,7 +2006,7 @@ function ftCriminalRow(items){
     return '<a href="' + href + '" target="_blank" rel="noopener">' + esc(title) + '</a>'
       + '（' + esc(ftCriminalDate(j.date)) + '，案由：' + esc(j.cause) + '）';
   }).join('、');
-  return '<dt>刑事確定判決</dt><dd class="wide">' + content + '</dd>';
+  return '<dt data-criminal-judgment>刑事確定判決</dt><dd class="wide" data-criminal-judgment>' + content + '</dd>';
 }
 function ftMeta(e){
   var r = [];
@@ -4443,13 +4443,29 @@ function patDescTodo(id){
   var pm = patMeta(id);
   return !(pm && pm.desc);
 }
+/* 與內頁共用已登錄的子類列；跨分類軸計數，不含僅標題的 tailGroups。 */
+function patSubcategoryCount(pid){
+  return Object.keys(SUBCAT_ROWS).filter(function(id){
+    return SUBCAT_ROWS[id].patternId === pid;
+  }).length;
+}
 /* 單張態樣卡片。尚無案件者加上 zero 類別，於樣式上與有案件之樣態區別。 */
 function patItemHtml(i){
-  var p = DATA.patterns[i];
-  return '<button type="button" class="db-pattern-item'+(p.cases.length?'':' db-zero')+
+  var p = DATA.patterns[i], overview = pst.idx < 0;
+  var subcategory_count = overview ? patSubcategoryCount(p.id) : 0;
+  var tag = overview ? 'a' : 'button';
+  return '<'+tag+(overview ? ' href="/pattern/'+esc(p.id)+'"' : ' type="button"')+
+    ' class="db-pattern-item'+(p.cases.length?'':' db-zero')+
     (patDescTodo(p.id)?' db-todo':'')+   /* [暫時] 說明待填寫者標紅 */
-    (i===pst.idx?' db-cur':'')+'" data-i="'+i+'" data-n="'+p.cases.length+'">'+
-    '<span>'+esc(p.name)+'</span><span class="db-cnt">'+p.cases.length+' 件</span></button>';
+    (PUBLIC_ENTRY_PATTERN_IDS[p.id]?' db-pat-common':'')+
+    (subcategory_count ? ' db-pattern-item--has-sub' : '')+
+    (i===pst.idx?' db-cur':'')+'" data-i="'+i+'" data-n="'+p.cases.length+'"'+
+    (PUBLIC_ENTRY_PATTERN_IDS[p.id] && !subcategory_count?' aria-label="'+esc(p.name)+'（實務上民眾可能較常見的類型），'+p.cases.length+' 件"':'')+'>'+
+    '<span'+(subcategory_count ? ' class="db-pattern-item__name"' : '')+'>'+esc(p.name)+'</span>'+
+    (subcategory_count ? '<span class="db-pattern-item__sub">'+
+      '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+
+      '<polygon points="12 4 4 8 12 12 20 8 12 4"></polygon><polyline points="4 12 12 16 20 12"></polyline><polyline points="4 16 12 20 20 16"></polyline></svg>'+subcategory_count+' 子類</span>' : '')+
+    '<span class="db-cnt">'+p.cases.length+' 件</span></'+tag+'>';
 }
 
 function renderPatternList(){
@@ -4458,6 +4474,10 @@ function renderPatternList(){
     box.addEventListener('click', function(e){
       var b = e.target.closest ? e.target.closest('.db-pattern-item') : null;
       if(!b || !box.contains(b)) return;
+      if(b.tagName === 'A'){
+        if(e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
+        e.preventDefault();
+      }
       pst.idx = parseInt(b.getAttribute('data-i'),10);
       pst.page = 1;
       pst.sort = 'h'; pst.asc = true;
@@ -4505,6 +4525,7 @@ function renderPatternList(){
     if(pst.idx >= PL_COLLAPSED_N) visible.push(pst.idx); /* 收起時仍顯示已選態樣 */
     h.push(visible.map(patItemHtml).join(''));
   }
+  if(pst.idx < 0) box.className += ' db-pattern-overview';
   box.innerHTML = h.join('');
   /* [暫時：撰寫進度標示] 全部寫完後刪除本段與 #pat-todo-note 元素 */
   var note = el('pat-todo-note');
@@ -7055,6 +7076,12 @@ var PUBLIC_ENTRY = [
     d:'律師故意犯罪，無論與辦案有無關聯，應受懲戒或暫時停職。',
     pats:[{p:'P002'},{p:'P053'}] }
 ];
+
+/* 態樣頁的淡黃色標示與民眾入口共用對應關係，避免另存清單後失步。 */
+var PUBLIC_ENTRY_PATTERN_IDS = {};
+PUBLIC_ENTRY.forEach(function(entry){
+  (entry.pats || []).forEach(function(pattern){ PUBLIC_ENTRY_PATTERN_IDS[pattern.p] = true; });
+});
 
 /* 民眾入口的態樣連結。刻意不沿用 patTagHtml：該函式產生的是全庫統一的紫色
    態樣標籤，本區則另有配色與等大版面的需求（見 .db-pub-pat 之註解），
