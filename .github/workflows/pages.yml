@@ -39,6 +39,7 @@ jobs:
         run: |
           mkdir _site
           cp -r index.html 404.html favicon.svg robots.txt sitemap.xml assets _site/
+          cp "司改會Logo 1（透明背景）.png" _site/
           mkdir -p _site/data
           cp data/pattern-meta.json _site/data/
           python3 scripts/build_site_data.py --source data/cases.json --output _site/data
